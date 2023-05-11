@@ -19,4 +19,11 @@ public class PerformersController : ControllerBase
     {
         return Ok();
     }
+
+    [HttpGet]
+    [Route("role/{value}")]
+    public IActionResult GetPerformersRole(string value, int? page, int? size)
+    {
+        return Ok();
+    }
 }
