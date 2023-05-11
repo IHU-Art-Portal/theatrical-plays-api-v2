@@ -9,13 +9,16 @@ namespace Theatrical.Api.Controllers;
 public class PerformersController : ControllerBase
 {
 
-    public static List<PerformerDto> AllPerformers = new();
+    private static List<PerformerDto> AllPerformers = new();
     
     [HttpGet]
     [Route("{id:int}")]
-    public IActionResult GetPerformer(int id)
+    public async Task<ActionResult<TheatricalResponse<PerformerDto>>> GetPerformer(int id)
     {
-        return Ok();
+        var performer = AllPerformers.FirstOrDefault(p => p.Id == id);
+        TheatricalResponse response = new TheatricalResponse<PerformerDto>(performer);
+        
+        return new ObjectResult(response);
     }
 
     [HttpGet]
@@ -27,14 +30,8 @@ public class PerformersController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
+    public ActionResult CreatePerformer([FromBody] PerformerDto performerDto)
     {
-        PerformerDto performerDto = new PerformerDto
-        {
-            FullName = createPerformerDto.FullName,
-            Image = createPerformerDto.Image
-        };
-        
         AllPerformers.Add(performerDto);
         return Ok();
     }
