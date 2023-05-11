@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Theatrical.Dto.PerformerDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
 
 namespace Theatrical.Api.Controllers;
 
@@ -7,6 +9,8 @@ namespace Theatrical.Api.Controllers;
 public class PerformersController : ControllerBase
 {
 
+    public static List<PerformerDto> AllPerformers = new();
+    
     [HttpGet]
     [Route("{id:int}")]
     public IActionResult GetPerformer(int id)
@@ -15,8 +19,23 @@ public class PerformersController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetPerformers(int? page, int? size)
+    public async Task<ActionResult<TheatricalResponse<List<PerformerDto>>>> GetPerformers(int? page, int? size)
     {
+        TheatricalResponse response = new TheatricalResponse<List<PerformerDto>>(AllPerformers);
+        
+        return new ObjectResult(response);
+    }
+
+    [HttpPost]
+    public ActionResult CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
+    {
+        PerformerDto performerDto = new PerformerDto
+        {
+            FullName = createPerformerDto.FullName,
+            Image = createPerformerDto.Image
+        };
+        
+        AllPerformers.Add(performerDto);
         return Ok();
     }
 
