@@ -4,6 +4,7 @@ using Serilog;
 using Theatrical.Data.Context;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Repositories;
+using Theatrical.Services.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
 //services registering
 builder.Services.AddTransient<IPerformerRepository, PerformerRepository>();
 builder.Services.AddTransient<IPerformerService, PerformerService>();
+builder.Services.AddTransient<IPerformerValidationService, PerformerValidationService>();
 
 //Serilog Console log
 var logger = new LoggerConfiguration()

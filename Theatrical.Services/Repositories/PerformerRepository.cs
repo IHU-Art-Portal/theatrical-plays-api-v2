@@ -8,6 +8,8 @@ public interface IPerformerRepository
 {
     Task Create(Performer performer);
     Task<List<Performer>> Get();
+    Task Delete(Performer performer);
+    Task<Performer> Get(int id);
 }
 
 public class PerformerRepository : IPerformerRepository
@@ -30,5 +32,18 @@ public class PerformerRepository : IPerformerRepository
         var performers = await _context.Performers.ToListAsync();
 
         return performers;
+    }
+    
+    public async Task<Performer> Get(int id)
+    {
+        var performer = await _context.Performers.FindAsync(id);
+
+        return performer;
+    }
+
+    public async Task Delete(Performer performer)
+    {
+        _context.Performers.Remove(performer);
+        await _context.SaveChangesAsync();
     }
 }

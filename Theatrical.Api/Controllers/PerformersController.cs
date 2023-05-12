@@ -2,6 +2,7 @@
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
+using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
@@ -13,10 +14,12 @@ namespace Theatrical.Api.Controllers;
 public class PerformersController : ControllerBase
 {
     private readonly IPerformerService _service;
+    private readonly IPerformerValidationService _validation;
 
-    public PerformersController(IPerformerService service)
+    public PerformersController(IPerformerService service, IPerformerValidationService validation)
     {
         _service = service;
+        _validation = validation;
     }
 
     /// <summary>
@@ -28,7 +31,19 @@ public class PerformersController : ControllerBase
     [Route("{id:int}")]
     public async Task<ActionResult<TheatricalResponse<PerformerDto>>> GetPerformer(int id)
     {
-        return Ok();
+        var (validation, performer) = await _validation.ValidateAndFetch(id);
+
+        if (!validation.Success)
+        {
+            TheatricalResponse errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+        
+        var performerDto = await _service.Get(id);
+
+        TheatricalResponse response = new TheatricalResponse<PerformerDto>(performerDto);
+        
+        return new ObjectResult(response);
     }
 
     /// <summary>
@@ -40,8 +55,8 @@ public class PerformersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<TheatricalResponse<PerformersPaginationDto>>> GetPerformers(int? page, int? size)
     {
-        //_service pagination logic. here//
-        PerformersPaginationDto performersDto = await _service.Get();
+
+        PerformersPaginationDto performersDto = await _service.Get(page, size);
         
         TheatricalResponse response = new TheatricalResponse<PerformersPaginationDto>(performersDto);
         
@@ -55,10 +70,27 @@ public class PerformersController : ControllerBase
         return Ok();
     }
 
-    [HttpGet]
+    /*[HttpGet]
     [Route("role/{value}")]
     public IActionResult GetPerformersRole(string value, int? page, int? size)
     {
         return Ok();
+    }*/
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id)
+    {
+        var (validation, performer) = await _validation.ValidateForDelete(id);
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+        
+        await _service.Delete(performer);
+
+        return NoContent();
     }
 }
