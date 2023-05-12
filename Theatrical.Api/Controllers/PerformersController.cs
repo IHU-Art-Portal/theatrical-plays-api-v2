@@ -39,7 +39,7 @@ public class PerformersController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
-        var performerDto = await _service.Get(id);
+        var performerDto = await _service.Get(performer);
 
         TheatricalResponse response = new TheatricalResponse<PerformerDto>(performerDto);
         

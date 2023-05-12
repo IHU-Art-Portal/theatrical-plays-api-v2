@@ -9,7 +9,7 @@ public interface IPerformerService
     Task Create(CreatePerformerDto createPerformerDto);
     Task<PerformersPaginationDto> Get(int? page, int? size);
     Task Delete(Performer performer);
-    Task<PerformerDto> Get(int id);
+    Task<PerformerDto> Get(Performer performer);
 }
 
 public class PerformerService : IPerformerService
@@ -96,10 +96,9 @@ public class PerformerService : IPerformerService
         await _repository.Delete(performer);
     }
 
-    public async Task<PerformerDto> Get(int id)
+    public async Task<PerformerDto> Get(Performer performer)
     {
-        var performer = await _repository.Get(id);
-        PerformerDto performerDto = new PerformerDto
+        var performerDto = new PerformerDto
         {
             Id = performer.Id,
             Name = performer.Name,
