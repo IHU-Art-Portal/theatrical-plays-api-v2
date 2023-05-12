@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Services.PerformersService;
 
 namespace Theatrical.Api.Controllers;
 
@@ -11,9 +12,13 @@ namespace Theatrical.Api.Controllers;
 [Route("/api/[controller]")]
 public class PerformersController : ControllerBase
 {
+    private readonly IPerformerService _service;
 
-    private static List<PerformerDto> AllPerformers = new();
-    
+    public PerformersController(IPerformerService service)
+    {
+        _service = service;
+    }
+
     /// <summary>
     /// Retrieves performer information by their Id
     /// </summary>
@@ -23,10 +28,7 @@ public class PerformersController : ControllerBase
     [Route("{id:int}")]
     public async Task<ActionResult<TheatricalResponse<PerformerDto>>> GetPerformer(int id)
     {
-        var performer = AllPerformers.FirstOrDefault(p => p.Id == id);
-        TheatricalResponse response = new TheatricalResponse<PerformerDto>(performer);
-        
-        return new ObjectResult(response);
+        return Ok();
     }
 
     /// <summary>
@@ -39,8 +41,9 @@ public class PerformersController : ControllerBase
     public async Task<ActionResult<TheatricalResponse<PerformersPaginationDto>>> GetPerformers(int? page, int? size)
     {
         //_service pagination logic. here//
+        PerformersPaginationDto performersDto = await _service.Get();
         
-        TheatricalResponse response = new TheatricalResponse();
+        TheatricalResponse response = new TheatricalResponse<PerformersPaginationDto>(performersDto);
         
         return new ObjectResult(response);
     }
@@ -48,7 +51,7 @@ public class PerformersController : ControllerBase
     [HttpPost]
     public ActionResult CreatePerformer([FromBody] PerformerDto performerDto)
     {
-        AllPerformers.Add(performerDto);
+        
         return Ok();
     }
 

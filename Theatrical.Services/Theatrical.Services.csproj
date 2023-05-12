@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Theatrical.Data\Theatrical.Data.csproj" />
+      <ProjectReference Include="..\Theatrical.Dto\Theatrical.Dto.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
+using Theatrical.Data.Context;
+using Theatrical.Services.PerformersService;
+using Theatrical.Services.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +19,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //dbconnection
-// -----------//
+builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("ConnString")));
 
 //services registering
-//--------------------//
-
+builder.Services.AddTransient<IPerformerRepository, PerformerRepository>();
+builder.Services.AddTransient<IPerformerService, PerformerService>();
 
 //Serilog Console log
 var logger = new LoggerConfiguration()
