@@ -49,9 +49,9 @@ public class PerformersController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult CreatePerformer([FromBody] PerformerDto performerDto)
+    public async Task<ActionResult> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
     {
-        
+        await _service.Create(createPerformerDto);
         return Ok();
     }
 
