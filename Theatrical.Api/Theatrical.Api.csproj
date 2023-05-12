@@ -24,4 +24,8 @@
       <ProjectReference Include="..\Theatrical.Services\Theatrical.Services.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="artifact" />
+    </ItemGroup>
+
 </Project>
