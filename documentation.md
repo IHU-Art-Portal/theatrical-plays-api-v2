@@ -66,7 +66,15 @@ For example `Theatrical.Api` has references to all three other project, as it wi
 This controller manages all the requests regarding a performer (former person).
 
 **Create Performer**
----
+
+| POST                 | /api/performers                            |
+|----------------------|--------------------------------------------|
+| **Parameters**       |                                            |
+| *CreatePerformerDto* | {string: FullName, string: Image}          |
+| **Responses**        |                                            |
+| *PerformerDto*       | {int: Id, string: FullName, string: Image} |
+
+----
 
 **Get Performer**
 
