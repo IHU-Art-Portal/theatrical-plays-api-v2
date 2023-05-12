@@ -4,6 +4,9 @@ using Theatrical.Dto.ResponseWrapperFolder;
 
 namespace Theatrical.Api.Controllers;
 
+/// <summary>
+/// Not yet implemented
+/// </summary>
 [ApiController]
 [Route("/api/[controller]")]
 public class PerformersController : ControllerBase
@@ -11,6 +14,11 @@ public class PerformersController : ControllerBase
 
     private static List<PerformerDto> AllPerformers = new();
     
+    /// <summary>
+    /// Retrieves performer information by their Id
+    /// </summary>
+    /// <param name="id">int</param>
+    /// <returns>TheatricalResponse&lt;PerformerDto&gt; object containing performer data.</returns>
     [HttpGet]
     [Route("{id:int}")]
     public async Task<ActionResult<TheatricalResponse<PerformerDto>>> GetPerformer(int id)
@@ -21,10 +29,18 @@ public class PerformersController : ControllerBase
         return new ObjectResult(response);
     }
 
+    /// <summary>
+    /// Retrieves all performers if pagination parameters are not specified
+    /// </summary>
+    /// <param name="page">Optional. The page number for pagination</param>
+    /// <param name="size">Optional. THe page size for pagination</param>
+    /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse<List<PerformerDto>>>> GetPerformers(int? page, int? size)
+    public async Task<ActionResult<TheatricalResponse<PerformersPaginationDto>>> GetPerformers(int? page, int? size)
     {
-        TheatricalResponse response = new TheatricalResponse<List<PerformerDto>>(AllPerformers);
+        //_service pagination logic. here//
+        
+        TheatricalResponse response = new TheatricalResponse();
         
         return new ObjectResult(response);
     }
