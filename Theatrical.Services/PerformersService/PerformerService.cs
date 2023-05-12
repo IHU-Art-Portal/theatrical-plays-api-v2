@@ -25,7 +25,7 @@ public class PerformerService : IPerformerService
         {
             Name = createPerformerDto.Name,
             Surname = createPerformerDto.Surname,
-            Created = DateTime.Now
+            Created = DateTime.UtcNow
         };
         await _repository.Create(performer);
     }
