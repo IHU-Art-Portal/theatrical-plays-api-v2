@@ -53,13 +53,20 @@ For example `Theatrical.Api` has references to all three other project, as it wi
 
 ## Api Requests
 <b>Changes from version 1 (https://github.com/ar1st/theatrical-plays-api/blob/master/documentation.md) project:</b>
-<li><b>PeopleController</b>, is now called <b>PerformersController</b>.</li>
+<ul><li><b>PeopleController</b>, is now called <b>PerformersController</b>.</li>
+    <li>Added the ability to add new Performers.</li>
+</ul>
+<I>These changes are not yet implemented and are subject to change.</I><br>
+<I>This text will be removed when everything is implemented and working.</I>
 
 ----
 ## Performers
 
 ---
 This controller manages all the requests regarding a performer (former person).
+
+**Create Performer**
+---
 
 **Get Performer**
 
@@ -81,15 +88,15 @@ It returns a `PerformerDto` wrapped in `TheatricalResponse`.
 This request is used to retrieve all performers.\
 <I>If neither of page and size is specified, all results are returned.</I>
 
-| GET                                       | /api/performers                            |
-|-------------------------------------------|--------------------------------------------|
-| **Parameters**                            |                                            |
-| *page*                                    | <u>Query parameter</u>                     |
-|                                           | The index of the page to return. Optional  |
-| *size*                                    | <u>Query parameter</u>                     |
-|                                           | The size of the page. Optional             |
-| **Responses**                             |                                            |
-| TheatricalResponse\<PerformerResponseDto> | {id: Int, fullName: String, image: String} |
+| GET                                              | /api/performers                            |
+|--------------------------------------------------|--------------------------------------------|
+| **Parameters**                                   |                                            |
+| *page*                                           | <u>Query parameter</u>                     |
+|                                                  | The index of the page to return. Optional  |
+| *size*                                           | <u>Query parameter</u>                     |
+|                                                  | The size of the page. Optional             |
+| **Responses**                                    |                                            |
+| TheatricalResponse<<List\<PerformerResponseDto>> | {id: Int, fullName: String, image: String} |
 
 ---
 
@@ -97,14 +104,14 @@ This request is used to retrieve all performers.\
 
 This request returns performers filtered by the provided role.
 
-| GET                                       | /api/performers/role                       |
-|-------------------------------------------|--------------------------------------------|
-| **Parameters**                            |                                            |
-| *value*                                   | <u>Path parameter</u>                      |
-|                                           | The role provided to filter the results    |
-| *page*                                    | <u>Query parameter</u>                     |
-|                                           | The index of the page to return. Optional  |
-| *size*                                    | <u>Query parameter</u>                     |
-|                                           | The size of the page. Optional             |
-| **Responses**                             |                                            |
-| TheatricalResponse\<PerformerResponseDto> | {id: Int, fullName: String, image: String} |
+| GET                                             | /api/performers/role                       |
+|-------------------------------------------------|--------------------------------------------|
+| **Parameters**                                  |                                            |
+| *value*                                         | <u>Path parameter</u>                      |
+|                                                 | The role provided to filter the results    |
+| *page*                                          | <u>Query parameter</u>                     |
+|                                                 | The index of the page to return. Optional  |
+| *size*                                          | <u>Query parameter</u>                     |
+|                                                 | The size of the page. Optional             |
+| **Responses**                                   |                                            |
+| TheatricalResponse\<List\<PerformerResponseDto> | {id: Int, fullName: String, image: String} |
