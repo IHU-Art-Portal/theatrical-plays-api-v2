@@ -14,6 +14,11 @@ public class TheatricalPlaysDbContext : DbContext
     }
     
     public virtual DbSet<Performer> Performers { get; set; }
+    public virtual DbSet<Authority> Authorities { get; set; }
+    public virtual DbSet<Organizer> Organizers { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Venue> Venues { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
