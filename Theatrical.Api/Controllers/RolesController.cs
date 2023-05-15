@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Services;
+using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
@@ -8,10 +9,12 @@ namespace Theatrical.Api.Controllers;
 public class RolesController : ControllerBase
 {
     private readonly IRoleService _service;
+    private readonly IRoleValidationService _validation;
 
-    public RolesController(IRoleService service)
+    public RolesController(IRoleService service, IRoleValidationService validation)
     {
         _service = service;
+        _validation = validation;
     }
     
     [HttpPost]
@@ -34,7 +37,14 @@ public class RolesController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> DeleteRole(int id)
     {
-        await _service.Delete(id);
+        var (validation, role) = await _validation.ValidateForDelete(id);
+
+        if (!validation.Success)
+        {
+            return NotFound(validation.Message);
+        }
+        
+        await _service.Delete(role);
         return NoContent();
     }
 }

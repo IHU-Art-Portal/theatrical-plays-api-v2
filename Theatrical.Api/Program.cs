@@ -31,6 +31,7 @@ builder.Services.AddTransient<IPerformerValidationService, PerformerValidationSe
 
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IRoleValidationService, RoleValidationService>();
 
 //Serilog Console log styling
 var logger = new LoggerConfiguration()

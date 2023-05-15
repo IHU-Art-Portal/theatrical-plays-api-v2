@@ -7,9 +7,9 @@ namespace Theatrical.Services.Repositories;
 public interface IRoleRepository
 {
     Task<List<Role>> GetRoles();
-    Task<Role> GetRole(int id);
+    Task<Role?> GetRole(int id);
     Task CreateRole(Role role);
-    Task DeleteRole(int id);
+    Task DeleteRole(Role role);
 }
 
 public class RoleRepository : IRoleRepository
@@ -27,9 +27,10 @@ public class RoleRepository : IRoleRepository
         return roles;
     }
 
-    public async Task<Role> GetRole(int id)
+    public async Task<Role?> GetRole(int id)
     {
         var role = await _context.Roles.FindAsync(id);
+
         return role;
     }
 
@@ -39,10 +40,9 @@ public class RoleRepository : IRoleRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteRole(int id)
+    public async Task DeleteRole(Role role)
     {
-        var roletodelete = await _context.Roles.FindAsync(id);
-        _context.Remove(roletodelete);
+        _context.Remove(role);
         await _context.SaveChangesAsync();
     }
 }

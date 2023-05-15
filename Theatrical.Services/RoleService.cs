@@ -8,7 +8,7 @@ public interface IRoleService
     Task<List<Role>> Get();
     Task<Role> Get(int id);
     Task Create(string role);
-    Task Delete(int id);
+    Task Delete(Role role);
 }
 
 public class RoleService : IRoleService
@@ -39,8 +39,8 @@ public class RoleService : IRoleService
         await _repository.CreateRole(_role);
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(Role role)
     {
-        await _repository.DeleteRole(id);
+        await _repository.DeleteRole(role);
     }
 }

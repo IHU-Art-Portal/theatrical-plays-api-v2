@@ -9,7 +9,7 @@ public interface IPerformerRepository
     Task Create(Performer performer);
     Task<List<Performer>> Get();
     Task Delete(Performer performer);
-    Task<Performer> Get(int id);
+    Task<Performer?> Get(int id);
 }
 
 public class PerformerRepository : IPerformerRepository
@@ -34,7 +34,7 @@ public class PerformerRepository : IPerformerRepository
         return performers;
     }
     
-    public async Task<Performer> Get(int id)
+    public async Task<Performer?> Get(int id)
     {
         var performer = await _context.Performers.FindAsync(id);
 

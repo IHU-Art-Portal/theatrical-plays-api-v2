@@ -1,6 +1,7 @@
 ﻿using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.PerformerDtos;
+using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
 
@@ -12,16 +13,16 @@ public interface IPerformerValidationService
 
 public class PerformerValidationService : IPerformerValidationService
 {
-    private readonly TheatricalPlaysDbContext _context;
+    private readonly IPerformerRepository _repository;
 
-    public PerformerValidationService(TheatricalPlaysDbContext context)
+    public PerformerValidationService(IPerformerRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<(ValidationReport report, Performer? performer)> ValidateAndFetch(int performerId)
     {
-        var performer = await _context.Performers.FindAsync(performerId);
+        var performer = await _repository.Get(performerId);
         var report = new ValidationReport();
 
         if (performer is null)
@@ -38,7 +39,7 @@ public class PerformerValidationService : IPerformerValidationService
 
     public async Task<(ValidationReport report, Performer? performer)> ValidateForDelete(int performerId)
     {
-        var performer = await _context.Performers.FindAsync(performerId);
+        var performer = await _repository.Get(performerId);
         var report = new ValidationReport();
         
         if (performer is null)
