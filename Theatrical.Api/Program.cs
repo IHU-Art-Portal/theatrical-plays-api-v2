@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
 using Theatrical.Data.Context;
+using Theatrical.Services;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
@@ -28,7 +29,10 @@ builder.Services.AddTransient<IPerformerRepository, PerformerRepository>();
 builder.Services.AddTransient<IPerformerService, PerformerService>();
 builder.Services.AddTransient<IPerformerValidationService, PerformerValidationService>();
 
-//Serilog Console log
+builder.Services.AddTransient<IRoleRepository, RoleRepository>();
+builder.Services.AddTransient<IRoleService, RoleService>();
+
+//Serilog Console log styling
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();

@@ -6,9 +6,6 @@ using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
-/// <summary>
-/// Not yet implemented
-/// </summary>
 [ApiController]
 [Route("/api/[controller]")]
 public class PerformersController : ControllerBase
