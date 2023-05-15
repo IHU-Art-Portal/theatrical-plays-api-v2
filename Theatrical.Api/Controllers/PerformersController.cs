@@ -87,7 +87,8 @@ public class PerformersController : ControllerBase
         }
         
         await _service.Delete(performer);
-
-        return NoContent();
+        TheatricalResponse response = new TheatricalResponse(message: $"Performer with ID: {id} has been deleted!");
+        
+        return new OkObjectResult(response);
     }
 }

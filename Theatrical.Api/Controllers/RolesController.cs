@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
 
@@ -26,25 +28,30 @@ public class RolesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetRoles()
+    public async Task<ActionResult<TheatricalResponse>> GetRoles()
     {
         var roles = await _service.Get();
+
+        var response = new TheatricalResponse<List<Role>>(roles);
         
-        return Ok(roles);
+        return new ObjectResult(response);
     }
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult> DeleteRole(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id)
     {
         var (validation, role) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            return NotFound(validation.Message);
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
         }
-        
+
         await _service.Delete(role);
-        return NoContent();
+        TheatricalResponse response = new TheatricalResponse(message: $"Role with ID: {id} has been deleted!");
+
+        return new OkObjectResult(response);
     }
 }
