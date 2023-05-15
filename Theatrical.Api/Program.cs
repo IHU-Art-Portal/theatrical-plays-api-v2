@@ -40,6 +40,11 @@ builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
 builder.Services.AddTransient<IOrganizerService, OrganizerService>();
 builder.Services.AddTransient<IOrganizerValidationService, OrganizerValidationService>();
 
+//Venue services
+builder.Services.AddTransient<IVenueRepository, VenueRepository>();
+builder.Services.AddTransient<IVenueService, VenueService>();
+builder.Services.AddTransient<IVenueValidationService, VenueValidationService>();
+
 //Serilog Console log styling
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
