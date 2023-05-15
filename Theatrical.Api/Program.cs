@@ -25,13 +25,20 @@ builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("ConnString")));
 
 //services registering
+//performer services
 builder.Services.AddTransient<IPerformerRepository, PerformerRepository>();
 builder.Services.AddTransient<IPerformerService, PerformerService>();
 builder.Services.AddTransient<IPerformerValidationService, PerformerValidationService>();
 
+//role services
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IRoleValidationService, RoleValidationService>();
+
+//organizer services
+builder.Services.AddTransient<IOrganizerRepository, OrganizerRepository>();
+builder.Services.AddTransient<IOrganizerService, OrganizerService>();
+builder.Services.AddTransient<IOrganizerValidationService, OrganizerValidationService>();
 
 //Serilog Console log styling
 var logger = new LoggerConfiguration()

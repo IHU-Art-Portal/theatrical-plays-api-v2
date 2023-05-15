@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
@@ -67,12 +68,12 @@ public class PerformersController : ControllerBase
         return Ok();
     }
 
-    /*[HttpGet]
-    [Route("role/{value}")]
-    public IActionResult GetPerformersRole(string value, int? page, int? size)
+    [HttpGet]
+    [Route("search")]
+    public ActionResult GetPerformersRole(string role, int? page, int? size)
     {
-        return Ok();
-    }*/
+        return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
+    }
 
     [HttpDelete]
     [Route("{id}")]
