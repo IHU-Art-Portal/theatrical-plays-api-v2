@@ -15,23 +15,18 @@ public interface ITokenService
 public class TokenService : ITokenService
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
-    private readonly IConfiguration configuration;
 
-    public TokenService(IConfiguration configuration)
-    {
-        this.configuration = configuration;
-    }
     
     public string GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(configuration.GetSection("JwtSettings:Key").ToString());
+        var key = Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged");
 
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, user.Username),
-            new("Role", user.Role)
+            new(ClaimTypes.Role, user.Role)
         };
 
         var securityKey = new SymmetricSecurityKey(key);
@@ -42,8 +37,8 @@ public class TokenService : ITokenService
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.Add(TokenLifetime),
             SigningCredentials = signingCredentials,
-            Issuer = configuration.GetSection("JwtSettings:Issuer").ToString(),
-            Audience = configuration.GetSection("JwtSettings:Audience").ToString()
+            Issuer = "https://theatricalportal.azurewebsites.net",
+            Audience = "https://theatricalportal.azurewebsites.net"
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);

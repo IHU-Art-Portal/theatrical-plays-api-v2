@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +24,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 {
     x.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuer = config["JwtSettings:Issuer"],
-        ValidAudience = config["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!)),
+        ValidIssuer = "https://theatricalportal.azurewebsites.net",
+        ValidAudience = "https://theatricalportal.azurewebsites.net",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged")),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -33,10 +34,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+//Authorization based on role
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
-        p.RequireClaim(IdentityData.AdminUserClaimName, "true"));
+        p.RequireClaim(ClaimTypes.Role, "admin"));
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson(o =>

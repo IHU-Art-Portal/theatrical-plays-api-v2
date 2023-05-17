@@ -22,6 +22,7 @@ public class OrganizersController : ControllerBase
         _validation = validation;
     }
     
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] OrganizerCreateDto organizerCreateDto)
     {

@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Identity;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
@@ -51,6 +53,7 @@ public class VenuesController : ControllerBase
         return new OkObjectResult(venue);
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {

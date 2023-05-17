@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Identity;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
@@ -61,6 +63,7 @@ public class PerformersController : ControllerBase
         return new ObjectResult(response);
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     public async Task<ActionResult> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
     {
@@ -75,6 +78,7 @@ public class PerformersController : ControllerBase
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id)

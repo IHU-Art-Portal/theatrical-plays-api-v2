@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Identity;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
@@ -19,6 +21,7 @@ public class RolesController : ControllerBase
         _validation = validation;
     }
     
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     [Route("{role}")]
     public async Task<ActionResult> CreateRole(string role)
@@ -37,6 +40,7 @@ public class RolesController : ControllerBase
         return new ObjectResult(response);
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id)
