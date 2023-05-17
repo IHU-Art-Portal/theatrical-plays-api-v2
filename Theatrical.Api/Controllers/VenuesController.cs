@@ -72,6 +72,7 @@ public class VenuesController : ControllerBase
         return new ObjectResult(response);
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult> DeleteVenue(int id)
