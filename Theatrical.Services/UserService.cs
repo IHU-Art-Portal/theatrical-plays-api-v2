@@ -10,7 +10,7 @@ public interface IUserService
 {
     Task<UserDtoRole> Register(UserDto userDto);
     bool VerifyPassword(string hashedPassword, string providedPassword);
-    string GenerateToken(User user);
+    UserJWT GenerateToken(User user);
 }
 
 public class UserService : IUserService
@@ -58,9 +58,18 @@ public class UserService : IUserService
         return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 
-    public string GenerateToken(User user)
+    public UserJWT GenerateToken(User user)
     {
-        return _tokenService.GenerateToken(user);
+        var token = _tokenService.GenerateToken(user);
+        UserJWT jwt = new UserJWT
+        {
+            JWT = token,
+            Note =
+                "Guide! Your token lasts for 8 hours. Using the token: Include an 'Authorization' header with your request with the value: 'Bearer YourJwtToken' "
+        };
+
+        return jwt;
+
     }
 }
 

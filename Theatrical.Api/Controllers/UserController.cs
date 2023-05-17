@@ -49,9 +49,9 @@ public class UserController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
        
-        var jwttoken = _service.GenerateToken(user);
-
-        var response = new TheatricalResponse<string>(jwttoken, "Your JWT token");
+        var userJwt = _service.GenerateToken(user);
+        
+        var response = new TheatricalResponse<UserJWT>(userJwt, "Your created JWT token");
         
         return new OkObjectResult(response);
     }
