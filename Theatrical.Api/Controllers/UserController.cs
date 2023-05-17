@@ -39,8 +39,20 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("login")]
-    public async Task<ActionResult> Login([FromBody]UserDto userDto)
+    public async Task<ActionResult<TheatricalResponse>> Login([FromBody]UserDto userDto)
     {
-        return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
+        var (report, user) = await _validation.ValidateForLogin(userDto);
+
+        if (!report.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+       
+        var jwttoken = _service.GenerateToken(user);
+
+        var response = new TheatricalResponse<string>(jwttoken, "Your JWT token");
+        
+        return new OkObjectResult(response);
     }
 }

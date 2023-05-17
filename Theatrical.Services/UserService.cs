@@ -2,21 +2,26 @@
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
 using BCrypt.Net;
+using Theatrical.Services.Jwt;
 
 namespace Theatrical.Services;
 
 public interface IUserService
 {
     Task<UserDtoRole> Register(UserDto userDto);
+    bool VerifyPassword(string hashedPassword, string providedPassword);
+    string GenerateToken(User user);
 }
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
+    private readonly ITokenService _tokenService;
 
-    public UserService(IUserRepository repository)
+    public UserService(IUserRepository repository, ITokenService tokenService)
     {
         _repository = repository;
+        _tokenService = tokenService;
     }
 
     /// <summary>
@@ -46,6 +51,16 @@ public class UserService : IUserService
         };
 
         return userDtoRole;
+    }
+
+    public bool VerifyPassword(string hashedPassword, string providedPassword)
+    {
+        return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
+    }
+
+    public string GenerateToken(User user)
+    {
+        return _tokenService.GenerateToken(user);
     }
 }
 
