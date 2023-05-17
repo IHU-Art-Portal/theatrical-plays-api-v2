@@ -75,6 +75,11 @@ builder.Services.AddTransient<IVenueRepository, VenueRepository>();
 builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IVenueValidationService, VenueValidationService>();
 
+//User services
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IUserValidationService, UserValidationService>();
+builder.Services.AddTransient<IUserService, UserService>();
+
 //Jwt Token service
 builder.Services.AddTransient<ITokenService, TokenService>();
 

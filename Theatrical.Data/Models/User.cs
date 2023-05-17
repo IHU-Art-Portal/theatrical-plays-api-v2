@@ -1,4 +1,6 @@
-﻿namespace Theatrical.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Theatrical.Data.Models;
 
 public class User
 {

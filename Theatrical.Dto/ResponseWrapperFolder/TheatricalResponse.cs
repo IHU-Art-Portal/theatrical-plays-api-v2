@@ -4,6 +4,7 @@ public enum ErrorCode
 {
     NotFound,
     InvalidPayload,
+    AlreadyExists
 }
 
 public class TheatricalResponse
@@ -31,6 +32,11 @@ public class TheatricalResponse<T> : TheatricalResponse
     public T? Data { get; }
 
     public TheatricalResponse(T? data, string message = "Completed") : base(message)
+    {
+        Data = data;
+    }
+
+    public TheatricalResponse(T? data, ErrorCode code, string message) : base(code, message)
     {
         Data = data;
     }

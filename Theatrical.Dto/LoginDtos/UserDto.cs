@@ -2,7 +2,7 @@
 
 namespace Theatrical.Dto.LoginDtos;
 
-public class UserLoginDto
+public class UserDto
 {
     [Required]
     public string Username { get; set; }

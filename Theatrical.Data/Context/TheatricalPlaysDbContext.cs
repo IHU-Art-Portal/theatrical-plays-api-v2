@@ -25,5 +25,9 @@ public class TheatricalPlaysDbContext : DbContext
 
         if (!string.IsNullOrWhiteSpace(_schema))
             modelBuilder.HasDefaultSchema(_schema);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
     }
 }
