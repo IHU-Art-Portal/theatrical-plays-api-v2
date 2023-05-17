@@ -36,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
-        p.RequireClaim(IdentityData.AdminUserClaimName));
+        p.RequireClaim(IdentityData.AdminUserClaimName, "true"));
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
@@ -48,6 +48,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(o =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Authorization swagger support
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 //dbconnection

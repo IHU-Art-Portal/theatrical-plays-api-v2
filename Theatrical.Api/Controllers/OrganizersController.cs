@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Identity;
 using Theatrical.Data.Models;
 using Theatrical.Dto.OrganizerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -43,6 +45,7 @@ public class OrganizersController : ControllerBase
         return new ObjectResult(organizers);
     }
 
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id)
