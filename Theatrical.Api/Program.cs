@@ -1,15 +1,43 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
+using Theatrical.Data.Identity;
 using Theatrical.Services;
+using Theatrical.Services.Jwt;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 // Add services to the container.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
+{
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = config["JwtSettings:Issuer"],
+        ValidAudience = config["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!)),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
+        p.RequireClaim(IdentityData.AdminUserClaimName));
+});
 
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
 {
@@ -19,6 +47,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(o =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 //dbconnection
 builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
@@ -45,6 +75,9 @@ builder.Services.AddTransient<IVenueRepository, VenueRepository>();
 builder.Services.AddTransient<IVenueService, VenueService>();
 builder.Services.AddTransient<IVenueValidationService, VenueValidationService>();
 
+//Jwt Token service
+builder.Services.AddTransient<ITokenService, TokenService>();
+
 //Serilog Console log styling
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -62,6 +95,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
