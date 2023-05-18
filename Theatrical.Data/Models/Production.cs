@@ -11,7 +11,7 @@ public class Production
     public string? Url { get; set; }
     public string? Producer { get; set; }
     public string? MediaUrl { get; set; }
-    public TimeSpan? Duration { get; set; }
+    public string? Duration { get; set; }
     public DateTime Created { get; set; }
     public virtual List<Contribution> Contributions { get; set; } //A production can have many contributions
     public virtual List<Event> Events { get; set; }

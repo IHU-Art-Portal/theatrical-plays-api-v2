@@ -1,11 +1,13 @@
-﻿using Theatrical.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 
 namespace Theatrical.Services.Repositories;
 
 public interface IProductionRepository
 {
-    
+   Task Create(Production production);
+   Task<List<Production>> Get();
 }
 
 public class ProductionRepository : IProductionRepository
@@ -21,5 +23,10 @@ public class ProductionRepository : IProductionRepository
     {
         await _context.Productions.AddAsync(production);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Production>> Get()
+    {
+        return await _context.Productions.ToListAsync();
     }
 }
