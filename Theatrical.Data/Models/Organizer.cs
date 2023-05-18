@@ -12,4 +12,5 @@ public class Organizer
     public string? Doy { get; set; }
     public string? Afm { get; set; }
     public DateTime Created { get; set; }
+    public virtual List<Production> Productions { get; set; } //One too many, an organizer can have many productions
 }

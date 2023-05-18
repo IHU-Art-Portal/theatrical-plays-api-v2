@@ -83,6 +83,9 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IUserValidationService, UserValidationService>();
 builder.Services.AddTransient<IUserService, UserService>();
 
+//Production services
+builder.Services.AddTransient<IProductionRepository, ProductionRepository>();
+
 //Jwt Token service
 builder.Services.AddTransient<ITokenService, TokenService>();
 

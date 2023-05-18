@@ -6,4 +6,5 @@ public class Venue
     public string Title { get; set; }
     public string Address { get; set; }
     public DateTime Created { get; set; }
+    public virtual List<Event> Events { get; set; }
 }
