@@ -6,7 +6,7 @@ namespace Theatrical.Services.Repositories;
 
 public interface IEventRepository
 {
-    Task<List<Event>>? Get();
+    Task<List<Event>?> Get();
     Task Create(Event newEvent);
     Task Delete(Event deletingEvent);
 }
@@ -20,7 +20,7 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public async Task<List<Event>>? Get()
+    public async Task<List<Event>?> Get()
     {
         return await _context.Events.ToListAsync();
     }

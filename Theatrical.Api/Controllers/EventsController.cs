@@ -3,6 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Services;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
@@ -12,19 +13,21 @@ namespace Theatrical.Api.Controllers;
 [Route("api/events")]
 public class EventsController : ControllerBase
 {
-    private readonly IEventRepository repo;
     private readonly IEventValidationService _validation;
+    private readonly IEventService _service;
 
-    public EventsController(IEventRepository repo, IEventValidationService validation)
+    public EventsController(IEventService service, IEventValidationService validation)
     {
-        this.repo = repo;
+        _service = service;
         _validation = validation;
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Event>>> GetEvents()
+    public async Task<ActionResult<TheatricalResponse>> GetEvents()
     {
-        return Ok(await repo.Get());
+        var eventDtos = await _service.Get();
+        var response = new TheatricalResponse<List<EventDto>>(eventDtos);
+        return new OkObjectResult(response);
     }
     
     [HttpPost]
@@ -37,16 +40,10 @@ public class EventsController : ControllerBase
             var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse) { StatusCode = 404 };
         }
+
+        await _service.Create(createEventDto);
+        var response = new TheatricalResponse("Successfully Created Event");
         
-        var eventNew = new Event
-        {
-            ProductionId = createEventDto.ProductionId,
-            VenueId = createEventDto.VenueId,
-            DateEvent = createEventDto.DateEvent,
-            PriceRage = createEventDto.PriceRange,
-            Created = DateTime.UtcNow
-        };
-        await repo.Create(eventNew);
-        return Ok();
+        return new ObjectResult(response);
     }
 }
