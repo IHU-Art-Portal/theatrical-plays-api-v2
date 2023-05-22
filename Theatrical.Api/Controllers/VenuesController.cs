@@ -1,8 +1,7 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Identity;
 using Theatrical.Data.Models;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services;
@@ -16,11 +15,13 @@ public class VenuesController : ControllerBase
 {
     private readonly IVenueService _service;
     private readonly IVenueValidationService _validation;
+    private readonly IUserValidationService _userValidation;
 
-    public VenuesController(IVenueService service, IVenueValidationService validation)
+    public VenuesController(IVenueService service, IVenueValidationService validation, IUserValidationService userValidationService)
     {
         _service = service;
         _validation = validation;
+        _userValidation = userValidationService;
     }
 
     [HttpGet]
@@ -53,30 +54,36 @@ public class VenuesController : ControllerBase
         return new OkObjectResult(venue);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
+    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
         
-        try
+        if (!userValidation.Success)
         {
-            await _service.Create(venueCreateDto);
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
         }
-        catch (Exception e)
-        {
-            return new ObjectResult(e.Message);
-        }
-
+        
+        await _service.Create(venueCreateDto);
+    
         var response = new TheatricalResponse("Venue successfully added");
 
         return new ObjectResult(response);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult> DeleteVenue(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var (validation, venue) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
@@ -89,7 +96,7 @@ public class VenuesController : ControllerBase
         
         TheatricalResponse response = new TheatricalResponse(message: $"Venue with ID: {id} has been deleted!");
         
-        return Ok();
+        return new ObjectResult(response);
     }
 
 }

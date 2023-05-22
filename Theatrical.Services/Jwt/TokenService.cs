@@ -10,6 +10,7 @@ namespace Theatrical.Services.Jwt;
 public interface ITokenService
 {
     string GenerateToken(User user);
+    ClaimsPrincipal? VerifyToken(string token);
 }
 
 public class TokenService : ITokenService
@@ -46,4 +47,35 @@ public class TokenService : ITokenService
 
         return tokenString;
     }
+    
+    public ClaimsPrincipal? VerifyToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged");
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidIssuer = "https://theatricalportal.azurewebsites.net",
+            ValidateAudience = true,
+            ValidAudience = "https://theatricalportal.azurewebsites.net",
+            ValidateLifetime = true
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+            return principal;
+        }
+        catch (Exception ex)
+        {
+            // Token validation failed
+            // You can handle the exception here or return null/throw custom exception based on your needs
+            return null;
+        }
+    }
+    
+
 }

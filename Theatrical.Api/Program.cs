@@ -1,15 +1,10 @@
-using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Serilog;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
-using Theatrical.Data.Identity;
 using Theatrical.Services;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.PerformersService;
@@ -34,13 +29,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-//Authorization based on role
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
-        p.RequireClaim(ClaimTypes.Role, "admin"));
-});
-
 builder.Services.AddControllers().AddNewtonsoftJson(o =>
 {
     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -49,9 +37,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(o =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-//Authorization swagger support
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 //dbconnection
 builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
@@ -109,7 +94,6 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 

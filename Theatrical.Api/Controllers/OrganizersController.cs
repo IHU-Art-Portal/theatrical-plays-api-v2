@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Identity;
+﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.OrganizerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
@@ -15,19 +14,31 @@ public class OrganizersController : ControllerBase
 {
     private readonly IOrganizerService _service;
     private readonly IOrganizerValidationService _validation;
-
-    public OrganizersController(IOrganizerService service, IOrganizerValidationService validation)
+    private readonly IUserValidationService _userValidation;
+    
+    public OrganizersController(IOrganizerService service, IOrganizerValidationService validation, IUserValidationService userService)
     {
         _service = service;
         _validation = validation;
+        _userValidation = userService;
     }
     
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] OrganizerCreateDto organizerCreateDto)
+    public async Task<ActionResult<TheatricalResponse>> Create([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         await _service.Create(organizerCreateDto);
-        return Ok();
+
+        var response = new TheatricalResponse("Successfully created Organizer");
+        
+        return new OkObjectResult(response);
     }
 
     [HttpGet]
@@ -46,11 +57,19 @@ public class OrganizersController : ControllerBase
         return new ObjectResult(response);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id, [FromHeader] string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var (report, organizer) = await _validation.ValidateForDelete(id);
 
         if (!report.Success)

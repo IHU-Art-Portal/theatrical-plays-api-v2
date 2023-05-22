@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Identity;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
@@ -15,11 +15,13 @@ public class PerformersController : ControllerBase
 {
     private readonly IPerformerService _service;
     private readonly IPerformerValidationService _validation;
+    private readonly IUserValidationService _userValidation;
 
-    public PerformersController(IPerformerService service, IPerformerValidationService validation)
+    public PerformersController(IPerformerService service, IPerformerValidationService validation, IUserValidationService userValidation)
     {
         _service = service;
         _validation = validation;
+        _userValidation = userValidation;
     }
 
     /// <summary>
@@ -63,12 +65,22 @@ public class PerformersController : ControllerBase
         return new ObjectResult(response);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
-    public async Task<ActionResult> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
+    public async Task<ActionResult<TheatricalResponse>> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto, [FromHeader] string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         await _service.Create(createPerformerDto);
-        return Ok();
+
+        var response = new TheatricalResponse("Successfully Created Performer");
+        
+        return new OkObjectResult(response);
     }
 
     [HttpGet]
@@ -78,11 +90,18 @@ public class PerformersController : ControllerBase
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id, [FromHeader] string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var (validation, performer) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

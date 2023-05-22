@@ -1,4 +1,5 @@
-﻿using Theatrical.Data.Models;
+﻿using System.Security.Claims;
+using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
 using BCrypt.Net;
@@ -10,7 +11,7 @@ public interface IUserService
 {
     Task<UserDtoRole> Register(UserDto userDto);
     bool VerifyPassword(string hashedPassword, string providedPassword);
-    UserJWT GenerateToken(User user);
+    string GenerateToken(User user);
 }
 
 public class UserService : IUserService
@@ -58,18 +59,13 @@ public class UserService : IUserService
         return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 
-    public UserJWT GenerateToken(User user)
+    public string GenerateToken(User user)
     {
         var token = _tokenService.GenerateToken(user);
-        UserJWT jwt = new UserJWT
-        {
-            JWT = token,
-            Note =
-                "Guide! Your token lasts for 8 hours. Using the token: Include an 'Authorization' header with your request with the value: 'Bearer YourJwtToken' "
-        };
 
-        return jwt;
+        return token;
 
     }
+
 }
 

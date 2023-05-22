@@ -51,7 +51,7 @@ public class UserController : ControllerBase
        
         var userJwt = _service.GenerateToken(user);
         
-        var response = new TheatricalResponse<UserJWT>(userJwt, "Your created JWT token");
+        var response = new TheatricalResponse<string>(userJwt, "Your created JWT token");
         
         return new OkObjectResult(response);
     }

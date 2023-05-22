@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Identity;
+﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
@@ -14,20 +13,32 @@ public class RolesController : ControllerBase
 {
     private readonly IRoleService _service;
     private readonly IRoleValidationService _validation;
+    private readonly IUserValidationService _userValidation;
 
-    public RolesController(IRoleService service, IRoleValidationService validation)
+    public RolesController(IRoleService service, IRoleValidationService validation, IUserValidationService userValidationService)
     {
         _service = service;
         _validation = validation;
+        _userValidation = userValidationService;
     }
     
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpPost]
     [Route("{role}")]
-    public async Task<ActionResult> CreateRole(string role)
+    public async Task<ActionResult<TheatricalResponse>> CreateRole(string role, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         await _service.Create(role);
-        return Ok();
+
+        var response = new TheatricalResponse("Successfully Created Role");
+        
+        return new OkObjectResult(response);
     }
 
     [HttpGet]
@@ -40,11 +51,18 @@ public class RolesController : ControllerBase
         return new ObjectResult(response);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var (validation, role) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

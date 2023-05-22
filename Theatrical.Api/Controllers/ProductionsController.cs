@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Identity;
-using Theatrical.Data.Models;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
-using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -16,16 +14,26 @@ public class ProductionsController : ControllerBase
 {
     private readonly IProductionValidationService _validation;
     private readonly IProductionService _service;
+    private readonly IUserValidationService _userValidation;
 
-    public ProductionsController(IProductionService service, IProductionValidationService validation)
+    public ProductionsController(IProductionService service, IProductionValidationService validation, IUserValidationService userValidationService)
     {
         _service = service;
         _validation = validation;
+        _userValidation = userValidationService;
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
+    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var validation = await _validation.ValidateForCreate(createProductionDto);
 
         if (!validation.Success)
@@ -59,10 +67,17 @@ public class ProductionsController : ControllerBase
         return new OkObjectResult(response);
     }
 
-    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
     [HttpDelete]
-    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id)
+    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id, [FromHeader]string? jwtToken)
     {
+        var userValidation = _userValidation.ValidateUser(jwtToken);
+        
+        if (!userValidation.Success)
+        {
+            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
+            return responseError;
+        }
+        
         var (validation, production) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

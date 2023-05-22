@@ -4,7 +4,10 @@ public enum ErrorCode
 {
     NotFound,
     InvalidPayload,
-    AlreadyExists
+    InvalidToken,
+    AlreadyExists,
+    Unauthorized,
+    Forbidden
 }
 
 public class TheatricalResponse
