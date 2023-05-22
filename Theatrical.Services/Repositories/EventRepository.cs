@@ -24,6 +24,11 @@ public class EventRepository : IEventRepository
     {
         return await _context.Events.ToListAsync();
     }
+
+    public async Task<Event?> GetEvent(int id)
+    {
+        return await _context.Events.FindAsync(id);
+    }
     
     public async Task Create(Event newEvent)
     {
