@@ -43,7 +43,7 @@ public class OrganizersController : ControllerBase
         
         var response = new TheatricalResponse<List<Organizer>>(organizers);
         
-        return new ObjectResult(organizers);
+        return new ObjectResult(response);
     }
 
     [Authorize(Policy = IdentityData.AdminUserPolicyName)]

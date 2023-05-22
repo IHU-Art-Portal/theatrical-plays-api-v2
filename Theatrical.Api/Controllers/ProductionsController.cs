@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Identity;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ProductionDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Services;
 using Theatrical.Services.Repositories;
+using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
@@ -9,35 +14,66 @@ namespace Theatrical.Api.Controllers;
 [Route("api/[controller]")]
 public class ProductionsController : ControllerBase
 {
-    private readonly IProductionRepository _repo;
+    private readonly IProductionValidationService _validation;
+    private readonly IProductionService _service;
 
-    public ProductionsController(IProductionRepository repo)
+    public ProductionsController(IProductionService service, IProductionValidationService validation)
     {
-        _repo = repo;
+        _service = service;
+        _validation = validation;
     }
     
     [HttpPost]
-    public async Task<ActionResult> CreateProduction([FromBody] CreateProductionDto createProductionDto)
+    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
-        var production = new Production
+        var validation = await _validation.ValidateForCreate(createProductionDto);
+
+        if (!validation.Success)
         {
-            OrganizerId = createProductionDto.OrganizerId,
-            Title = createProductionDto.Title,
-            Description = createProductionDto.Description,
-            Url = createProductionDto.Url,
-            Producer = createProductionDto.Producer,
-            MediaUrl = createProductionDto.MediaUrl,
-            Duration = createProductionDto.Duration,
-            Created = DateTime.UtcNow
-        };
-        await _repo.Create(production);
-        return Ok();
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse) { StatusCode = 404 };
+        }
+
+        var createdProduction = await _service.Create(createProductionDto);
+
+        var response = new TheatricalResponse<ProductionDto>(createdProduction, "Successfully Created Production");
+
+        return new ObjectResult(response){StatusCode = 201};
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetProductions()
+    public async Task<ActionResult<TheatricalResponse>> GetProductions()
     {
-        var s = await _repo.Get();
-        return Ok(s);
+        var (validation, productions) = await _validation.ValidateAndFetch();
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+
+        var productionsDto = _service.ConvertToDto(productions);
+
+        var response = new TheatricalResponse<List<ProductionDto>>(productionsDto);
+        
+        return new OkObjectResult(response);
+    }
+
+    [Authorize(Policy = IdentityData.AdminUserPolicyName)]
+    [HttpDelete]
+    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id)
+    {
+        var (validation, production) = await _validation.ValidateForDelete(id);
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+
+        await _service.Delete(production);
+        var response = new TheatricalResponse("Successfully Delete Production");
+
+        return new ObjectResult(response);
     }
 }
