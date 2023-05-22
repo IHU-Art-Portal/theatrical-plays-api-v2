@@ -73,6 +73,11 @@ builder.Services.AddTransient<IProductionRepository, ProductionRepository>();
 builder.Services.AddTransient<IProductionValidationService, ProductionValidationService>();
 builder.Services.AddTransient<IProductionService, ProductionService>();
 
+//Event services
+builder.Services.AddTransient<IEventRepository, EventRepository>();
+builder.Services.AddTransient<IEventValidationService, EventValidationService>();
+builder.Services.AddTransient<IEventService, EventService>();
+
 //Jwt Token service
 builder.Services.AddTransient<ITokenService, TokenService>();
 
