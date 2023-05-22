@@ -8,6 +8,7 @@ public interface IEventRepository
 {
     Task<List<Event>>? Get();
     Task Create(Event newEvent);
+    Task Delete(Event deletingEvent);
 }
 
 public class EventRepository : IEventRepository
@@ -27,6 +28,12 @@ public class EventRepository : IEventRepository
     public async Task Create(Event newEvent)
     {
         await _context.Events.AddAsync(newEvent);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task Delete(Event deletingEvent)
+    {
+        _context.Events.Remove(deletingEvent);
         await _context.SaveChangesAsync();
     }
 }
