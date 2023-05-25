@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
-using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -25,8 +23,15 @@ public class EventsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<TheatricalResponse>> GetEvents()
     {
-        var eventDtos = await _service.Get();
-        var response = new TheatricalResponse<List<EventDto>>(eventDtos);
+        var (validation, events) = await _validation.FetchAndValidate();
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message!);
+            return new ObjectResult(errorResponse) { StatusCode = 404 };
+        }
+        
+        var response = new TheatricalResponse<List<Event>>(events);
         return new OkObjectResult(response);
     }
     
