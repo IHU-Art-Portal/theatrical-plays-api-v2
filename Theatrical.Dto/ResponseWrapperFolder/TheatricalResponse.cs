@@ -7,7 +7,8 @@ public enum ErrorCode
     InvalidToken,
     AlreadyExists,
     Unauthorized,
-    Forbidden
+    Forbidden,
+    BadRequest,
 }
 
 public class TheatricalResponse

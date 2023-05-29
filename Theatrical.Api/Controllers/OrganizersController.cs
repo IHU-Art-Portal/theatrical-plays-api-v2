@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.OrganizerDtos;
@@ -44,6 +46,24 @@ public class OrganizersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<TheatricalResponse>> GetOrganizers()
     {
+        var (report, organizers) = await _validation.ValidateAndFetch();
+
+        if (!report.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
+            return new NotFoundObjectResult(errorResponse);
+        }
+        
+        var response = new TheatricalResponse<List<Organizer>>(organizers);
+        
+        return new ObjectResult(response);
+    }
+    
+    [HttpGet("authorization")]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> GetOrganizersAuthorization()
+    {
+        
         var (report, organizers) = await _validation.ValidateAndFetch();
 
         if (!report.Success)
