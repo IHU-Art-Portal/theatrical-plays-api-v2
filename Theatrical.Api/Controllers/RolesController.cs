@@ -53,9 +53,9 @@ public class RolesController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id, [FromHeader]string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {

@@ -24,9 +24,9 @@ public class OrganizersController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> Create([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> Create([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
 
         if (!userValidation.Success)
         {
@@ -60,9 +60,9 @@ public class OrganizersController : ControllerBase
     
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id, [FromHeader] string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id, [FromHeader] string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {

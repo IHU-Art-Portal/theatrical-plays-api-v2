@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Serilog;
 using Theatrical.Data.Context;
+using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.PerformersService;
@@ -13,15 +14,16 @@ using Theatrical.Services.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
+var jwtOptions = config.GetSection("JwtOptions").Get<JwtOptions>();
 
 // Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(x =>
 {
     x.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuer = "https://theatricalportal.azurewebsites.net",
-        ValidAudience = "https://theatricalportal.azurewebsites.net",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged")),
+        ValidIssuer = jwtOptions!.Issuer,
+        ValidAudience = jwtOptions.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,

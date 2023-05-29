@@ -24,9 +24,9 @@ public class ProductionsController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto, [FromHeader]string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {
@@ -68,9 +68,9 @@ public class ProductionsController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id, [FromHeader]string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {

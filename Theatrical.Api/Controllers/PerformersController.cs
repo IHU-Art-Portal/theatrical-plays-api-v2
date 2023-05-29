@@ -92,9 +92,9 @@ public class PerformersController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id, [FromHeader] string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id, [FromHeader] string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {

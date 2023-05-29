@@ -4,24 +4,30 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Theatrical.Data.Models;
+using Theatrical.Dto.LoginDtos;
 
 namespace Theatrical.Services.Jwt;
 
 public interface ITokenService
 {
-    string GenerateToken(User user);
+    JwtDto GenerateToken(User user);
     ClaimsPrincipal? VerifyToken(string token);
 }
 
 public class TokenService : ITokenService
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
+    private readonly IConfiguration _config;
 
-    
-    public string GenerateToken(User user)
+    public TokenService(IConfiguration config)
+    {
+        _config = config;
+    }
+    public JwtDto GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged");
+        var jwtOptions = _config.GetSection("JwtOptions").Get<JwtOptions>();
+        var key = Encoding.UTF8.GetBytes(jwtOptions.SigningKey);
 
         var claims = new List<Claim>
         {
@@ -38,29 +44,36 @@ public class TokenService : ITokenService
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.Add(TokenLifetime),
             SigningCredentials = signingCredentials,
-            Issuer = "https://theatricalportal.azurewebsites.net",
-            Audience = "https://theatricalportal.azurewebsites.net"
+            Issuer = jwtOptions.Issuer,
+            Audience = jwtOptions.Audience
         };
-
+        
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
+        var jwtDto = new JwtDto
+        {
+            access_token = tokenString,
+            token_type = "bearer",
+            expires_in = (int)TokenLifetime.TotalSeconds
+        };
 
-        return tokenString;
+        return jwtDto;
     }
     
     public ClaimsPrincipal? VerifyToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes("ARandomKeyThatIsLikelyToGetChanged");
-
+        var jwtOptions = _config.GetSection("JwtOptions").Get<JwtOptions>();
+        var key = Encoding.UTF8.GetBytes(jwtOptions.SigningKey);
+        
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
-            ValidIssuer = "https://theatricalportal.azurewebsites.net",
+            ValidIssuer = jwtOptions.Issuer,
             ValidateAudience = true,
-            ValidAudience = "https://theatricalportal.azurewebsites.net",
+            ValidAudience = jwtOptions.Audience,
             ValidateLifetime = true
         };
 

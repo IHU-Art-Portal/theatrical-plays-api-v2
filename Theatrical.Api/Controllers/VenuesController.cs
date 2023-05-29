@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -36,7 +35,7 @@ public class VenuesController : ControllerBase
         }
         var response = new TheatricalResponse<List<Venue>>(venues);
         
-        return new ObjectResult(venues);
+        return new ObjectResult(response);
     }
 
     [HttpGet]
@@ -55,9 +54,9 @@ public class VenuesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto, [FromHeader]string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {
@@ -74,9 +73,9 @@ public class VenuesController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id, [FromHeader]string? bearer)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
+        var userValidation = _userValidation.ValidateUser(bearer);
         
         if (!userValidation.Success)
         {

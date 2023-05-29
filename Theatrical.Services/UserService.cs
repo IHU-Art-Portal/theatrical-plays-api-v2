@@ -11,7 +11,7 @@ public interface IUserService
 {
     Task<UserDtoRole> Register(UserDto userDto);
     bool VerifyPassword(string hashedPassword, string providedPassword);
-    string GenerateToken(User user);
+    JwtDto GenerateToken(User user);
 }
 
 public class UserService : IUserService
@@ -59,12 +59,11 @@ public class UserService : IUserService
         return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 
-    public string GenerateToken(User user)
+    public JwtDto GenerateToken(User user)
     {
-        var token = _tokenService.GenerateToken(user);
-
-        return token;
-
+        var jwtDto = _tokenService.GenerateToken(user);
+        
+        return jwtDto;
     }
 
 }
