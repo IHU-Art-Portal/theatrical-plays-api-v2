@@ -10,6 +10,7 @@ public interface IRoleRepository
     Task<Role?> GetRole(int id);
     Task CreateRole(Role role);
     Task DeleteRole(Role role);
+    Task<Role?> GetRoleByName(string searchRole);
 }
 
 public class RoleRepository : IRoleRepository
@@ -31,6 +32,12 @@ public class RoleRepository : IRoleRepository
     {
         var role = await _context.Roles.FindAsync(id);
 
+        return role;
+    }
+
+    public async Task<Role?> GetRoleByName(string searchRole)
+    {
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Value == searchRole);
         return role;
     }
 

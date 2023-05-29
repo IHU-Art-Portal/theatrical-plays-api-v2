@@ -25,9 +25,18 @@ public class RolesController : ControllerBase
     [Route("{role}")]
     public async Task<ActionResult<TheatricalResponse>> CreateRole(string role)
     {
-        await _service.Create(role);
+        var rolelowercase = role.ToLower();
+        var validation = await _validation.ValidateForCreate(rolelowercase);
 
-        var response = new TheatricalResponse("Successfully Created Role");
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.AlreadyExists, validation.Message!);
+            return new ConflictObjectResult(errorResponse);
+        }
+        
+        await _service.Create(rolelowercase);
+
+        var response = new TheatricalResponse($"Successfully Created Role: {rolelowercase}");
         
         return new OkObjectResult(response);
     }
@@ -35,7 +44,13 @@ public class RolesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<TheatricalResponse>> GetRoles()
     {
-        var roles = await _service.Get();
+        var (validation, roles) = await _validation.ValidateForFetch();
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
 
         var response = new TheatricalResponse<List<Role>>(roles);
         
@@ -57,6 +72,26 @@ public class RolesController : ControllerBase
 
         await _service.Delete(role);
         TheatricalResponse response = new TheatricalResponse(message: $"Role with ID: {id} has been deleted!");
+
+        return new OkObjectResult(response);
+    }
+    
+    [HttpDelete]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    [Route("@name/{roleToDelete}")]
+    public async Task<ActionResult<TheatricalResponse>> DeleteRoleByName(string roleToDelete)
+    {
+        var lowercaseRole = roleToDelete.ToLower();
+        var (validation, role) = await _validation.ValidateForDelete(lowercaseRole);
+
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+
+        await _service.Delete(role);
+        TheatricalResponse response = new TheatricalResponse(message: $"Role: {lowercaseRole} has been deleted!");
 
         return new OkObjectResult(response);
     }
