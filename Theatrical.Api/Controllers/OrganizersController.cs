@@ -24,7 +24,7 @@ public class OrganizersController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> Create([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? bearer)
+    public async Task<ActionResult<TheatricalResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? bearer)
     {
         var userValidation = _userValidation.ValidateUser(bearer);
 
