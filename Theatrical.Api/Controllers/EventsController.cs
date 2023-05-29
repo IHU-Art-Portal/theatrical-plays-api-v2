@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -36,6 +37,7 @@ public class EventsController : ControllerBase
     }
     
     [HttpPost]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<TheatricalResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
     {
         var validation = await _validation.ValidateForCreate(createEventDto);
@@ -51,4 +53,5 @@ public class EventsController : ControllerBase
         
         return new ObjectResult(response);
     }
+    
 }

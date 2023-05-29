@@ -14,13 +14,11 @@ public class VenuesController : ControllerBase
 {
     private readonly IVenueService _service;
     private readonly IVenueValidationService _validation;
-    private readonly IUserValidationService _userValidation;
 
-    public VenuesController(IVenueService service, IVenueValidationService validation, IUserValidationService userValidationService)
+    public VenuesController(IVenueService service, IVenueValidationService validation)
     {
         _service = service;
         _validation = validation;
-        _userValidation = userValidationService;
     }
 
     [HttpGet]
@@ -54,16 +52,9 @@ public class VenuesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto, [FromHeader]string? bearer)
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         await _service.Create(venueCreateDto);
     
         var response = new TheatricalResponse("Venue successfully added");
@@ -72,17 +63,10 @@ public class VenuesController : ControllerBase
     }
 
     [HttpDelete]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id, [FromHeader]string? bearer)
+    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         var (validation, venue) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

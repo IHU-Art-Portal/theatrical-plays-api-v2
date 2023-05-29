@@ -15,13 +15,11 @@ public class PerformersController : ControllerBase
 {
     private readonly IPerformerService _service;
     private readonly IPerformerValidationService _validation;
-    private readonly IUserValidationService _userValidation;
 
-    public PerformersController(IPerformerService service, IPerformerValidationService validation, IUserValidationService userValidation)
+    public PerformersController(IPerformerService service, IPerformerValidationService validation)
     {
         _service = service;
         _validation = validation;
-        _userValidation = userValidation;
     }
 
     /// <summary>
@@ -66,16 +64,9 @@ public class PerformersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto, [FromHeader] string? jwtToken)
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         await _service.Create(createPerformerDto);
 
         var response = new TheatricalResponse("Successfully Created Performer");
@@ -91,17 +82,10 @@ public class PerformersController : ControllerBase
     }
 
     [HttpDelete]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id, [FromHeader] string? bearer)
+    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         var (validation, performer) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

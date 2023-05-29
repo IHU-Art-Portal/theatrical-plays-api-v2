@@ -13,27 +13,18 @@ public class RolesController : ControllerBase
 {
     private readonly IRoleService _service;
     private readonly IRoleValidationService _validation;
-    private readonly IUserValidationService _userValidation;
 
-    public RolesController(IRoleService service, IRoleValidationService validation, IUserValidationService userValidationService)
+    public RolesController(IRoleService service, IRoleValidationService validation)
     {
         _service = service;
         _validation = validation;
-        _userValidation = userValidationService;
     }
     
     [HttpPost]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{role}")]
-    public async Task<ActionResult<TheatricalResponse>> CreateRole(string role, [FromHeader]string? jwtToken)
+    public async Task<ActionResult<TheatricalResponse>> CreateRole(string role)
     {
-        var userValidation = _userValidation.ValidateUser(jwtToken);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         await _service.Create(role);
 
         var response = new TheatricalResponse("Successfully Created Role");
@@ -52,17 +43,10 @@ public class RolesController : ControllerBase
     }
 
     [HttpDelete]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id, [FromHeader]string? bearer)
+    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         var (validation, role) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)

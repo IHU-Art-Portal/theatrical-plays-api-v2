@@ -16,26 +16,17 @@ public class OrganizersController : ControllerBase
 {
     private readonly IOrganizerService _service;
     private readonly IOrganizerValidationService _validation;
-    private readonly IUserValidationService _userValidation;
     
-    public OrganizersController(IOrganizerService service, IOrganizerValidationService validation, IUserValidationService userService)
+    public OrganizersController(IOrganizerService service, IOrganizerValidationService validation)
     {
         _service = service;
         _validation = validation;
-        _userValidation = userService;
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto, [FromHeader] string? bearer)
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         await _service.Create(organizerCreateDto);
 
         var response = new TheatricalResponse("Successfully created Organizer");
@@ -59,36 +50,11 @@ public class OrganizersController : ControllerBase
         return new ObjectResult(response);
     }
     
-    [HttpGet("authorization")]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> GetOrganizersAuthorization()
-    {
-        
-        var (report, organizers) = await _validation.ValidateAndFetch();
-
-        if (!report.Success)
-        {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
-            return new NotFoundObjectResult(errorResponse);
-        }
-        
-        var response = new TheatricalResponse<List<Organizer>>(organizers);
-        
-        return new ObjectResult(response);
-    }
-
-    
     [HttpDelete]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id, [FromHeader] string? bearer)
+    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
         
         var (report, organizer) = await _validation.ValidateForDelete(id);
 

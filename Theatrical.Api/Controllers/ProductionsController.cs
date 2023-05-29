@@ -14,26 +14,17 @@ public class ProductionsController : ControllerBase
 {
     private readonly IProductionValidationService _validation;
     private readonly IProductionService _service;
-    private readonly IUserValidationService _userValidation;
 
-    public ProductionsController(IProductionService service, IProductionValidationService validation, IUserValidationService userValidationService)
+    public ProductionsController(IProductionService service, IProductionValidationService validation)
     {
         _service = service;
         _validation = validation;
-        _userValidation = userValidationService;
     }
     
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto, [FromHeader]string? bearer)
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         var validation = await _validation.ValidateForCreate(createProductionDto);
 
         if (!validation.Success)
@@ -68,16 +59,9 @@ public class ProductionsController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id, [FromHeader]string? bearer)
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id)
     {
-        var userValidation = _userValidation.ValidateUser(bearer);
-        
-        if (!userValidation.Success)
-        {
-            var responseError = new UserErrorMessage(userValidation.Message!).ConstructActionResult();
-            return responseError;
-        }
-        
         var (validation, production) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
