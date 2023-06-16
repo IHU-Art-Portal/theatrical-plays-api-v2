@@ -29,6 +29,21 @@ public class PerformerService : IPerformerService
             Surname = createPerformerDto.Surname,
             Created = DateTime.UtcNow
         };
+
+        if (createPerformerDto.Images != null && createPerformerDto.Images.Any())
+        {
+            List<Image> images = new List<Image>();
+            
+            foreach (string imageUrl in createPerformerDto.Images)
+            {
+                Image image = new Image { ImageUrl = imageUrl };
+                images.Add(image);
+            }
+
+            performer.Images = images;
+        }
+        
+        
         await _repository.Create(performer);
     }
 
@@ -36,7 +51,6 @@ public class PerformerService : IPerformerService
     {
         List<Performer> performers = await _repository.Get();
         List<PerformerDto> performerDtos = new();
-        
         
         if (page is null && size is null)
         {
