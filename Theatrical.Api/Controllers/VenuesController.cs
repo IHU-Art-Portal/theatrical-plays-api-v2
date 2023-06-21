@@ -45,7 +45,7 @@ public class VenuesController : ControllerBase
         if (!validation.Success)
         {
             var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse);
+            return new NotFoundObjectResult(errorResponse);
         }
 
         return new OkObjectResult(venue);
