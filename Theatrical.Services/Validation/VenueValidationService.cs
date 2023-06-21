@@ -1,4 +1,5 @@
 ﻿using Theatrical.Data.Models;
+using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -8,6 +9,7 @@ public interface IVenueValidationService
     Task<(ValidationReport report, List<Venue>? venue)> ValidateAndFetch();
     Task<(ValidationReport report, Venue? venue)> ValidateAndFetch(int venueId);
     Task<(ValidationReport report, Venue? venue)> ValidateForDelete(int venueId);
+    Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
 }
 
 public class VenueValidationService :  IVenueValidationService
@@ -68,5 +70,22 @@ public class VenueValidationService :  IVenueValidationService
         report.Success = true;
         report.Message = "Venue found and marked for delete";
         return (report, venue);
+    }
+
+    public async Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto)
+    {
+        var report = new ValidationReport();
+        var venue = await _repository.Get(venueDto.Id);
+
+        if (venue is null)
+        {
+            report.Success = false;
+            report.Message = "Venue not found";
+            return report;
+        }
+        
+        report.Success = true;
+        report.Message = "Venue can be updated";
+        return report;
     }
 }

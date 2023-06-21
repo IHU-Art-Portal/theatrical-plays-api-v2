@@ -82,4 +82,23 @@ public class VenuesController : ControllerBase
         return new ObjectResult(response);
     }
 
+    [HttpPut]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    public async Task<ActionResult<TheatricalResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
+    {
+        var validation = await _validation.ValidateForUpdate(venueDto);
+        
+        if (!validation.Success)
+        {
+            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+
+        
+        await _service.Update(venueDto);
+        TheatricalResponse response = new TheatricalResponse(message: $"Venue with ID: {venueDto.Id} has been updated!");
+        
+        return new ObjectResult(response);
+    }
+
 }

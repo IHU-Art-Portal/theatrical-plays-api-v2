@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 
@@ -10,6 +11,7 @@ public interface IVenueRepository
     Task<Venue?> Get(int id);
     Task Create(Venue venue);
     Task Delete(Venue venue);
+    Task Update(Venue venue);
 }
 
 public class VenueRepository : IVenueRepository
@@ -44,5 +46,16 @@ public class VenueRepository : IVenueRepository
         _context.Venues.Remove(venue);
         await _context.SaveChangesAsync();
     }
-    
+
+    public async Task Update(Venue venue)
+    {
+        var venueToUpdate = await _context.Venues.FindAsync(venue.Id);
+
+        venueToUpdate.Address = venue.Address;
+        venueToUpdate.Title = venue.Title;
+        
+        _context.Venues.Update(venueToUpdate);
+        await _context.SaveChangesAsync();
+        
+    }
 }

@@ -8,6 +8,7 @@ public interface IVenueService
 {
     Task Create(VenueCreateDto venueCreateDto);
     Task Delete(Venue venue);
+    Task Update(VenueUpdateDto venue);
 }
 
 public class VenueService : IVenueService
@@ -34,5 +35,16 @@ public class VenueService : IVenueService
     public async Task Delete(Venue venue)
     {
         await _repository.Delete(venue);
+    }
+
+    public async Task Update(VenueUpdateDto venueDto)
+    {
+        Venue venue = new Venue
+        {
+            Id = venueDto.Id,
+            Title = venueDto.Title,
+            Address = venueDto.Address
+        };
+        await _repository.Update(venue);
     }
 }
