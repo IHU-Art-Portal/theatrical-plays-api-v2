@@ -22,29 +22,29 @@ public class VenuesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetVenues()
+    public async Task<ActionResult<ApiResponse>> GetVenues()
     {
         var (validation, venues) = await _validation.ValidateAndFetch();
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new NotFoundObjectResult(errorResponse);
         }
-        var response = new TheatricalResponse<List<Venue>>(venues);
+        var response = new ApiResponse<List<Venue>>(venues);
         
         return new ObjectResult(response);
     }
 
     [HttpGet]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> GetVenue(int id)
+    public async Task<ActionResult<ApiResponse>> GetVenue(int id)
     {
         var (validation, venue) = await _validation.ValidateAndFetch(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new NotFoundObjectResult(errorResponse);
         }
 
@@ -52,51 +52,47 @@ public class VenuesController : ControllerBase
     }
 
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
+    public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
         await _service.Create(venueCreateDto);
     
-        var response = new TheatricalResponse("Venue successfully added");
+        var response = new ApiResponse("Venue successfully added");
 
         return new ObjectResult(response);
     }
 
     [HttpDelete]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteVenue(int id)
+    public async Task<ActionResult<ApiResponse>> DeleteVenue(int id)
     {
         var (validation, venue) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
         await _service.Delete(venue);
         
-        TheatricalResponse response = new TheatricalResponse(message: $"Venue with ID: {id} has been deleted!");
+        ApiResponse response = new ApiResponse(message: $"Venue with ID: {id} has been deleted!");
         
         return new ObjectResult(response);
     }
 
     [HttpPut]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
+    public async Task<ActionResult<ApiResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
     {
         var validation = await _validation.ValidateForUpdate(venueDto);
         
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
-
         
         await _service.Update(venueDto);
-        TheatricalResponse response = new TheatricalResponse(message: $"Venue with ID: {venueDto.Id} has been updated!");
+        ApiResponse response = new ApiResponse(message: $"Venue with ID: {venueDto.Id} has been updated!");
         
         return new ObjectResult(response);
     }

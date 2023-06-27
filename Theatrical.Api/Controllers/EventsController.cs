@@ -22,34 +22,34 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetEvents()
+    public async Task<ActionResult<ApiResponse>> GetEvents()
     {
         var (validation, events) = await _validation.FetchAndValidate();
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message!);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
             return new ObjectResult(errorResponse) { StatusCode = 404 };
         }
         
-        var response = new TheatricalResponse<List<Event>>(events);
+        var response = new ApiResponse<List<Event>>(events);
         return new OkObjectResult(response);
     }
     
     [HttpPost]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
+    public async Task<ActionResult<ApiResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
     {
         var validation = await _validation.ValidateForCreate(createEventDto);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse) { StatusCode = 404 };
         }
 
         await _service.Create(createEventDto);
-        var response = new TheatricalResponse("Successfully Created Event");
+        var response = new ApiResponse("Successfully Created Event");
         
         return new ObjectResult(response);
     }

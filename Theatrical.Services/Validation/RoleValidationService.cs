@@ -6,9 +6,9 @@ namespace Theatrical.Services.Validation;
 
 public interface IRoleValidationService
 {
-    Task<(ValidationReport report, Role? role)> ValidateForDelete(int id);
-    Task<(ValidationReport report, Role role)> ValidateForDelete(string roleToDelete);
-    Task<(ValidationReport report, List<Role>? roles)> ValidateForFetch();
+    Task<(ValidationReport report, Roles? role)> ValidateForDelete(int id);
+    Task<(ValidationReport report, Roles role)> ValidateForDelete(string roleToDelete);
+    Task<(ValidationReport report, List<Roles>? roles)> ValidateForFetch();
     Task<ValidationReport> ValidateForCreate(string searchRole);
 }
 
@@ -20,7 +20,7 @@ public class RoleValidationService : IRoleValidationService
     {
         _repository = repository;
     }
-    public async Task<(ValidationReport report, Role? role)> ValidateForDelete(int id)
+    public async Task<(ValidationReport report, Roles? role)> ValidateForDelete(int id)
     {
         var report = new ValidationReport();
         var role = await _repository.GetRole(id);
@@ -37,7 +37,7 @@ public class RoleValidationService : IRoleValidationService
         return (report, role);
     }
 
-    public async Task<(ValidationReport report, Role role)> ValidateForDelete(string roleToDelete)
+    public async Task<(ValidationReport report, Roles role)> ValidateForDelete(string roleToDelete)
     {
         var report = new ValidationReport();
         var role = await _repository.GetRoleByName(roleToDelete);
@@ -54,7 +54,7 @@ public class RoleValidationService : IRoleValidationService
         return (report, role);
     }
     
-    public async Task<(ValidationReport report, List<Role>? roles)> ValidateForFetch()
+    public async Task<(ValidationReport report, List<Roles>? roles)> ValidateForFetch()
     {
         var report = new ValidationReport();
         var roles = await _repository.GetRoles();

@@ -6,7 +6,7 @@ namespace Theatrical.Services;
 public interface IRoleService
 {
     Task Create(string role);
-    Task Delete(Role role);
+    Task Delete(Roles roles);
 }
 
 public class RoleService : IRoleService
@@ -20,13 +20,13 @@ public class RoleService : IRoleService
 
     public async Task Create(string role)
     {
-        var _role = new Role();
-        _role.Value = role;
+        var _role = new Roles();
+        _role.Role = role;
         await _repository.CreateRole(_role);
     }
 
-    public async Task Delete(Role role)
+    public async Task Delete(Roles roles)
     {
-        await _repository.DeleteRole(role);
+        await _repository.DeleteRole(roles);
     }
 }

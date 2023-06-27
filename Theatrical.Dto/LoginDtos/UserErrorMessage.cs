@@ -12,21 +12,21 @@ public class UserErrorMessage
         this.validationMessage = validationMessage;
     }
     
-    public ActionResult<TheatricalResponse> ConstructActionResult()
+    public ActionResult<ApiResponse> ConstructActionResult()
     {
         if (validationMessage.Equals("Invalid token"))
         {
-            var errorResponse1 = new TheatricalResponse(ErrorCode.InvalidToken, validationMessage);
+            var errorResponse1 = new ApiResponse(ErrorCode.InvalidToken, validationMessage);
             return new ObjectResult(errorResponse1){StatusCode = 498};
         }
         else if (validationMessage.Contains("forbidden"))
         {
-            var errorResponse1 = new TheatricalResponse(ErrorCode.Forbidden, validationMessage);
+            var errorResponse1 = new ApiResponse(ErrorCode.Forbidden, validationMessage);
             return new ObjectResult(errorResponse1){StatusCode = 403};
         }
         else
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.Unauthorized, validationMessage);
+            var errorResponse = new ApiResponse(ErrorCode.Unauthorized, validationMessage);
             return new ObjectResult(errorResponse){StatusCode = 401};
         }
     }

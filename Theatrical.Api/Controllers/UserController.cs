@@ -20,37 +20,37 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("register")]
-    public async Task<ActionResult<TheatricalResponse>> Register([FromBody] UserDto userDto)
+    public async Task<ActionResult<ApiResponse>> Register([FromBody] UserDto userDto)
     {
         
         var validation = await _validation.ValidateForRegister(userDto);
         
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.AlreadyExists, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message);
             return new ConflictObjectResult(errorResponse);
         }
 
         var userCreated = await _service.Register(userDto);
-        var response = new TheatricalResponse<UserDtoRole>(userCreated,"Successfully Registered!");
+        var response = new ApiResponse<UserDtoRole>(userCreated,"Successfully Registered!");
         
         return new OkObjectResult(response);
     }
     
     [HttpPost("login")]
-    public async Task<ActionResult<TheatricalResponse>> Login([FromBody]UserDto userDto)
+    public async Task<ActionResult<ApiResponse>> Login([FromBody]UserDto userDto)
     {
         var (report, user) = await _validation.ValidateForLogin(userDto);
 
         if (!report.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
        
         var jwtDto = _service.GenerateToken(user);
         
-        var response = new TheatricalResponse<JwtDto>(jwtDto);
+        var response = new ApiResponse<JwtDto>(jwtDto);
         
         return new OkObjectResult(response);
     }

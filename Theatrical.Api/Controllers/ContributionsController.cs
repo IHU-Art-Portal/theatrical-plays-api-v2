@@ -3,7 +3,6 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.ContributionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
-using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -22,35 +21,35 @@ public class ContributionsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetContributions()
+    public async Task<ActionResult<ApiResponse>> GetContributions()
     {
         var (validation, contributions) = await _validation.ValidateForFetch();
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message!);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
             return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound};
         }
 
-        var response = new TheatricalResponse<List<Contribution>>(contributions, "Completed");
+        var response = new ApiResponse<List<Contribution>>(contributions, "Completed");
         
         return new OkObjectResult(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<TheatricalResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
+    public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
     {
         var validation = await _validation.ValidateForCreate(contributionDto);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message!);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
             return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound};
         }
 
         await _service.Create(contributionDto);
         
-        var response = new TheatricalResponse("Successfully Created Contribution");
+        var response = new ApiResponse("Successfully Created Contribution");
 
         return new OkObjectResult(response);
     }

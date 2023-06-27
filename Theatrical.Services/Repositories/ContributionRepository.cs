@@ -77,7 +77,7 @@ public class ContributionRepository : IContributionRepository
     public async Task<(bool productionExists, bool performerExists, bool roleExists)> CheckExists(int performerId, int productionId, int roleId)
     {
         bool productionExists = await _context.Productions.AnyAsync(p => p.Id == productionId);
-        bool performerExists = await _context.Performers.AnyAsync(p => p.Id == performerId);
+        bool performerExists = await _context.persons.AnyAsync(p => p.Id == performerId);
         bool roleExists = await _context.Roles.AnyAsync(r => r.Id == roleId);
 
         return (productionExists, performerExists, roleExists);

@@ -21,57 +21,55 @@ public class RolesController : ControllerBase
     }
     
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{role}")]
-    public async Task<ActionResult<TheatricalResponse>> CreateRole(string role)
+    public async Task<ActionResult<ApiResponse>> CreateRole(string role)
     {
         var rolelowercase = role.ToLower();
         var validation = await _validation.ValidateForCreate(rolelowercase);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.AlreadyExists, validation.Message!);
+            var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message!);
             return new ConflictObjectResult(errorResponse);
         }
         
         await _service.Create(rolelowercase);
 
-        var response = new TheatricalResponse($"Successfully Created Role: {rolelowercase}");
+        var response = new ApiResponse($"Successfully Created Role: {rolelowercase}");
         
         return new OkObjectResult(response);
     }
 
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetRoles()
+    public async Task<ActionResult<ApiResponse>> GetRoles()
     {
         var (validation, roles) = await _validation.ValidateForFetch();
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
-        var response = new TheatricalResponse<List<Role>>(roles);
+        var response = new ApiResponse<List<Roles>>(roles);
         
         return new ObjectResult(response);
     }
 
     [HttpDelete]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteRole(int id)
+    public async Task<ActionResult<ApiResponse>> DeleteRole(int id)
     {
         var (validation, role) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
         await _service.Delete(role);
-        TheatricalResponse response = new TheatricalResponse(message: $"Role with ID: {id} has been deleted!");
+        ApiResponse response = new ApiResponse(message: $"Role with ID: {id} has been deleted!");
 
         return new OkObjectResult(response);
     }
@@ -79,19 +77,19 @@ public class RolesController : ControllerBase
     [HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("@name/{roleToDelete}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteRoleByName(string roleToDelete)
+    public async Task<ActionResult<ApiResponse>> DeleteRoleByName(string roleToDelete)
     {
         var lowercaseRole = roleToDelete.ToLower();
         var (validation, role) = await _validation.ValidateForDelete(lowercaseRole);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
         await _service.Delete(role);
-        TheatricalResponse response = new TheatricalResponse(message: $"Role: {lowercaseRole} has been deleted!");
+        ApiResponse response = new ApiResponse(message: $"Role: {lowercaseRole} has been deleted!");
 
         return new OkObjectResult(response);
     }

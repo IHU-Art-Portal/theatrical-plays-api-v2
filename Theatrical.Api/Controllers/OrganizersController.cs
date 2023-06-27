@@ -25,27 +25,27 @@ public class OrganizersController : ControllerBase
     
     [HttpPost]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
+    public async Task<ActionResult<ApiResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
     {
         await _service.Create(organizerCreateDto);
 
-        var response = new TheatricalResponse("Successfully created Organizer");
+        var response = new ApiResponse("Successfully created Organizer");
         
         return new OkObjectResult(response);
     }
 
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetOrganizers()
+    public async Task<ActionResult<ApiResponse>> GetOrganizers()
     {
         var (report, organizers) = await _validation.ValidateAndFetch();
 
         if (!report.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
             return new NotFoundObjectResult(errorResponse);
         }
         
-        var response = new TheatricalResponse<List<Organizer>>(organizers);
+        var response = new ApiResponse<List<Organizer>>(organizers);
         
         return new ObjectResult(response);
     }
@@ -53,19 +53,19 @@ public class OrganizersController : ControllerBase
     [HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeleteOrganizer(int id)
+    public async Task<ActionResult<ApiResponse>> DeleteOrganizer(int id)
     {
         
         var (report, organizer) = await _validation.ValidateForDelete(id);
 
         if (!report.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, report.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
             return new NotFoundObjectResult(errorResponse);
         }
 
         await _service.Delete(organizer);
-        var response = new TheatricalResponse<Organizer>(organizer, message: "Organizer has been deleted");
+        var response = new ApiResponse<Organizer>(organizer, message: "Organizer has been deleted");
         return new OkObjectResult(response);
     }
 }

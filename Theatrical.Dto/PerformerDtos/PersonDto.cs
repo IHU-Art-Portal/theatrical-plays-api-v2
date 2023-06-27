@@ -1,7 +1,7 @@
 ﻿namespace Theatrical.Dto.PerformerDtos;
 
-public class CreatePerformerDto
+public class PersonDto
 {
+    public int Id { get; set; }
     public string Fullname { get; set; }
-    public List<string>? Images { get; set; }
 }

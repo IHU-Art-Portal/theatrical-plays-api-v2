@@ -24,7 +24,7 @@ public class CustomAuthorizationFilter : IAuthorizationFilter
         if (string.IsNullOrEmpty(bearerToken))
         {
             // Handle unauthorized request
-            var errorResponse = new TheatricalResponse(ErrorCode.Unauthorized,"You did not provide a JWT token");
+            var errorResponse = new ApiResponse(ErrorCode.Unauthorized,"You did not provide a JWT token");
             context.Result = new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.Unauthorized};
             return;
         }
@@ -32,7 +32,7 @@ public class CustomAuthorizationFilter : IAuthorizationFilter
         if (!bearerToken.StartsWith("Bearer "))
         {
             //Handle incorrect bearer format
-            var errorResponse1 = new TheatricalResponse(ErrorCode.BadRequest, "Correct Format: Bearer YourToken");
+            var errorResponse1 = new ApiResponse(ErrorCode.BadRequest, "Correct Format: Bearer YourToken");
             context.Result = new ObjectResult(errorResponse1) { StatusCode = (int)HttpStatusCode.BadRequest };
             return;
         }
@@ -42,7 +42,7 @@ public class CustomAuthorizationFilter : IAuthorizationFilter
         
         if (claimsPrincipal is null)
         {
-            var errorResponse3 = new TheatricalResponse(ErrorCode.InvalidToken, "Invalid Token");
+            var errorResponse3 = new ApiResponse(ErrorCode.InvalidToken, "Invalid Token");
             context.Result = new ObjectResult(errorResponse3) { StatusCode = (int)HttpStatusCode.Unauthorized };
             return;
         }
@@ -50,7 +50,7 @@ public class CustomAuthorizationFilter : IAuthorizationFilter
         if (!context.HttpContext.User.IsInRole(_requiredRole))
         {
             //Handle forbidden user
-            var errorResponse2 = new TheatricalResponse(ErrorCode.Forbidden, "You are not allowed to make changes");
+            var errorResponse2 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes");
             context.Result = new ObjectResult(errorResponse2){StatusCode = (int)HttpStatusCode.Forbidden};
             return;
         }

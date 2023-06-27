@@ -4,30 +4,29 @@ using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.PerformersService;
 
-public interface IPerformerService
+public interface IPersonService
 {
     Task Create(CreatePerformerDto createPerformerDto);
     Task<PerformersPaginationDto> Get(int? page, int? size);
-    Task Delete(Performer performer);
-    Task<PerformerDto> Get(Performer performer);
+    Task Delete(Person person);
+    Task<PersonDto> Get(Person person);
 }
 
-public class PerformerService : IPerformerService
+public class PersonService : IPersonService
 {
-    private readonly IPerformerRepository _repository;
+    private readonly IPersonRepository _repository;
 
-    public PerformerService(IPerformerRepository repository)
+    public PersonService(IPersonRepository repository)
     {
         _repository = repository;
     }
 
     public async Task Create(CreatePerformerDto createPerformerDto)
     {
-        Performer performer = new Performer
+        Person person = new Person
         {
-            Name = createPerformerDto.Name,
-            Surname = createPerformerDto.Surname,
-            Created = DateTime.UtcNow
+            Fullname = createPerformerDto.Fullname,
+            Timestamp = DateTime.UtcNow
         };
 
         if (createPerformerDto.Images != null && createPerformerDto.Images.Any())
@@ -40,26 +39,25 @@ public class PerformerService : IPerformerService
                 images.Add(image);
             }
 
-            performer.Images = images;
+            person.Images = images;
         }
         
         
-        await _repository.Create(performer);
+        await _repository.Create(person);
     }
 
     public async Task<PerformersPaginationDto> Get(int? page, int? size)
     {
-        List<Performer> performers = await _repository.Get();
-        List<PerformerDto> performerDtos = new();
+        List<Person> performers = await _repository.Get();
+        List<PersonDto> performerDtos = new();
         
         if (page is null && size is null)
         {
             performerDtos.AddRange(performers.Select(performer => 
-                new PerformerDto
+                new PersonDto
                 {
                     Id = performer.Id,
-                    Name = performer.Name,
-                    Surname = performer.Surname
+                    Fullname = performer.Fullname
                 }));
 
             var response = new PerformersPaginationDto
@@ -85,13 +83,12 @@ public class PerformerService : IPerformerService
 
         foreach (var performer in performersPaged)
         {
-            PerformerDto performerDto = new PerformerDto
+            PersonDto personDto = new PersonDto
             {
                 Id = performer.Id,
-                Name = performer.Name,
-                Surname = performer.Surname
+                Fullname = performer.Fullname
             };
-            performerDtos.Add(performerDto);
+            performerDtos.Add(personDto);
         }
 
         PerformersPaginationDto response1 = new PerformersPaginationDto
@@ -105,18 +102,17 @@ public class PerformerService : IPerformerService
         return response1;
     }
 
-    public async Task Delete(Performer performer)
+    public async Task Delete(Person person)
     {
-        await _repository.Delete(performer);
+        await _repository.Delete(person);
     }
 
-    public async Task<PerformerDto> Get(Performer performer)
+    public async Task<PersonDto> Get(Person person)
     {
-        var performerDto = new PerformerDto
+        var performerDto = new PersonDto
         {
-            Id = performer.Id,
-            Name = performer.Name,
-            Surname = performer.Surname
+            Id = person.Id,
+            Fullname = person.Fullname
         };
         return performerDto;
     }

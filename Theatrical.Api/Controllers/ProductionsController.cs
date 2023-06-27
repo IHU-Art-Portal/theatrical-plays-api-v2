@@ -23,55 +23,55 @@ public class ProductionsController : ControllerBase
     
     [HttpPost]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
+    public async Task<ActionResult<ApiResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
         var validation = await _validation.ValidateForCreate(createProductionDto);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse) { StatusCode = 404 };
         }
 
         var createdProduction = await _service.Create(createProductionDto);
 
-        var response = new TheatricalResponse<ProductionDto>(createdProduction, "Successfully Created Production");
+        var response = new ApiResponse<ProductionDto>(createdProduction, "Successfully Created Production");
 
         return new ObjectResult(response){StatusCode = 201};
     }
 
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse>> GetProductions()
+    public async Task<ActionResult<ApiResponse>> GetProductions()
     {
         var (validation, productions) = await _validation.ValidateAndFetch();
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
         var productionsDto = _service.ConvertToDto(productions);
 
-        var response = new TheatricalResponse<List<ProductionDto>>(productionsDto);
+        var response = new ApiResponse<List<ProductionDto>>(productionsDto);
         
         return new OkObjectResult(response);
     }
 
     [HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> DeleteProduction(int id)
+    public async Task<ActionResult<ApiResponse>> DeleteProduction(int id)
     {
         var (validation, production) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
         await _service.Delete(production);
-        var response = new TheatricalResponse("Successfully Delete Production");
+        var response = new ApiResponse("Successfully Delete Production");
 
         return new ObjectResult(response);
     }

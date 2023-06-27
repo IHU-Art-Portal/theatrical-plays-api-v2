@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
@@ -11,12 +9,12 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class PerformersController : ControllerBase
+public class PersonsController : ControllerBase
 {
-    private readonly IPerformerService _service;
-    private readonly IPerformerValidationService _validation;
+    private readonly IPersonService _service;
+    private readonly IPersonValidationService _validation;
 
-    public PerformersController(IPerformerService service, IPerformerValidationService validation)
+    public PersonsController(IPersonService service, IPersonValidationService validation)
     {
         _service = service;
         _validation = validation;
@@ -29,19 +27,19 @@ public class PerformersController : ControllerBase
     /// <returns>TheatricalResponse&lt;PerformerDto&gt; object containing performer data.</returns>
     [HttpGet]
     [Route("{id:int}")]
-    public async Task<ActionResult<TheatricalResponse<PerformerDto>>> GetPerformer(int id)
+    public async Task<ActionResult<ApiResponse<PersonDto>>> GetPerson(int id)
     {
         var (validation, performer) = await _validation.ValidateAndFetch(id);
 
         if (!validation.Success)
         {
-            TheatricalResponse errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            ApiResponse errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
         var performerDto = await _service.Get(performer);
 
-        TheatricalResponse response = new TheatricalResponse<PerformerDto>(performerDto);
+        ApiResponse response = new ApiResponse<PersonDto>(performerDto);
         
         return new ObjectResult(response);
     }
@@ -53,23 +51,22 @@ public class PerformersController : ControllerBase
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
-    public async Task<ActionResult<TheatricalResponse<PerformersPaginationDto>>> GetPerformers(int? page, int? size)
+    public async Task<ActionResult<ApiResponse<PerformersPaginationDto>>> GetPersons(int? page, int? size)
     {
 
         PerformersPaginationDto performersDto = await _service.Get(page, size);
         
-        TheatricalResponse response = new TheatricalResponse<PerformersPaginationDto>(performersDto);
+        ApiResponse response = new ApiResponse<PerformersPaginationDto>(performersDto);
         
         return new ObjectResult(response);
     }
 
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
-    public async Task<ActionResult<TheatricalResponse>> CreatePerformer([FromBody] CreatePerformerDto createPerformerDto)
+    public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePerformerDto createPerformerDto)
     {
         await _service.Create(createPerformerDto);
 
-        var response = new TheatricalResponse("Successfully Created Performer");
+        var response = new ApiResponse("Successfully Created Person");
         
         return new OkObjectResult(response);
     }
@@ -82,20 +79,19 @@ public class PerformersController : ControllerBase
     }
 
     [HttpDelete]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
-    public async Task<ActionResult<TheatricalResponse>> DeletePerformer(int id)
+    public async Task<ActionResult<ApiResponse>> DeletePerformer(int id)
     {
         var (validation, performer) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new TheatricalResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
         await _service.Delete(performer);
-        TheatricalResponse response = new TheatricalResponse(message: $"Performer with ID: {id} has been deleted!");
+        ApiResponse response = new ApiResponse(message: $"Person with ID: {id} has been deleted!");
         
         return new OkObjectResult(response);
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -42,20 +43,24 @@ builder.Services.AddControllers().AddNewtonsoftJson(o =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(swagger =>
+{
+    swagger.SwaggerDoc("v2", new OpenApiInfo { Title = "Theatrical.Api", Version = "v2" });
+                    
+});
 
 //Swagger UI authorization support
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 //dbconnection
 builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("ConnString")));
+    opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //services registering
-//performer services
-builder.Services.AddTransient<IPerformerRepository, PerformerRepository>();
-builder.Services.AddTransient<IPerformerService, PerformerService>();
-builder.Services.AddTransient<IPerformerValidationService, PerformerValidationService>();
+//persons services
+builder.Services.AddTransient<IPersonRepository, PersonRepository>();
+builder.Services.AddTransient<IPersonService, PersonService>();
+builder.Services.AddTransient<IPersonValidationService, PersonValidationService>();
 
 //role services
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
@@ -107,7 +112,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v2/swagger.json", "Theatrical.Api v2"));
 
 
 app.UseHttpsRedirection();

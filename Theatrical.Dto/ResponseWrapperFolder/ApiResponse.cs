@@ -11,36 +11,36 @@ public enum ErrorCode
     BadRequest,
 }
 
-public class TheatricalResponse
+public class ApiResponse
 {
     public bool Success { get; }
     public string Message { get; }
     public string?  ErrorCode { get; }
 
-    public TheatricalResponse(ErrorCode code, string message)
+    public ApiResponse(ErrorCode code, string message)
     {
         ErrorCode = code.ToString();
         Success = false;
         Message = message;
     }
 
-    public TheatricalResponse(string message = "Successful")
+    public ApiResponse(string message = "Successful")
     {
         Success = true;
         Message = message;
     }
 }
 
-public class TheatricalResponse<T> : TheatricalResponse
+public class ApiResponse<T> : ApiResponse
 {
     public T? Data { get; }
 
-    public TheatricalResponse(T? data, string message = "Completed") : base(message)
+    public ApiResponse(T? data, string message = "Completed") : base(message)
     {
         Data = data;
     }
 
-    public TheatricalResponse(T? data, ErrorCode code, string message) : base(code, message)
+    public ApiResponse(T? data, ErrorCode code, string message) : base(code, message)
     {
         Data = data;
     }
