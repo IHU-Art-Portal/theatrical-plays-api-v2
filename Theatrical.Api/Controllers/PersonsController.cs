@@ -78,7 +78,7 @@ public class PersonsController : ControllerBase
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
     }
 
-    [HttpDelete]
+    /*[HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeletePerformer(int id)
     {
@@ -94,5 +94,5 @@ public class PersonsController : ControllerBase
         ApiResponse response = new ApiResponse(message: $"Person with ID: {id} has been deleted!");
         
         return new OkObjectResult(response);
-    }
+    }*/
 }

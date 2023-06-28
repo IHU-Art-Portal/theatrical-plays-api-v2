@@ -45,7 +45,7 @@ public class EventService : IEventService
         {
             ProductionId = createEventDto.ProductionId,
             VenueId = createEventDto.VenueId,
-            DateEvent = createEventDto.DateEvent,
+            //DateEvent = createEventDto.DateEvent,
             PriceRange = createEventDto.PriceRange,
             Timestamp = DateTime.UtcNow
         };

@@ -80,7 +80,7 @@ public class VenuesController : ControllerBase
         return new ObjectResult(response);
     }*/
 
-    [HttpPut]
+    /*[HttpPut]
     public async Task<ActionResult<ApiResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
     {
         var validation = await _validation.ValidateForUpdate(venueDto);
@@ -95,6 +95,6 @@ public class VenuesController : ControllerBase
         ApiResponse response = new ApiResponse(message: $"Venue with ID: {venueDto.Id} has been updated!");
         
         return new ObjectResult(response);
-    }
+    }*/
 
 }
