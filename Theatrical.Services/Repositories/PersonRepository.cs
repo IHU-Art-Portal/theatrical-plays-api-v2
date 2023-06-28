@@ -23,27 +23,27 @@ public class PersonRepository : IPersonRepository
 
     public async Task Create(Person person)
     {
-        await _context.persons.AddAsync(person);
+        await _context.Persons.AddAsync(person);
         await _context.SaveChangesAsync();
     }
     
     public async Task<List<Person>> Get()
     {
-        var persons = await _context.persons.ToListAsync();
+        var persons = await _context.Persons.ToListAsync();
 
         return persons;
     }
     
     public async Task<Person?> Get(int id)
     {
-        var performer = await _context.persons.FindAsync(id);
+        var performer = await _context.Persons.FindAsync(id);
 
         return performer;
     }
 
     public async Task Delete(Person person)
     {
-        _context.persons.Remove(person);
+        _context.Persons.Remove(person);
         await _context.SaveChangesAsync();
     }
 }

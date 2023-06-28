@@ -29,7 +29,7 @@ public class UserValidationService : IUserValidationService
     public async Task<ValidationReport> ValidateForRegister(UserDto userdto)
     {
         var report = new ValidationReport();
-        var user = await _repository.Get(userdto.Username);
+        var user = await _repository.Get(userdto.Email);
 
         if (user is not null)
         {
@@ -46,7 +46,7 @@ public class UserValidationService : IUserValidationService
     public async Task<(ValidationReport report, User user)> ValidateForLogin(UserDto userDto)
     {
         var report = new ValidationReport();
-        var user = await _repository.Get(userDto.Username);
+        var user = await _repository.Get(userDto.Email);
 
         if (user is null)
         {

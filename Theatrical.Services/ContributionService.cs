@@ -23,11 +23,11 @@ public class ContributionService : IContributionService
     {
         Contribution contribution = new Contribution
         {
-            PerformerId = createContributionDto.PerformerId,
+            PeopleId = createContributionDto.PeopleId,
             ProductionId = createContributionDto.ProductionId,
             RoleId = createContributionDto.RoleId,
-            Subrole = createContributionDto.SubRole,
-            Created = DateTime.UtcNow
+            SubRole = createContributionDto.SubRole,
+            Timestamp = DateTime.UtcNow
         };
 
         await _repository.Create(contribution);

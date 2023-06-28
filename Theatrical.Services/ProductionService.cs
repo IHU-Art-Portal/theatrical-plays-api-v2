@@ -26,7 +26,7 @@ public class ProductionService : IProductionService
         var productionDto = new ProductionDto
         {
             Id = production.Id,
-            OrganizerId = production.OrganizerId,
+            OrganizerId = (int)production.OrganizerId,
             Title = production.Title,
             Description = production.Description,
             Url = production.Url,
@@ -49,7 +49,7 @@ public class ProductionService : IProductionService
             Producer = createProductionDto.Producer,
             MediaUrl = createProductionDto.MediaUrl,
             Duration = createProductionDto.Duration,
-            Created = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow
         };
 
         await _repo.Create(production);
@@ -60,7 +60,7 @@ public class ProductionService : IProductionService
             Description = production.Description,
             Duration = production.Duration,
             MediaUrl = production.MediaUrl,
-            OrganizerId = production.OrganizerId,
+            OrganizerId = (int)production.OrganizerId,
             Producer = production.Producer,
             Title = production.Title,
             Url = production.Url
@@ -86,7 +86,7 @@ public class ProductionService : IProductionService
                 Description = production.Description,
                 Duration = production.Duration,
                 MediaUrl = production.MediaUrl,
-                OrganizerId = production.OrganizerId,
+                OrganizerId = (int)production.OrganizerId,
                 Producer = production.Producer,
                 Title = production.Title,
                 Url = production.Url

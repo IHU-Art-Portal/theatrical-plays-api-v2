@@ -8,10 +8,10 @@ public interface IContributionRepository
 {
     Task<List<Contribution>> Get();
     Task Create(Contribution contribution);
-    Task<List<Contribution>> GetSpecific(int performerId, int productionId, int roleId);
+    Task<List<Contribution>> GetSpecific(int personId, int productionId, int roleId);
     Task<List<Contribution>> GetByRole(int roleId);
     Task<List<Contribution>> GetByProduction(int productionId);
-    Task<List<Contribution>> GetByPerformer(int performerId);
+    Task<List<Contribution>> GetByPerformer(int personId);
 
     Task<(bool productionExists, bool performerExists, bool roleExists)> CheckExists(int performerId, int productionId,
         int roleId);
@@ -38,10 +38,10 @@ public class ContributionRepository : IContributionRepository
         return contributions;
     }
 
-    public async Task<List<Contribution>> GetByPerformer(int performerId)
+    public async Task<List<Contribution>> GetByPerformer(int personId)
     {
         var contributions = await _context.Contributions
-            .Where(c => c.PerformerId == performerId)
+            .Where(c => c.PeopleId == personId)
             .ToListAsync();
         
         return contributions;
@@ -65,10 +65,10 @@ public class ContributionRepository : IContributionRepository
         return contributions;
     }
 
-    public async Task<List<Contribution>> GetSpecific(int performerId, int productionId, int roleId)
+    public async Task<List<Contribution>> GetSpecific(int personId, int productionId, int roleId)
     {
         var contributions = await _context.Contributions
-            .Where(c => c.PerformerId == performerId && c.ProductionId == productionId && c.RoleId == roleId)
+            .Where(c => c.PeopleId == personId && c.ProductionId == productionId && c.RoleId == roleId)
             .ToListAsync();
         
         return contributions;
@@ -77,7 +77,7 @@ public class ContributionRepository : IContributionRepository
     public async Task<(bool productionExists, bool performerExists, bool roleExists)> CheckExists(int performerId, int productionId, int roleId)
     {
         bool productionExists = await _context.Productions.AnyAsync(p => p.Id == productionId);
-        bool performerExists = await _context.persons.AnyAsync(p => p.Id == performerId);
+        bool performerExists = await _context.Persons.AnyAsync(p => p.Id == performerId);
         bool roleExists = await _context.Roles.AnyAsync(r => r.Id == roleId);
 
         return (productionExists, performerExists, roleExists);

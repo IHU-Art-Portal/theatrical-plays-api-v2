@@ -61,7 +61,7 @@ public class VenuesController : ControllerBase
         return new ObjectResult(response);
     }
 
-    [HttpDelete]
+    /*[HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeleteVenue(int id)
     {
@@ -78,7 +78,7 @@ public class VenuesController : ControllerBase
         ApiResponse response = new ApiResponse(message: $"Venue with ID: {id} has been deleted!");
         
         return new ObjectResult(response);
-    }
+    }*/
 
     [HttpPut]
     public async Task<ActionResult<ApiResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)

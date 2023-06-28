@@ -26,7 +26,7 @@ public class VenueService : IVenueService
         {
             Title = venueCreateDto.Address,
             Address = venueCreateDto.Address,
-            Created = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow
         }; 
         
         await _repository.Create(venue);

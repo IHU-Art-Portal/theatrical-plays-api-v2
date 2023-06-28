@@ -50,7 +50,7 @@ public class OrganizersController : ControllerBase
         return new ObjectResult(response);
     }
     
-    [HttpDelete]
+    /*[HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeleteOrganizer(int id)
@@ -67,5 +67,5 @@ public class OrganizersController : ControllerBase
         await _service.Delete(organizer);
         var response = new ApiResponse<Organizer>(organizer, message: "Organizer has been deleted");
         return new OkObjectResult(response);
-    }
+    }*/
 }

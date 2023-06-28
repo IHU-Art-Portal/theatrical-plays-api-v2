@@ -48,21 +48,22 @@ public class PersonService : IPersonService
 
     public async Task<PerformersPaginationDto> Get(int? page, int? size)
     {
-        List<Person> performers = await _repository.Get();
-        List<PersonDto> performerDtos = new();
+        List<Person> persons = await _repository.Get();
+        List<PersonDto> personDtos = new();
         
         if (page is null && size is null)
         {
-            performerDtos.AddRange(performers.Select(performer => 
+            personDtos.AddRange(persons.Select(person => 
                 new PersonDto
                 {
-                    Id = performer.Id,
-                    Fullname = performer.Fullname
+                    Id = person.Id,
+                    Fullname = person.Fullname,
+                    SystemID = person.SystemId
                 }));
 
             var response = new PerformersPaginationDto
             {
-                Performers = performerDtos,
+                Persons = personDtos,
                 CurrentPage = null,
                 PageSize = null
             };
@@ -74,26 +75,27 @@ public class PersonService : IPersonService
         if (page is null) page = 1;
 
         var pageResults = (float)size;
-        var pageCount = Math.Ceiling(performers.Count / pageResults);
+        var pageCount = Math.Ceiling(persons.Count / pageResults);
 
-        var performersPaged = performers
+        var personsPaged = persons
             .Skip((page.Value - 1) * (int)pageResults)
             .Take((int)pageResults)
             .ToList();
 
-        foreach (var performer in performersPaged)
+        foreach (var person in personsPaged)
         {
             PersonDto personDto = new PersonDto
             {
-                Id = performer.Id,
-                Fullname = performer.Fullname
+                Id = person.Id,
+                Fullname = person.Fullname,
+                SystemID = person.SystemId
             };
-            performerDtos.Add(personDto);
+            personDtos.Add(personDto);
         }
 
         PerformersPaginationDto response1 = new PerformersPaginationDto
         {
-            Performers = performerDtos,
+            Persons = personDtos,
             CurrentPage = page,
             PageSize = (int)pageCount
         };
@@ -109,12 +111,13 @@ public class PersonService : IPersonService
 
     public async Task<PersonDto> Get(Person person)
     {
-        var performerDto = new PersonDto
+        var personDto = new PersonDto
         {
             Id = person.Id,
-            Fullname = person.Fullname
+            Fullname = person.Fullname,
+            SystemID = person.SystemId
         };
-        return performerDto;
+        return personDto;
     }
 
 }

@@ -37,17 +37,17 @@ public class UserService : IUserService
         
         User user = new User
         {
-            Username = userDto.Username,
+            Email = userDto.Email,
             Password = hashedPassword,
-            Role = "user"
+            Enabled = true
         };
         
         var userCreated = await _repository.Register(user);
         var userDtoRole = new UserDtoRole
         {
             Id = userCreated.Id,
-            Username = userCreated.Username,
-            Role = userCreated.Role,
+            Email = userCreated.Email,
+            Enabled = true,
             Note = "In order to use POST/DELETE methods your account role must be admin."
         };
 

@@ -6,7 +6,7 @@ namespace Theatrical.Services.Repositories;
 
 public interface IUserRepository
 {
-    Task<User?> Get(string username);
+    Task<User?> Get(string email);
     Task<User> Register(User user);
 }
 
@@ -19,9 +19,9 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<User?> Get(string username)
+    public async Task<User?> Get(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<User> Register(User user)
@@ -29,7 +29,7 @@ public class UserRepository : IUserRepository
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
         
-        var userCreated = await Get(user.Username);
+        var userCreated = await Get(user.Email);
         return userCreated;
     }
 }

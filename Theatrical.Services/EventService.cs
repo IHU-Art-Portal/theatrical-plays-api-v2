@@ -29,7 +29,7 @@ public class EventService : IEventService
             var tempEvent = new EventDto
             {
                 DateEvent = newEvent.DateEvent,
-                PriceRange = newEvent.PriceRage,
+                PriceRange = newEvent.PriceRange,
                 ProductionId = newEvent.ProductionId,
                 VenueId = newEvent.VenueId
             };
@@ -46,8 +46,8 @@ public class EventService : IEventService
             ProductionId = createEventDto.ProductionId,
             VenueId = createEventDto.VenueId,
             DateEvent = createEventDto.DateEvent,
-            PriceRage = createEventDto.PriceRange,
-            Created = DateTime.UtcNow
+            PriceRange = createEventDto.PriceRange,
+            Timestamp = DateTime.UtcNow
         };
         
         await _repository.Create(eventNew);

@@ -1,18 +1,22 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace Theatrical.Data.Models;
 
 public class Production
 {
     public int Id { get; set; }
-    public int OrganizerId { get; set; }
-    public virtual Organizer Organizer { get; set; } //A production belongs to one Organizer
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public string? Url { get; set; }
-    public string? Producer { get; set; }
-    public string? MediaUrl { get; set; }
-    public string? Duration { get; set; }
-    public DateTime Created { get; set; }
-    public virtual List<Contribution> Contributions { get; set; } //A production can have many contributions
+    public int? OrganizerId { get; set; }
+    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public string Url { get; set; } = null!;
+    public string Producer { get; set; } = null!;
+    public string MediaUrl { get; set; } = null!;
+    public string Duration { get; set; } = null!;
+    public int SystemId { get; set; }
+    public DateTime Timestamp { get; set; }
+    public virtual Organizer? Organizer { get; set; }
+    public virtual System System { get; set; } = null!;
+    public virtual List<Contribution> Contributions { get; set; }
     public virtual List<Event> Events { get; set; }
 }

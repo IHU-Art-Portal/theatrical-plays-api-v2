@@ -51,12 +51,12 @@ public class RolesController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
-        var response = new ApiResponse<List<Roles>>(roles);
+        var response = new ApiResponse<List<Role>>(roles);
         
         return new ObjectResult(response);
     }
 
-    [HttpDelete]
+    /*[HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeleteRole(int id)
     {
@@ -92,5 +92,5 @@ public class RolesController : ControllerBase
         ApiResponse response = new ApiResponse(message: $"Role: {lowercaseRole} has been deleted!");
 
         return new OkObjectResult(response);
-    }
+    }*/
 }

@@ -37,7 +37,7 @@ public class OrganizerService : IOrganizerService
             Email = organizerCreateDto.Email,
             Doy = organizerCreateDto.Doy,
             Afm = organizerCreateDto.Afm,
-            Created = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow
         };
         await _repository.Create(organizer);
     }

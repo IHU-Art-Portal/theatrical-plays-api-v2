@@ -29,7 +29,7 @@ public class PersonsController : ControllerBase
     [Route("{id:int}")]
     public async Task<ActionResult<ApiResponse<PersonDto>>> GetPerson(int id)
     {
-        var (validation, performer) = await _validation.ValidateAndFetch(id);
+        var (validation, person) = await _validation.ValidateAndFetch(id);
 
         if (!validation.Success)
         {
@@ -37,7 +37,7 @@ public class PersonsController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
-        var performerDto = await _service.Get(performer);
+        var performerDto = await _service.Get(person);
 
         ApiResponse response = new ApiResponse<PersonDto>(performerDto);
         

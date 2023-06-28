@@ -58,7 +58,7 @@ public class ProductionsController : ControllerBase
         return new OkObjectResult(response);
     }
 
-    [HttpDelete]
+    /*[HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DeleteProduction(int id)
     {
@@ -74,5 +74,5 @@ public class ProductionsController : ControllerBase
         var response = new ApiResponse("Successfully Delete Production");
 
         return new ObjectResult(response);
-    }
+    }*/
 }
