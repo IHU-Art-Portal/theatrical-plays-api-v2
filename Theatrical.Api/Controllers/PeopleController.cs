@@ -81,6 +81,7 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
         try
@@ -133,6 +134,8 @@ public class PeopleController : ControllerBase
         }
     }
 
+    
+    
     /*[HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeletePerformer(int id)

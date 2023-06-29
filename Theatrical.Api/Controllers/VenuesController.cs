@@ -75,6 +75,7 @@ public class VenuesController : ControllerBase
     }
 
     [HttpPost]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
         try

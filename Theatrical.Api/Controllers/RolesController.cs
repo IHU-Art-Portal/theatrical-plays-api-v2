@@ -22,6 +22,7 @@ public class RolesController : ControllerBase
     
     [HttpPost]
     [Route("{role}")]
+    [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateRole(string role)
     {
         try
