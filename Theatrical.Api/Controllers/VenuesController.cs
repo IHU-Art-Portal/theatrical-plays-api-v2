@@ -31,7 +31,10 @@ public class VenuesController : ControllerBase
             var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
             return new NotFoundObjectResult(errorResponse);
         }
-        var response = new ApiResponse<List<Venue>>(venues);
+
+        var venuesDto = _service.ToDto(venues!);
+        
+        var response = new ApiResponse<List<VenueDto>>(venuesDto);
         
         return new ObjectResult(response);
     }
@@ -48,12 +51,15 @@ public class VenuesController : ControllerBase
             return new NotFoundObjectResult(errorResponse);
         }
 
-        return new OkObjectResult(venue);
+        var venueDto = _service.ToDto(venue!);
+
+        return new OkObjectResult(venueDto);
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
+        
         await _service.Create(venueCreateDto);
     
         var response = new ApiResponse("Venue successfully added");

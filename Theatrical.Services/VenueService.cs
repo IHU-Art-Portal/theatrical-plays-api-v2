@@ -9,6 +9,8 @@ public interface IVenueService
     Task Create(VenueCreateDto venueCreateDto);
     Task Delete(Venue venue);
     Task Update(VenueUpdateDto venue);
+    List<VenueDto> ToDto(List<Venue> venue);
+    VenueDto ToDto(Venue venue);
 }
 
 public class VenueService : IVenueService
@@ -46,5 +48,38 @@ public class VenueService : IVenueService
             Address = venueDto.Address
         };
         await _repository.Update(venue);
+    }
+
+    public List<VenueDto> ToDto(List<Venue> venues)
+    {
+        var venuesDtos = new List<VenueDto>();
+
+        foreach (var venue in venues)
+        {
+            VenueDto venueDto = new VenueDto
+            {
+                Id = venue.Id,
+                Title = venue.Title,
+                Address = venue.Address,
+                SystemId = venue.SystemId
+            };
+            venuesDtos.Add(venueDto);
+        }
+        
+        
+        return venuesDtos;
+    }
+
+    public VenueDto ToDto(Venue venue)
+    {
+        var venueDto = new VenueDto
+        {
+            Id = venue.Id,
+            Title = venue.Title,
+            Address = venue.Address,
+            SystemId = venue.SystemId
+        };
+        
+        return venueDto;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.PerformerDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
@@ -9,12 +10,12 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
-public class PersonsController : ControllerBase
+public class PeopleController : ControllerBase
 {
     private readonly IPersonService _service;
     private readonly IPersonValidationService _validation;
 
-    public PersonsController(IPersonService service, IPersonValidationService validation)
+    public PeopleController(IPersonService service, IPersonValidationService validation)
     {
         _service = service;
         _validation = validation;
@@ -37,7 +38,7 @@ public class PersonsController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
-        var performerDto = await _service.Get(person);
+        var performerDto = _service.ToDto(person);
 
         ApiResponse response = new ApiResponse<PersonDto>(performerDto);
         
@@ -76,6 +77,22 @@ public class PersonsController : ControllerBase
     public ActionResult GetPerformersRole(string role, int? page, int? size)
     {
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
+    }
+
+    [HttpGet]
+    [Route("{role}")]
+    public async Task<ActionResult> GetPeopleByRole(string role)
+    {
+        var (validation, people) = await _validation.ValidateForFetchRole(role);
+
+        if (!validation.Success)
+        {
+            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+            return new ObjectResult(errorResponse){StatusCode = 404};
+        }
+
+        var response = new ApiResponse<List<Person>>(people);
+        return new OkObjectResult(response);
     }
 
     /*[HttpDelete]

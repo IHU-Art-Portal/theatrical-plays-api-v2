@@ -9,7 +9,7 @@ public interface IPersonService
     Task Create(CreatePerformerDto createPerformerDto);
     Task<PerformersPaginationDto> Get(int? page, int? size);
     Task Delete(Person person);
-    Task<PersonDto> Get(Person person);
+    PersonDto ToDto(Person person);
 }
 
 public class PersonService : IPersonService
@@ -109,7 +109,7 @@ public class PersonService : IPersonService
         await _repository.Delete(person);
     }
 
-    public async Task<PersonDto> Get(Person person)
+    public PersonDto ToDto(Person person)
     {
         var personDto = new PersonDto
         {

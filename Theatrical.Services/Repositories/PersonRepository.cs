@@ -10,6 +10,7 @@ public interface IPersonRepository
     Task<List<Person>> Get();
     Task Delete(Person person);
     Task<Person?> Get(int id);
+    Task<List<Person>?> GetByRole(string role);
 }
 
 public class PersonRepository : IPersonRepository
@@ -36,9 +37,18 @@ public class PersonRepository : IPersonRepository
     
     public async Task<Person?> Get(int id)
     {
-        var performer = await _context.Persons.FindAsync(id);
+        var person = await _context.Persons.FindAsync(id);
 
-        return performer;
+        return person;
+    }
+
+    public async Task<List<Person>?> GetByRole(string role)
+    {
+        var personsWithRole = await _context.Persons.Where(p => p.Contributions
+                .Any(c => c.Role.Role1 == role))
+            .ToListAsync();
+
+        return personsWithRole;
     }
 
     public async Task Delete(Person person)

@@ -9,10 +9,7 @@ public class Person
     public string Fullname { get; set; } = null!;
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
-
     public virtual System System { get; set; } = null!;
     public virtual List<Contribution> Contributions { get; set; }
-    
-    public int ImageId { get; set; }
     public virtual List<Image> Images { get; set; }
 }

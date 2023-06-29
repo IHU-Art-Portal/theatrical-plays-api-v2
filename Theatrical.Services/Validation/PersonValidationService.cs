@@ -7,8 +7,9 @@ namespace Theatrical.Services.Validation;
 
 public interface IPersonValidationService
 {
-    Task<(ValidationReport report, Person? performer)> ValidateAndFetch(int performerId);
-    Task<(ValidationReport report, Person? performer)> ValidateForDelete(int performerId);
+    Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId);
+    Task<(ValidationReport report, Person? person)> ValidateForDelete(int performerId);
+    Task<(ValidationReport report, List<Person>? person)> ValidateForFetchRole(string role);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -20,7 +21,7 @@ public class PersonValidationService : IPersonValidationService
         _repository = repository;
     }
 
-    public async Task<(ValidationReport report, Person? performer)> ValidateAndFetch(int performerId)
+    public async Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId)
     {
         var performer = await _repository.Get(performerId);
         var report = new ValidationReport();
@@ -37,12 +38,12 @@ public class PersonValidationService : IPersonValidationService
         return (report, performer);
     }
 
-    public async Task<(ValidationReport report, Person? performer)> ValidateForDelete(int performerId)
+    public async Task<(ValidationReport report, Person? person)> ValidateForDelete(int performerId)
     {
-        var performer = await _repository.Get(performerId);
+        var person = await _repository.Get(performerId);
         var report = new ValidationReport();
         
-        if (performer is null)
+        if (person is null)
         {
             report.Success = false;
             report.Message = "Person not found";
@@ -51,6 +52,24 @@ public class PersonValidationService : IPersonValidationService
 
         report.Success = true;
         report.Message = "Person exists and marked for deletion";
-        return (report, performer);
+        return (report, person);
+    }
+
+    public async Task<(ValidationReport report, List<Person>? person)> ValidateForFetchRole(string role)
+    {
+        var persons = await _repository.GetByRole(role);
+        var report = new ValidationReport();
+
+        if (!persons.Any())
+        {
+            report.Success = false;
+            report.Message = "Not Found any people with the provided role";
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Found people with the provided role";
+        return (report, persons);
+
     }
 }
