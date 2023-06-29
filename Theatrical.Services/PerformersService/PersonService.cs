@@ -12,7 +12,8 @@ public interface IPersonService
     Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
-    PaginationResult<PersonDto> Paginate(List<Person> persons, int? size, int? page);
+    PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size);
+    List<PersonDto> ToDto(List<Person> people);
 }
 
 public class PersonService : IPersonService
@@ -84,7 +85,7 @@ public class PersonService : IPersonService
         return personDto;
     }
 
-    public PaginationResult<PersonDto> Paginate(List<Person> persons, int? page, int? size)
+    public PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size)
     {
         var paginationResult = _pagination.GetPaginated(page, size, persons, items =>
         {
@@ -98,5 +99,18 @@ public class PersonService : IPersonService
         
         return paginationResult;
     }
-    
+
+    public List<PersonDto> ToDto(List<Person> people)
+    {
+        
+        var personDtos = people.Select(person => new PersonDto
+        {
+            Id = person.Id,
+            Fullname = person.Fullname,
+            SystemID = person.SystemId
+        }).ToList();
+
+        return personDtos;
+
+    }
 }

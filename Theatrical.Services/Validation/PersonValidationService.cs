@@ -9,6 +9,7 @@ public interface IPersonValidationService
     Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId);
     Task<(ValidationReport report, Person? person)> ValidateForDelete(int performerId);
     Task<(ValidationReport report, List<Person>? person)> ValidateForFetchRole(string role);
+    Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -69,6 +70,22 @@ public class PersonValidationService : IPersonValidationService
         report.Success = true;
         report.Message = "Found people with the provided role";
         return (report, persons);
+    }
 
+    public async Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials)
+    {
+        var persons = await _repository.GetByLetter(initials);
+        var report = new ValidationReport();
+
+        if (!persons.Any())
+        {
+            report.Success = false;
+            report.Message = $"Not Found any people with the initials: {initials}";
+            return (report, null);
+        }
+        
+        report.Success = true;
+        report.Message = "Found people with the provided criteria";
+        return (report, persons);
     }
 }
