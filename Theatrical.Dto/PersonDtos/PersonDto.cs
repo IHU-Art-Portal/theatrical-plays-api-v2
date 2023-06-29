@@ -1,4 +1,4 @@
-﻿namespace Theatrical.Dto.PerformerDtos;
+﻿namespace Theatrical.Dto.PersonDtos;
 
 public class PersonDto
 {

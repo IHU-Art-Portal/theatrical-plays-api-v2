@@ -12,6 +12,7 @@ using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
 using Theatrical.Services.Jwt;
+using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
@@ -99,6 +100,9 @@ builder.Services.AddTransient<IContributionService, ContributionService>();
 
 //Jwt Token service
 builder.Services.AddTransient<ITokenService, TokenService>();
+
+//Pagination service
+builder.Services.AddTransient<IPaginationService, PaginationService>();
 
 //Serilog Console log styling
 var logger = new LoggerConfiguration()

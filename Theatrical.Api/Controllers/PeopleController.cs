@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
-using Theatrical.Dto.PerformerDtos;
+using Theatrical.Dto.Pagination;
+using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Validation;
@@ -52,20 +53,20 @@ public class PeopleController : ControllerBase
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<PerformersPaginationDto>>> GetPersons(int? page, int? size)
+    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size)
     {
 
-        PerformersPaginationDto performersDto = await _service.Get(page, size);
+        var peopleDto = await _service.GetAndPaginate(page, size);
         
-        ApiResponse response = new ApiResponse<PerformersPaginationDto>(performersDto);
+        ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
         
         return new ObjectResult(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePerformerDto createPerformerDto)
+    public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
-        await _service.Create(createPerformerDto);
+        await _service.Create(createPersonDto);
 
         var response = new ApiResponse("Successfully Created Person");
         
@@ -74,14 +75,14 @@ public class PeopleController : ControllerBase
 
     [HttpGet]
     [Route("search")]
-    public ActionResult GetPerformersRole(string role, int? page, int? size)
+    public ActionResult GetPerformersRole(string? role, int? page, int? size)
     {
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
     }
 
     [HttpGet]
     [Route("{role}")]
-    public async Task<ActionResult> GetPeopleByRole(string role)
+    public async Task<ActionResult<ApiResponse>> GetPeopleByRole(string role, int? page, int? size)
     {
         var (validation, people) = await _validation.ValidateForFetchRole(role);
 
@@ -91,7 +92,9 @@ public class PeopleController : ControllerBase
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
 
-        var response = new ApiResponse<List<Person>>(people);
+        var paginationResult = _service.Paginate(people!, page, size);
+        
+        var response = new ApiResponse<PaginationResult<PersonDto>>(paginationResult);
         return new OkObjectResult(response);
     }
 

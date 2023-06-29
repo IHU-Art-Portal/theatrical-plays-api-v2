@@ -1,39 +1,44 @@
 ﻿using Theatrical.Data.Models;
-using Theatrical.Dto.PerformerDtos;
+using Theatrical.Dto.Pagination;
+using Theatrical.Dto.PersonDtos;
+using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.PerformersService;
 
 public interface IPersonService
 {
-    Task Create(CreatePerformerDto createPerformerDto);
-    Task<PerformersPaginationDto> Get(int? page, int? size);
+    Task Create(CreatePersonDto createPersonDto);
+    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
+    PaginationResult<PersonDto> Paginate(List<Person> persons, int? size, int? page);
 }
 
 public class PersonService : IPersonService
 {
     private readonly IPersonRepository _repository;
+    private readonly IPaginationService _pagination;
 
-    public PersonService(IPersonRepository repository)
+    public PersonService(IPersonRepository repository, IPaginationService paginationService)
     {
         _repository = repository;
+        _pagination = paginationService;
     }
 
-    public async Task Create(CreatePerformerDto createPerformerDto)
+    public async Task Create(CreatePersonDto createPersonDto)
     {
         Person person = new Person
         {
-            Fullname = createPerformerDto.Fullname,
+            Fullname = createPersonDto.Fullname,
             Timestamp = DateTime.UtcNow
         };
 
-        if (createPerformerDto.Images != null && createPerformerDto.Images.Any())
+        if (createPersonDto.Images != null && createPersonDto.Images.Any())
         {
             List<Image> images = new List<Image>();
             
-            foreach (string imageUrl in createPerformerDto.Images)
+            foreach (string imageUrl in createPersonDto.Images)
             {
                 Image image = new Image { ImageUrl = imageUrl };
                 images.Add(image);
@@ -46,62 +51,21 @@ public class PersonService : IPersonService
         await _repository.Create(person);
     }
 
-    public async Task<PerformersPaginationDto> Get(int? page, int? size)
+    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size)
     {
         List<Person> persons = await _repository.Get();
-        List<PersonDto> personDtos = new();
+
+        var paginationResult = _pagination.GetPaginated(page, size, persons, items =>
+        {
+            return items.Select(personsDto => new PersonDto
+            {
+                Id = personsDto.Id,
+                Fullname = personsDto.Fullname,
+                SystemID = personsDto.SystemId
+            });
+        });
         
-        if (page is null && size is null)
-        {
-            personDtos.AddRange(persons.Select(person => 
-                new PersonDto
-                {
-                    Id = person.Id,
-                    Fullname = person.Fullname,
-                    SystemID = person.SystemId
-                }));
-
-            var response = new PerformersPaginationDto
-            {
-                Persons = personDtos,
-                CurrentPage = null,
-                PageSize = null
-            };
-
-            return response;
-        }
-
-        size ??= 10;
-        if (page is null) page = 1;
-
-        var pageResults = (float)size;
-        var pageCount = Math.Ceiling(persons.Count / pageResults);
-
-        var personsPaged = persons
-            .Skip((page.Value - 1) * (int)pageResults)
-            .Take((int)pageResults)
-            .ToList();
-
-        foreach (var person in personsPaged)
-        {
-            PersonDto personDto = new PersonDto
-            {
-                Id = person.Id,
-                Fullname = person.Fullname,
-                SystemID = person.SystemId
-            };
-            personDtos.Add(personDto);
-        }
-
-        PerformersPaginationDto response1 = new PerformersPaginationDto
-        {
-            Persons = personDtos,
-            CurrentPage = page,
-            PageSize = (int)pageCount
-        };
-       
-
-        return response1;
+        return paginationResult;
     }
 
     public async Task Delete(Person person)
@@ -120,4 +84,19 @@ public class PersonService : IPersonService
         return personDto;
     }
 
+    public PaginationResult<PersonDto> Paginate(List<Person> persons, int? page, int? size)
+    {
+        var paginationResult = _pagination.GetPaginated(page, size, persons, items =>
+        {
+            return items.Select(personsDto => new PersonDto
+            {
+                Id = personsDto.Id,
+                Fullname = personsDto.Fullname,
+                SystemID = personsDto.SystemId
+            });
+        });
+        
+        return paginationResult;
+    }
+    
 }
