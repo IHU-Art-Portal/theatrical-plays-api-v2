@@ -31,19 +31,28 @@ public class PeopleController : ControllerBase
     [Route("{id:int}")]
     public async Task<ActionResult<ApiResponse<PersonDto>>> GetPerson(int id)
     {
-        var (validation, person) = await _validation.ValidateAndFetch(id);
-
-        if (!validation.Success)
+        try
         {
-            ApiResponse errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
-        }
-        
-        var performerDto = _service.ToDto(person);
+            var (validation, person) = await _validation.ValidateAndFetch(id);
 
-        ApiResponse response = new ApiResponse<PersonDto>(performerDto);
-        
-        return new ObjectResult(response);
+            if (!validation.Success)
+            {
+                ApiResponse errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var performerDto = _service.ToDto(person);
+
+            ApiResponse response = new ApiResponse<PersonDto>(performerDto);
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     /// <summary>
@@ -55,22 +64,39 @@ public class PeopleController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size)
     {
+        try
+        {
+            var peopleDto = await _service.GetAndPaginate(page, size);
 
-        var peopleDto = await _service.GetAndPaginate(page, size);
-        
-        ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
-        
-        return new ObjectResult(response);
+            ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
-        await _service.Create(createPersonDto);
+        try
+        {
+            await _service.Create(createPersonDto);
 
-        var response = new ApiResponse("Successfully Created Person");
-        
-        return new OkObjectResult(response);
+            var response = new ApiResponse("Successfully Created Person");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpGet]
@@ -84,18 +110,27 @@ public class PeopleController : ControllerBase
     [Route("{role}")]
     public async Task<ActionResult<ApiResponse>> GetPeopleByRole(string role, int? page, int? size)
     {
-        var (validation, people) = await _validation.ValidateForFetchRole(role);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
-        }
+            var (validation, people) = await _validation.ValidateForFetchRole(role);
 
-        var paginationResult = _service.Paginate(people!, page, size);
-        
-        var response = new ApiResponse<PaginationResult<PersonDto>>(paginationResult);
-        return new OkObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var paginationResult = _service.Paginate(people!, page, size);
+
+            var response = new ApiResponse<PaginationResult<PersonDto>>(paginationResult);
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     /*[HttpDelete]

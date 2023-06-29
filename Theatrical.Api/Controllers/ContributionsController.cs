@@ -23,34 +23,52 @@ public class ContributionsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetContributions()
     {
-        var (validation, contributions) = await _validation.ValidateForFetch();
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
-            return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound};
-        }
+            var (validation, contributions) = await _validation.ValidateForFetch();
 
-        var response = new ApiResponse<List<Contribution>>(contributions, "Completed");
-        
-        return new OkObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound };
+            }
+
+            var response = new ApiResponse<List<Contribution>>(contributions, "Completed");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
     {
-        var validation = await _validation.ValidateForCreate(contributionDto);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
-            return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound};
+            var validation = await _validation.ValidateForCreate(contributionDto);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound };
+            }
+
+            await _service.Create(contributionDto);
+
+            var response = new ApiResponse("Successfully Created Contribution");
+
+            return new OkObjectResult(response);
         }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
 
-        await _service.Create(contributionDto);
-        
-        var response = new ApiResponse("Successfully Created Contribution");
-
-        return new OkObjectResult(response);
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 }

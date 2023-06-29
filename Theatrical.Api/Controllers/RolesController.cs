@@ -24,36 +24,54 @@ public class RolesController : ControllerBase
     [Route("{role}")]
     public async Task<ActionResult<ApiResponse>> CreateRole(string role)
     {
-        var rolelowercase = role.ToLower();
-        var validation = await _validation.ValidateForCreate(rolelowercase);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message!);
-            return new ConflictObjectResult(errorResponse);
-        }
-        
-        await _service.Create(rolelowercase);
+            var rolelowercase = role.ToLower();
+            var validation = await _validation.ValidateForCreate(rolelowercase);
 
-        var response = new ApiResponse($"Successfully Created Role: {rolelowercase}");
-        
-        return new OkObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message!);
+                return new ConflictObjectResult(errorResponse);
+            }
+
+            await _service.Create(rolelowercase);
+
+            var response = new ApiResponse($"Successfully Created Role: {rolelowercase}");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetRoles()
     {
-        var (validation, roles) = await _validation.ValidateForFetch();
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
-        }
+            var (validation, roles) = await _validation.ValidateForFetch();
 
-        var response = new ApiResponse<List<Role>>(roles);
-        
-        return new ObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var response = new ApiResponse<List<Role>>(roles);
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     /*[HttpDelete]

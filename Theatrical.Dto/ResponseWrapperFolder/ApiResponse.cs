@@ -9,6 +9,7 @@ public enum ErrorCode
     Unauthorized,
     Forbidden,
     BadRequest,
+    ServerError
 }
 
 public class ApiResponse

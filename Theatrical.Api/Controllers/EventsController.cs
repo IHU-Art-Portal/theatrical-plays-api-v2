@@ -24,34 +24,52 @@ public class EventsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetEvents()
     {
-        var (validation, events) = await _validation.FetchAndValidate();
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
-            return new ObjectResult(errorResponse) { StatusCode = 404 };
+            var (validation, events) = await _validation.FetchAndValidate();
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var response = new ApiResponse<List<Event>>(events);
+            return new OkObjectResult(response);
         }
-        
-        var response = new ApiResponse<List<Event>>(events);
-        return new OkObjectResult(response);
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
     
     [HttpPost]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
     {
-        var validation = await _validation.ValidateForCreate(createEventDto);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse) { StatusCode = 404 };
-        }
+            var validation = await _validation.ValidateForCreate(createEventDto);
 
-        await _service.Create(createEventDto);
-        var response = new ApiResponse("Successfully Created Event");
-        
-        return new ObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            await _service.Create(createEventDto);
+            var response = new ApiResponse("Successfully Created Event");
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
     
 }

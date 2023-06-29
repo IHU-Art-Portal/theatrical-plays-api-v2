@@ -25,37 +25,55 @@ public class ProductionsController : ControllerBase
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
-        var validation = await _validation.ValidateForCreate(createProductionDto);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse) { StatusCode = 404 };
+            var validation = await _validation.ValidateForCreate(createProductionDto);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var createdProduction = await _service.Create(createProductionDto);
+
+            var response = new ApiResponse<ProductionDto>(createdProduction, "Successfully Created Production");
+
+            return new ObjectResult(response) { StatusCode = 201 };
         }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
 
-        var createdProduction = await _service.Create(createProductionDto);
-
-        var response = new ApiResponse<ProductionDto>(createdProduction, "Successfully Created Production");
-
-        return new ObjectResult(response){StatusCode = 201};
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetProductions()
     {
-        var (validation, productions) = await _validation.ValidateAndFetch();
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
+            var (validation, productions) = await _validation.ValidateAndFetch();
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var productionsDto = _service.ConvertToDto(productions);
+
+            var response = new ApiResponse<List<ProductionDto>>(productionsDto);
+
+            return new OkObjectResult(response);
         }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
 
-        var productionsDto = _service.ConvertToDto(productions);
-
-        var response = new ApiResponse<List<ProductionDto>>(productionsDto);
-        
-        return new OkObjectResult(response);
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     /*[HttpDelete]

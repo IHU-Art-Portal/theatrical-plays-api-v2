@@ -27,27 +27,45 @@ public class OrganizersController : ControllerBase
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
     {
-        await _service.Create(organizerCreateDto);
+        try
+        {
+            await _service.Create(organizerCreateDto);
 
-        var response = new ApiResponse("Successfully created Organizer");
-        
-        return new OkObjectResult(response);
+            var response = new ApiResponse("Successfully created Organizer");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetOrganizers()
     {
-        var (report, organizers) = await _validation.ValidateAndFetch();
-
-        if (!report.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
-            return new NotFoundObjectResult(errorResponse);
+            var (report, organizers) = await _validation.ValidateAndFetch();
+
+            if (!report.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var response = new ApiResponse<List<Organizer>>(organizers);
+
+            return new ObjectResult(response);
         }
-        
-        var response = new ApiResponse<List<Organizer>>(organizers);
-        
-        return new ObjectResult(response);
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
     
     /*[HttpDelete]

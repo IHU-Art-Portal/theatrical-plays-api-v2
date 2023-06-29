@@ -24,47 +24,73 @@ public class VenuesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetVenues()
     {
-        var (validation, venues) = await _validation.ValidateAndFetch();
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new NotFoundObjectResult(errorResponse);
-        }
+            var (validation, venues) = await _validation.ValidateAndFetch();
 
-        var venuesDto = _service.ToDto(venues!);
-        
-        var response = new ApiResponse<List<VenueDto>>(venuesDto);
-        
-        return new ObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var venuesDto = _service.ToDto(venues!);
+
+            var response = new ApiResponse<List<VenueDto>>(venuesDto);
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> GetVenue(int id)
     {
-        var (validation, venue) = await _validation.ValidateAndFetch(id);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new NotFoundObjectResult(errorResponse);
+            var (validation, venue) = await _validation.ValidateAndFetch(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var venueDto = _service.ToDto(venue!);
+
+            return new OkObjectResult(venueDto);
         }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
 
-        var venueDto = _service.ToDto(venue!);
-
-        return new OkObjectResult(venueDto);
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
-        
-        await _service.Create(venueCreateDto);
-    
-        var response = new ApiResponse("Venue successfully added");
+        try
+        {
+            await _service.Create(venueCreateDto);
 
-        return new ObjectResult(response);
+            var response = new ApiResponse("Venue successfully added");
+
+            return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
 
     /*[HttpDelete]
