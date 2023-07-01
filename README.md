@@ -7,7 +7,7 @@ The API was built utilizing the .Net Framework and the C# programming language.
 -------
 ## Api Response
 
-Every server response is wrapped within the `TheatricalResponse` container object. 
+Every server response is wrapped within the `ApiResponse` container object. 
 This object comprises four possible fields: `data`, `success`, `message`, and the `errorCode`.
 
 The `data` field contains the requested data.\
@@ -28,7 +28,7 @@ Examples:\
 ```json
 {
   "success": false,
-  "message": "Performer does not exist",
+  "message": "Person does not exist",
   "errorCode": "NotFound" 
 }
 ```
@@ -43,7 +43,7 @@ The solution is divided into four essential projects, for better management.
 Each project contains related job classes.
 1) `Theatrical.Api`: The start-up class of the project lives here. It configures the services and the settings of the web API, also contains the controllers.
 2) `Theatrical.Data`: The data project holds the models, the database schema and configuration, and migrations (if any).
-3) `Theatrical.Dto`: The Dto project contains all the Data Transfer Objects, and the `TheatricalResponse` template container.
+3) `Theatrical.Dto`: The Dto project contains all the Data Transfer Objects, and the `ApiResponse` template container.
 4) `Theatrical.Services`: The Service project includes all the services used, such as the repository which is used to interact with the database.
 
 <I>A project may reference one or more projects in order to use its functions and data</I>.\
@@ -53,73 +53,74 @@ For example `Theatrical.Api` has references to all three other project, as it wi
 
 ## Api Requests
 <b>Changes from version 1 (https://github.com/ar1st/theatrical-plays-api/blob/master/documentation.md) project:</b>
-<ul><li><b>PeopleController</b>, is now called <b>PerformersController</b>.</li>
-    <li>Added the ability to add new Performers.</li>
+<ul><li>Placeholder</li>
+    <li>Placeholder</li>
 </ul>
-<I>These changes are not yet implemented and are subject to change.</I><br>
+<I>New changes will be listed here.</I><br>
 <I>This text will be removed when everything is implemented and working.</I>
 
 ----
-## Performers
+## Person
 
 ---
 This controller manages all the requests regarding a performer (former person).
 
-**Create Performer**
+<I>Disabled until further notice</I><br>
+**Create Person**
 
-| POST                 | /api/performers                            |
-|----------------------|--------------------------------------------|
-| **Parameters**       |                                            |
-| *CreatePerformerDto* | {string: FullName, string: Image}          |
-| **Responses**        |                                            |
-| *PerformerDto*       | {int: Id, string: FullName, string: Image} |
+| POST              | /api/performers                            |
+|-------------------|--------------------------------------------|
+| **Parameters**    |                                            |
+| *CreatePersonDto* | {string: FullName, string: Image}          |
+| **Responses**     |                                            |
+| *PersonDto*       | {int: Id, string: FullName, string: Image} |
 
 ----
 
-**Get Performer**
+**Get Person**
 
-This request is used to retrieve a performer and their image.
-It returns a `PerformerDto` wrapped in `TheatricalResponse`.
+This request is used to retrieve a performer <s>and their image</s>.
+It returns a `PersonDto` wrapped in `ApiResponse`.
 
-| GET                               | /api/performers/{id}                                 |
-|-----------------------------------|------------------------------------------------------|
-| **Parameters**                    |                                                      |
-| *id*                              | <u>Path variable</u>                                 |
-|                                   | The integer identifier of the performer to retrieve. |
-| **Responses**                     |                                                      |
-| TheatricalResponse\<PerformerDto> | {id: Int, fullName: String, image: String}           |
+| GET                     | /api/person/{id}                                     |
+|-------------------------|------------------------------------------------------|
+| **Parameters**          |                                                      |
+| *id*                    | <u>Path variable</u>                                 |
+|                         | The integer identifier of the performer to retrieve. |
+| **Responses**           |                                                      |
+| ApiResponse\<PersonDto> | {id: Int, fullName: String, image: String}           |
 
 ---
 
-**Get Performers**
+**Get Persons**
 
-This request is used to retrieve all performers.\
+This request is used to retrieve all people.\
 <I>If neither of page and size is specified, all results are returned.</I>
 
-| GET                                              | /api/performers                            |
-|--------------------------------------------------|--------------------------------------------|
-| **Parameters**                                   |                                            |
-| *page*                                           | <u>Query parameter</u>                     |
-|                                                  | The index of the page to return. Optional  |
-| *size*                                           | <u>Query parameter</u>                     |
-|                                                  | The size of the page. Optional             |
-| **Responses**                                    |                                            |
-| TheatricalResponse<<List\<PerformerResponseDto>> | {id: Int, fullName: String, image: String} |
+| GET                                    | /api/persons                               |
+|----------------------------------------|--------------------------------------------|
+| **Parameters**                         |                                            |
+| *page*                                 | <u>Query parameter</u>                     |
+|                                        | The index of the page to return. Optional  |
+| *size*                                 | <u>Query parameter</u>                     |
+|                                        | The size of the page. Optional             |
+| **Responses**                          |                                            |
+| ApiResponse<<List\<PersonResponseDto>> | {id: Int, fullName: String, image: String} |
 
 ---
 
-**Get Performers By Role**
+**Get Persons By Role**
 
 This request returns performers filtered by the provided role.
 
-| GET                                             | /api/performers/role                       |
-|-------------------------------------------------|--------------------------------------------|
-| **Parameters**                                  |                                            |
-| *value*                                         | <u>Path parameter</u>                      |
-|                                                 | The role provided to filter the results    |
-| *page*                                          | <u>Query parameter</u>                     |
-|                                                 | The index of the page to return. Optional  |
-| *size*                                          | <u>Query parameter</u>                     |
-|                                                 | The size of the page. Optional             |
-| **Responses**                                   |                                            |
-| TheatricalResponse\<List\<PerformerResponseDto> | {id: Int, fullName: String, image: String} |
+| GET                                   | /api/performers/role                       |
+|---------------------------------------|--------------------------------------------|
+| **Parameters**                        |                                            |
+| *value*                               | <u>Path parameter</u>                      |
+|                                       | The role provided to filter the results    |
+| *page*                                | <u>Query parameter</u>                     |
+|                                       | The index of the page to return. Optional  |
+| *size*                                | <u>Query parameter</u>                     |
+|                                       | The size of the page. Optional             |
+| **Responses**                         |                                            |
+| ApiResponse\<List\<PersonResponseDto> | {id: Int, fullName: String, image: String} |
