@@ -129,7 +129,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v2/swagger.json", "Theatrical.Api v2"));
-
+app.UseCors("AllowOrigin");
 
 app.UseHttpsRedirection();
 
