@@ -104,6 +104,18 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 //Pagination service
 builder.Services.AddTransient<IPaginationService, PaginationService>();
 
+//cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin",
+        builderCors =>
+        {
+            builderCors.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 //Serilog Console log styling
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)

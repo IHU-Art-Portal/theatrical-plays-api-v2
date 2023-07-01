@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
@@ -62,6 +63,7 @@ public class PeopleController : ControllerBase
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
+    [EnableCors("AllowOrigin")]
     public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size)
     {
         try
