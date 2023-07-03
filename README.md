@@ -53,8 +53,9 @@ For example `Theatrical.Api` has references to all three other project, as it wi
 
 ## Api Requests
 <b>Changes from version 1 (https://github.com/ar1st/theatrical-plays-api/blob/master/documentation.md) project:</b>
-<ul><li>Placeholder</li>
-    <li>Placeholder</li>
+<ul><li><b>/api/people/letter</b> endpoint has changed to <b>/api/people/initials/letters</b></li>
+    <li><b>/api/people/initials/letters</b> functionality changed to return results based on the provided initials,
+instead of one provided letter.</li>
 </ul>
 <I>New changes will be listed here.</I><br>
 <I>This text will be removed when everything is implemented and working.</I>
@@ -63,12 +64,11 @@ For example `Theatrical.Api` has references to all three other project, as it wi
 ## Person
 
 ---
-This controller manages all the requests regarding a performer (former person).
+This controller manages all the requests regarding a person.
 
-<I>Disabled until further notice</I><br>
 **Create Person**
 
-| POST              | /api/performers                            |
+| POST              | /api/person                                |
 |-------------------|--------------------------------------------|
 | **Parameters**    |                                            |
 | *CreatePersonDto* | {string: FullName, string: Image}          |
@@ -97,7 +97,7 @@ It returns a `PersonDto` wrapped in `ApiResponse`.
 This request is used to retrieve all people.\
 <I>If neither of page and size is specified, all results are returned.</I>
 
-| GET                                    | /api/persons                               |
+| GET                                    | /api/people                                |
 |----------------------------------------|--------------------------------------------|
 | **Parameters**                         |                                            |
 | *page*                                 | <u>Query parameter</u>                     |
@@ -113,7 +113,7 @@ This request is used to retrieve all people.\
 
 This request returns performers filtered by the provided role.
 
-| GET                                   | /api/performers/role                       |
+| GET                                   | /api/people/role                           |
 |---------------------------------------|--------------------------------------------|
 | **Parameters**                        |                                            |
 | *value*                               | <u>Path parameter</u>                      |
