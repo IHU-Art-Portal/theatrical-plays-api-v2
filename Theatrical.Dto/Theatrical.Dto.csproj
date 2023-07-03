@@ -10,4 +10,8 @@
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.16" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Theatrical.Data\Theatrical.Data.csproj" />
+    </ItemGroup>
+
 </Project>

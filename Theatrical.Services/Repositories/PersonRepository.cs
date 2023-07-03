@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Dto.PersonDtos;
+using Theatrical.Services.PerformersService;
 
 namespace Theatrical.Services.Repositories;
 
@@ -11,7 +13,8 @@ public interface IPersonRepository
     Task Delete(Person person);
     Task<Person?> Get(int id);
     Task<List<Person>?> GetByRole(string role);
-    Task<List<Person>> GetByLetter(string initials);
+    Task<List<Person>?> GetByLetter(string initials);
+    Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId);
 }
 
 public class PersonRepository : IPersonRepository
@@ -52,7 +55,7 @@ public class PersonRepository : IPersonRepository
         return personsWithRole;
     }
 
-    public async Task<List<Person>> GetByLetter(string initials)
+    public async Task<List<Person>?> GetByLetter(string initials)
     {
         var persons = await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
 
@@ -63,5 +66,20 @@ public class PersonRepository : IPersonRepository
     {
         _context.Persons.Remove(person);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId)
+    {
+        var personProductions = await _context.Contributions
+            .Where(c => c.PeopleId == personId)
+            .Include(c => c.Role)
+            .Select(c => new PersonProductionsRoleInfo
+            {
+                Production = c.Production,
+                Role = c.Role
+            })
+            .ToListAsync();
+    
+        return personProductions;
     }
 }
