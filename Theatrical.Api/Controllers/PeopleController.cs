@@ -191,6 +191,32 @@ public class PeopleController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+
+    [HttpGet]
+    [Route("{id}/photos")]
+    public async Task<ActionResult<ApiResponse>> GetPersonsPhotos(int id)
+    {
+        try
+        {
+            var (validation, images) = await _validation.ValidatePersonsPhotos(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var response = new ApiResponse<List<Image>>(images);
+            return new OkObjectResult(response);
+
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
     
     /*[HttpDelete]
     [Route("{id}")]

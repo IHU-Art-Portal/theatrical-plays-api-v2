@@ -15,6 +15,7 @@ public interface IPersonRepository
     Task<List<Person>?> GetByRole(string role);
     Task<List<Person>?> GetByLetter(string initials);
     Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId);
+    Task<List<Image>?> GetPersonsImages(int personId);
 }
 
 public class PersonRepository : IPersonRepository
@@ -81,5 +82,12 @@ public class PersonRepository : IPersonRepository
             .ToListAsync();
     
         return personProductions;
+    }
+
+    public async Task<List<Image>?> GetPersonsImages(int personId)
+    {
+        var person = await _context.Persons.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == personId);
+
+        return person.Images;
     }
 }

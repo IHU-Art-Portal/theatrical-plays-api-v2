@@ -11,8 +11,9 @@ public interface IPersonValidationService
     Task<(ValidationReport report, Person? person)> ValidateForDelete(int performerId);
     Task<(ValidationReport report, List<Person>? person)> ValidateForFetchRole(string role);
     Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials);
-    Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)>
-        ValidatePersonsProductions(int personId);
+    Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
+
+    Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -114,5 +115,32 @@ public class PersonValidationService : IPersonValidationService
         report.Success = true;
 
         return (report, productions);
+    }
+
+    public async Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId)
+    {
+        var person = await _repository.Get(personId);
+        var report = new ValidationReport();
+        
+        if (person is null)
+        {
+            report.Success = false;
+            report.Message = "Person not found";
+            return (report, null);
+        }
+
+        var images = await _repository.GetPersonsImages(personId);
+
+        if (!images.Any())
+        {
+            report.Success = false;
+            report.Message = "This person does not have any photos";
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Successful";
+
+        return (report, images);
     }
 }
