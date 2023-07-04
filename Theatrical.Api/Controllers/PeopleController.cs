@@ -206,9 +206,11 @@ public class PeopleController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var response = new ApiResponse<List<Image>>(images);
+            var imagesDto = _service.ImagesToDto(images!);
+            
+            var response = new ApiResponse<List<ImageDto>>(imagesDto);
+            
             return new OkObjectResult(response);
-
         }
         catch (Exception e)
         {

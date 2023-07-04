@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Theatrical.Dto.PersonDtos;
 
-namespace Theatrical.Data.Models;
-public partial class Image
+public class ImageDto
 {
     public int Id { get; set; }
     public string? ImageUrl { get; set; }

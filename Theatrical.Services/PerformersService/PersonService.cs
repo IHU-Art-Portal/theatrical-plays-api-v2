@@ -17,6 +17,8 @@ public interface IPersonService
     PaginationResult<PersonProductionsRoleInfo> PaginateContributionsOfPerson(
         List<PersonProductionsRoleInfo> personProductionsRole, int? page, int? size);
 
+    List<ImageDto> ImagesToDto(List<Image> images);
+
 }
 
 public class PersonService : IPersonService
@@ -115,5 +117,10 @@ public class PersonService : IPersonService
         });
 
         return paginationResult;
+    }
+
+    public List<ImageDto> ImagesToDto(List<Image> images)
+    {
+        return images.Select(image => new ImageDto { Id = image.Id, ImageUrl = image.ImageUrl, PersonId = image.PersonId }).ToList();
     }
 }
