@@ -1,6 +1,9 @@
-﻿using Theatrical.Data.Context;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.PersonDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Services.Curators;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -12,17 +15,19 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<Person>? person)> ValidateForFetchRole(string role);
     Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials);
     Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
-
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
+    Task<ValidationReport> ValidateForCreate(string fullName);
 }
 
 public class PersonValidationService : IPersonValidationService
 {
     private readonly IPersonRepository _repository;
+    private readonly IDataCurator _curator;
 
-    public PersonValidationService(IPersonRepository repository)
+    public PersonValidationService(IPersonRepository repository, IDataCurator curator)
     {
         _repository = repository;
+        _curator = curator;
     }
 
     public async Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId)
@@ -142,5 +147,33 @@ public class PersonValidationService : IPersonValidationService
         report.Message = "Successful";
 
         return (report, images);
+    }
+
+    public async Task<ValidationReport> ValidateForCreate(string fullName)
+    {
+        bool isValid = _curator.ValidateFullName(fullName);
+        var report = new ValidationReport();
+        
+        if (!isValid)
+        {
+            report.Success = false;
+            report.Message = "Curation failed. Person's name must follow the template: {Name Surname}, {Name}, or {Surname}";
+            report.ErrorCode = ErrorCode.CurationFailure;
+            return report;
+        }
+
+        var person = await _repository.GetByName(fullName);
+
+        if (person is not null)
+        {
+            report.Success = false;
+            report.Message = "Person with a similar name already exists.";
+            report.ErrorCode = ErrorCode.AlreadyExists;
+            return report;
+        }
+        
+        report.Message = "Success";
+        report.Success = true;
+        return report;
     }
 }

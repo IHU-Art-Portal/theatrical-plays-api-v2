@@ -11,6 +11,7 @@ using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
+using Theatrical.Services.Curators;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
@@ -103,6 +104,9 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 
 //Pagination service
 builder.Services.AddTransient<IPaginationService, PaginationService>();
+
+//Curator service
+builder.Services.AddTransient<IDataCurator, DataCurator>();
 
 //cors
 builder.Services.AddCors(options =>

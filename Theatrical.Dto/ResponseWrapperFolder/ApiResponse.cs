@@ -9,14 +9,15 @@ public enum ErrorCode
     Unauthorized,
     Forbidden,
     BadRequest,
-    ServerError
+    ServerError,
+    CurationFailure
 }
 
 public class ApiResponse
 {
     public bool Success { get; }
     public string Message { get; }
-    public string?  ErrorCode { get; }
+    public string? ErrorCode { get; }
 
     public ApiResponse(ErrorCode code, string message)
     {

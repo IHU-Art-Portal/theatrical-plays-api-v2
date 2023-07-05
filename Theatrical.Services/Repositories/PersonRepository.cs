@@ -14,6 +14,7 @@ public interface IPersonRepository
     Task<Person?> Get(int id);
     Task<List<Person>?> GetByRole(string role);
     Task<List<Person>?> GetByLetter(string initials);
+    Task<Person?> GetByName(string name);
     Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId);
     Task<List<Image>?> GetPersonsImages(int personId);
 }
@@ -61,6 +62,11 @@ public class PersonRepository : IPersonRepository
         var persons = await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
 
         return persons;
+    }
+
+    public async Task<Person?> GetByName(string name)
+    {
+        return await _context.Persons.FirstOrDefaultAsync(p => p.Fullname == name);
     }
 
     public async Task Delete(Person person)

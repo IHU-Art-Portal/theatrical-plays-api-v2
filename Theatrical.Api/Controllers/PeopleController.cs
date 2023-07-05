@@ -83,11 +83,20 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    //[TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
         try
         {
+            var validation = await _validation.ValidateForCreate(createPersonDto.Fullname);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                
+                return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status400BadRequest};
+            }
+            
             await _service.Create(createPersonDto);
 
             var response = new ApiResponse("Successfully Created Person");
