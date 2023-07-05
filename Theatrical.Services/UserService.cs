@@ -9,7 +9,7 @@ namespace Theatrical.Services;
 
 public interface IUserService
 {
-    Task<UserDtoRole> Register(UserDto userDto);
+    Task<UserDtoRole> Register(RegisterUserDto registerUserDto);
     bool VerifyPassword(string hashedPassword, string providedPassword);
     JwtDto GenerateToken(User user);
 }
@@ -29,25 +29,25 @@ public class UserService : IUserService
     /// This function is used to has the password of the user.
     /// Then calls the register of users repository to add the user.
     /// </summary>
-    /// <param name="userDto"></param>
+    /// <param name="registerUserDto"></param>
     /// <returns>UserDtoRole</returns>
-    public async Task<UserDtoRole> Register(UserDto userDto)
+    public async Task<UserDtoRole> Register(RegisterUserDto registerUserDto)
     {
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
         
         User user = new User
         {
-            Email = userDto.Email,
+            Email = registerUserDto.Email,
             Password = hashedPassword,
             Enabled = true
         };
 
-        if (! (userDto.Role.Equals(1) || userDto.Role.Equals(2)) || userDto.Role is null)
+        if (! (registerUserDto.Role.Equals(1) || registerUserDto.Role.Equals(2)) || registerUserDto.Role is null)
         {
-            userDto.Role = 2;
+            registerUserDto.Role = 2;
         }
         
-        var userCreated = await _repository.Register(user, (int)userDto.Role);
+        var userCreated = await _repository.Register(user, (int)registerUserDto.Role);
         var userDtoRole = new UserDtoRole
         {
             Id = userCreated.Id,

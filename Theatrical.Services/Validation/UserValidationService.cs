@@ -9,8 +9,8 @@ namespace Theatrical.Services.Validation;
 
 public interface IUserValidationService
 {
-    Task<ValidationReport> ValidateForRegister(UserDto userdto);
-    Task<(ValidationReport report, User user)> ValidateForLogin(UserDto userDto);
+    Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
+    Task<(ValidationReport report, User user)> ValidateForLogin(LoginUserDto loginUserDto);
     ValidationReport ValidateUser(string? jwtToken);
 }
 
@@ -27,7 +27,7 @@ public class UserValidationService : IUserValidationService
         _tokenService = tokenService;
     }
 
-    public async Task<ValidationReport> ValidateForRegister(UserDto userdto)
+    public async Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto)
     {
         var report = new ValidationReport();
         var user = await _repository.Get(userdto.Email);
@@ -45,22 +45,24 @@ public class UserValidationService : IUserValidationService
         return report;
     }
 
-    public async Task<(ValidationReport report, User user)> ValidateForLogin(UserDto userDto)
+    public async Task<(ValidationReport report, User user)> ValidateForLogin(LoginUserDto loginUserDto)
     {
         var report = new ValidationReport();
-        var user = await _repository.Get(userDto.Email);
+        var user = await _repository.Get(loginUserDto.Email);
 
         if (user is null)
         {
             report.Message = "User not found";
             report.Success = false;
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
-        if (!_userService.VerifyPassword(user.Password, userDto.Password))
+        if (!_userService.VerifyPassword(user.Password, loginUserDto.Password))
         {
             report.Message = "User with this combination not found";
             report.Success = false;
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
         else

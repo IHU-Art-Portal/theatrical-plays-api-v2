@@ -25,15 +25,15 @@ public class UserController : ControllerBase
     /// Use 2 for user account.
     /// If you don't define role, user account will be created.
     /// </summary>
-    /// <param name="userDto"></param>
+    /// <param name="registerUserDto"></param>
     /// <param name="role">Integer number for role</param>
     /// <returns></returns>
     [HttpPost("register")]
-    public async Task<ActionResult<ApiResponse>> Register([FromBody] UserDto userDto)
+    public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterUserDto registerUserDto)
     {
         try
         {
-            var validation = await _validation.ValidateForRegister(userDto);
+            var validation = await _validation.ValidateForRegister(registerUserDto);
 
             if (!validation.Success)
             {
@@ -41,7 +41,7 @@ public class UserController : ControllerBase
                 return new ConflictObjectResult(errorResponse);
             }
 
-            var userCreated = await _service.Register(userDto);
+            var userCreated = await _service.Register(registerUserDto);
             var response = new ApiResponse<UserDtoRole>(userCreated, "Successfully Registered!");
 
             return new OkObjectResult(response);
@@ -55,15 +55,15 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("login")]
-    public async Task<ActionResult<ApiResponse>> Login([FromBody]UserDto userDto)
+    public async Task<ActionResult<ApiResponse>> Login([FromBody]LoginUserDto loginUserDto)
     {
         try
         {
-            var (report, user) = await _validation.ValidateForLogin(userDto);
+            var (report, user) = await _validation.ValidateForLogin(loginUserDto);
 
             if (!report.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
+                var errorResponse = new ApiResponse((ErrorCode)report.ErrorCode!, report.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
