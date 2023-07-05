@@ -42,16 +42,16 @@ public class CustomAuthorizationFilter : IAuthorizationFilter
         
         if (claimsPrincipal is null)
         {
-            var errorResponse3 = new ApiResponse(ErrorCode.InvalidToken, "Invalid Token");
-            context.Result = new ObjectResult(errorResponse3) { StatusCode = (int)HttpStatusCode.Unauthorized };
+            var errorResponse2 = new ApiResponse(ErrorCode.InvalidToken, "Invalid Token");
+            context.Result = new ObjectResult(errorResponse2) { StatusCode = (int)HttpStatusCode.Unauthorized };
             return;
         }
-        
+
         if (!context.HttpContext.User.IsInRole(_requiredRole))
         {
             //Handle forbidden user
-            var errorResponse2 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes");
-            context.Result = new ObjectResult(errorResponse2){StatusCode = (int)HttpStatusCode.Forbidden};
+            var errorResponse3 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes");
+            context.Result = new ObjectResult(errorResponse3){StatusCode = (int)HttpStatusCode.Forbidden};
             return;
         }
     }

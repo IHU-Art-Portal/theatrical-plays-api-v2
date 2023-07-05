@@ -8,6 +8,7 @@ public interface IUserRepository
 {
     Task<User?> Get(string email);
     Task<User> Register(User user, int userRole);
+    Task<User?> GetUserIncludingAuthorities(string email);
 }
 
 public class UserRepository : IUserRepository
@@ -23,6 +24,14 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
+    
+    public async Task<User?> GetUserIncludingAuthorities(string email)
+    {
+        return await _context.Users
+            .Include(u => u.UserAuthorities)
+            .FirstOrDefaultAsync(u => u.Email == email);
+    }
+
 
     public async Task<User> Register(User user, int userRole)
     {

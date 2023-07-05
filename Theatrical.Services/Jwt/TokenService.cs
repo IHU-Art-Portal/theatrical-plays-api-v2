@@ -28,14 +28,20 @@ public class TokenService : ITokenService
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtOptions = _config.GetSection("JwtOptions").Get<JwtOptions>();
         var key = Encoding.UTF8.GetBytes(jwtOptions.SigningKey);
-
+        
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Sub, user.Email),
-            //new(ClaimTypes.Role, user.Role)
+            new(JwtRegisteredClaimNames.Sub, user.Email)
         };
 
+        var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
+
+        if (userIntRole == 1)
+            claims.Add(new Claim(ClaimTypes.Role, "admin"));
+        else if (userIntRole == 2)
+            claims.Add(new Claim(ClaimTypes.Role, "user"));
+        
         var securityKey = new SymmetricSecurityKey(key);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 

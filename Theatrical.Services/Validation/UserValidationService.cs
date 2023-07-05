@@ -10,8 +10,7 @@ namespace Theatrical.Services.Validation;
 public interface IUserValidationService
 {
     Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
-    Task<(ValidationReport report, User user)> ValidateForLogin(LoginUserDto loginUserDto);
-    ValidationReport ValidateUser(string? jwtToken);
+    Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
 }
 
 public class UserValidationService : IUserValidationService
@@ -45,11 +44,11 @@ public class UserValidationService : IUserValidationService
         return report;
     }
 
-    public async Task<(ValidationReport report, User user)> ValidateForLogin(LoginUserDto loginUserDto)
+    public async Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto)
     {
         var report = new ValidationReport();
-        var user = await _repository.Get(loginUserDto.Email);
-
+        var user = await _repository.GetUserIncludingAuthorities(loginUserDto.Email);
+        
         if (user is null)
         {
             report.Message = "User not found";
@@ -58,51 +57,18 @@ public class UserValidationService : IUserValidationService
             return (report, null);
         }
 
-        if (!_userService.VerifyPassword(user.Password, loginUserDto.Password))
+        if (!_userService.VerifyPassword(user.Password!, loginUserDto.Password))
         {
             report.Message = "User with this combination not found";
             report.Success = false;
             report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
-        else
-        {
-            report.Message = "User Verified";
-            report.Success = true;
-            return (report, user);
-        }
-
-    }
-
-    public ValidationReport ValidateUser(string? jwtToken)
-    {
-        var report = new ValidationReport();
-
-        if (jwtToken is null)
-        {
-            report.Success = false;
-            report.Message = "You did not provide a JWT token";
-            return report;
-        }
-
-        var principal = _tokenService.VerifyToken(jwtToken);
-
-        if (principal is null)
-        {
-            report.Success = false;
-            report.Message = "Invalid token";
-            return report;
-        }
-
-        if (!principal.IsInRole("admin"))
-        {
-            report.Success = false;
-            report.Message = "User is forbidden for changes";
-            return report;
-        }
         
+        report.Message = "User Verified";
         report.Success = true;
-        report.Message = "User is authorized for changes";
-        return report;
+        return (report, user);
+
     }
+    
 }

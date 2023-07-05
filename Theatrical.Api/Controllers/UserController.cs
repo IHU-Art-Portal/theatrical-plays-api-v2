@@ -67,7 +67,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var jwtDto = _service.GenerateToken(user);
+            var jwtDto = _service.GenerateToken(user!);
 
             var response = new ApiResponse<JwtDto>(jwtDto);
 
