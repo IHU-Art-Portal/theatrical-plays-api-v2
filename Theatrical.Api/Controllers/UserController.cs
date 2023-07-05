@@ -19,6 +19,15 @@ public class UserController : ControllerBase
         _service = service;
     }
     
+    /// <summary>
+    /// Use this method to register.
+    /// Use 1 for admin account or
+    /// Use 2 for user account.
+    /// If you don't define role, user account will be created.
+    /// </summary>
+    /// <param name="userDto"></param>
+    /// <param name="role">Integer number for role</param>
+    /// <returns></returns>
     [HttpPost("register")]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] UserDto userDto)
     {

@@ -41,14 +41,18 @@ public class UserService : IUserService
             Password = hashedPassword,
             Enabled = true
         };
+
+        if (! (userDto.Role.Equals(1) || userDto.Role.Equals(2)) || userDto.Role is null)
+        {
+            userDto.Role = 2;
+        }
         
-        var userCreated = await _repository.Register(user);
+        var userCreated = await _repository.Register(user, (int)userDto.Role);
         var userDtoRole = new UserDtoRole
         {
             Id = userCreated.Id,
             Email = userCreated.Email,
-            Enabled = true,
-            Note = "In order to use POST/DELETE/PUT methods your account role must be admin."
+            Enabled = true
         };
 
         return userDtoRole;

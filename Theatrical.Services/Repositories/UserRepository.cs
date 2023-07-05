@@ -7,7 +7,7 @@ namespace Theatrical.Services.Repositories;
 public interface IUserRepository
 {
     Task<User?> Get(string email);
-    Task<User> Register(User user);
+    Task<User> Register(User user, int userRole);
 }
 
 public class UserRepository : IUserRepository
@@ -24,7 +24,7 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User> Register(User user)
+    public async Task<User> Register(User user, int userRole)
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
@@ -34,7 +34,7 @@ public class UserRepository : IUserRepository
         var userAuthorities = new UserAuthority
         {
             UserId = userCreated!.Id,
-            AuthorityId = 2                         //1 for admin, 2 for user.
+            AuthorityId = userRole                         //1 for admin, 2 for user.
         };
 
         await _context.UserAuthorities.AddAsync(userAuthorities);
