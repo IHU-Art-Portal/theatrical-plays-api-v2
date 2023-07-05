@@ -30,6 +30,16 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
         
         var userCreated = await Get(user.Email);
+
+        var userAuthorities = new UserAuthority
+        {
+            UserId = userCreated!.Id,
+            AuthorityId = 2                         //1 for admin, 2 for user.
+        };
+
+        await _context.UserAuthorities.AddAsync(userAuthorities);
+        await _context.SaveChangesAsync();
+        
         return userCreated;
     }
 }

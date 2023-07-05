@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.Repositories;
 
@@ -33,12 +34,13 @@ public class UserValidationService : IUserValidationService
 
         if (user is not null)
         {
-            report.Message = "Username taken!";
+            report.Message = "email field already exists!";
             report.Success = false;
+            report.ErrorCode = ErrorCode.AlreadyExists;
             return report;
         }
 
-        report.Message = "User with this username can be created";
+        report.Message = "User with this email can be created";
         report.Success = true;
         return report;
     }

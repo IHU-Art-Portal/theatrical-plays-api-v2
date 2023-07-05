@@ -48,7 +48,7 @@ public class UserService : IUserService
             Id = userCreated.Id,
             Email = userCreated.Email,
             Enabled = true,
-            Note = "In order to use POST/DELETE methods your account role must be admin."
+            Note = "In order to use POST/DELETE/PUT methods your account role must be admin."
         };
 
         return userDtoRole;

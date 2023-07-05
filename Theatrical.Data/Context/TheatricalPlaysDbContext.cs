@@ -12,6 +12,7 @@ public class TheatricalPlaysDbContext : DbContext
     }
 
     public virtual DbSet<Authority> Authorities { get; set; } = null!;
+    public virtual DbSet<UserAuthority> UserAuthorities { get; set; } = null!;
     public virtual DbSet<ChangeLog> ChangeLogs { get; set; } = null!;
     public virtual DbSet<Contribution> Contributions { get; set; } = null!;
     public virtual DbSet<Event> Events { get; set; } = null!;
@@ -35,17 +36,6 @@ public class TheatricalPlaysDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Authority>(entity =>
-        {
-            entity.ToTable("authorities");
-
-            entity.HasIndex(e => e.Name, "name")
-                .IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-
-            entity.Property(e => e.Name).HasColumnName("name");
-        });
 
         modelBuilder.Entity<ChangeLog>(entity =>
         {
@@ -342,6 +332,8 @@ public class TheatricalPlaysDbContext : DbContext
         {
             entity.ToTable("users");
 
+            entity.HasKey(e => e.Id);
+            
             entity.HasIndex(e => e.Email, "email")
                 .IsUnique();
 
@@ -354,27 +346,40 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
+        });
+        
+        modelBuilder.Entity<Authority>(entity =>
+        {
+            entity.ToTable("authorities");
 
-            entity.HasMany(d => d.Authorities)
-                .WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserAuthority",
-                    l => l.HasOne<Authority>().WithMany().HasForeignKey("AuthorityId")
-                        .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("user_roles_authority_id_fk"),
-                    r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("user_roles_user_id_fk"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "AuthorityId").HasName("PRIMARY");
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.Name, "name")
+                .IsUnique();
 
-                        j.ToTable("user_authorities");
+            entity.Property(e => e.Id).HasColumnName("id");
 
-                        j.HasIndex(new[] { "AuthorityId" }, "user_roles_authority_id_fk");
+            entity.Property(e => e.Name).HasColumnName("name");
+        });
+        
+        modelBuilder.Entity<UserAuthority>(entity =>
+        {
+            entity.ToTable("user_authorities");
+            
+            entity.HasKey(ua => new { ua.UserId, ua.AuthorityId });
+            
+            entity.Property(ua => ua.UserId).HasColumnName("user_id");
+            entity.Property(ua => ua.AuthorityId).HasColumnName("authority_id");
 
-                        j.IndexerProperty<int>("UserId").HasColumnName("user_id");
+            entity.HasOne(ua => ua.User)
+                .WithMany(u => u.UserAuthorities)
+                .HasForeignKey(ua => ua.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                        j.IndexerProperty<int>("AuthorityId").HasColumnName("authority_id");
-                    });
+            entity.HasOne(ua => ua.Authority)
+                .WithMany()
+                .HasForeignKey(ua => ua.AuthorityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Venue>(entity =>

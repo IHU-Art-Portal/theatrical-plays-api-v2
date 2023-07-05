@@ -28,7 +28,7 @@ public class UserController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message!);
                 return new ConflictObjectResult(errorResponse);
             }
 
