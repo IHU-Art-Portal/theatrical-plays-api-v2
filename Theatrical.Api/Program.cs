@@ -141,4 +141,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+app.Run("https://0.0.0.0:7042");

@@ -12,6 +12,7 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
+[EnableCors("AllowOrigin")]
 public class PeopleController : ControllerBase
 {
     private readonly IPersonService _service;
@@ -63,7 +64,6 @@ public class PeopleController : ControllerBase
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
-    [EnableCors("AllowOrigin")]
     public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size)
     {
         try

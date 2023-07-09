@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ProductionDtos;
@@ -10,6 +11,7 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors("AllowOrigin")]
 public class ProductionsController : ControllerBase
 {
     private readonly IProductionValidationService _validation;

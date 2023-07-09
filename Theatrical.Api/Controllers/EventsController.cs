@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
@@ -10,6 +11,7 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("api/events")]
+[EnableCors("AllowOrigin")]
 public class EventsController : ControllerBase
 {
     private readonly IEventValidationService _validation;
