@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ContributionDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
@@ -23,7 +24,7 @@ public class ContributionsController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetContributions()
+    public async Task<ActionResult<ApiResponse>> GetContributions(int? page, int? size)
     {
         try
         {
@@ -35,7 +36,11 @@ public class ContributionsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound };
             }
 
-            var response = new ApiResponse<List<Contribution>>(contributions, "Completed");
+            var contributionDtos = _service.ToDto(contributions);
+
+            var paginationResult = _service.Paginate(page, size, contributionDtos);
+            
+            var response = new ApiResponse<PaginationResult<ContributionDto>>(paginationResult);
 
             return new OkObjectResult(response);
         }
