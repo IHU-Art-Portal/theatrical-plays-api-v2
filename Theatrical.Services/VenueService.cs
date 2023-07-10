@@ -1,5 +1,7 @@
 ﻿using Theatrical.Data.Models;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.VenueDtos;
+using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services;
@@ -11,15 +13,18 @@ public interface IVenueService
     Task Update(VenueUpdateDto venue);
     List<VenueDto> ToDto(List<Venue> venue);
     VenueDto ToDto(Venue venue);
+    PaginationResult<VenueDto> Paginate(int? page, int? size, List<VenueDto> venuesDto);
 }
 
 public class VenueService : IVenueService
 {
     private readonly IVenueRepository _repository;
+    private readonly IPaginationService _pagination;
 
-    public VenueService(IVenueRepository repository)
+    public VenueService(IVenueRepository repository, IPaginationService paginationService)
     {
         _repository = repository;
+        _pagination = paginationService;
     }
     
     public async Task Create(VenueCreateDto venueCreateDto)
@@ -81,5 +86,21 @@ public class VenueService : IVenueService
         };
         
         return venueDto;
+    }
+
+    public PaginationResult<VenueDto> Paginate(int? page, int? size, List<VenueDto> venuesDto)
+    {
+        var result = _pagination.GetPaginated(page, size, venuesDto, items =>
+        {
+            return items.Select(venue => new VenueDto
+            {
+                Address = venue.Address,
+                Id = venue.Id,
+                SystemId = venue.SystemId,
+                Title = venue.Title
+            });
+        });
+        
+        return result;
     }
 }

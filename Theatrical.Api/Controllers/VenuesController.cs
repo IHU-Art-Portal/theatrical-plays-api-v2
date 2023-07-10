@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services;
@@ -24,7 +25,7 @@ public class VenuesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetVenues()
+    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size)
     {
         try
         {
@@ -38,7 +39,9 @@ public class VenuesController : ControllerBase
 
             var venuesDto = _service.ToDto(venues!);
 
-            var response = new ApiResponse<List<VenueDto>>(venuesDto);
+            var paginationResult = _service.Paginate(page, size, venuesDto);
+
+            var response = new ApiResponse<PaginationResult<VenueDto>>(paginationResult);
 
             return new ObjectResult(response);
         }
