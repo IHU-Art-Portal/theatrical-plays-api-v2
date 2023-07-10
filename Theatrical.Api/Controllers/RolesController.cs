@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Dto.RoleDtos;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
 
@@ -53,7 +55,7 @@ public class RolesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetRoles()
+    public async Task<ActionResult<ApiResponse>> GetRoles(int? page,  int? size)
     {
         try
         {
@@ -61,11 +63,15 @@ public class RolesController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var response = new ApiResponse<List<Role>>(roles);
+            var rolesDto = _service.ToDto(roles!);
+
+            var paginationResult = _service.Paginate(page, size, rolesDto);
+            
+            var response = new ApiResponse<PaginationResult<RoleDto>>(paginationResult);
 
             return new ObjectResult(response);
         }
