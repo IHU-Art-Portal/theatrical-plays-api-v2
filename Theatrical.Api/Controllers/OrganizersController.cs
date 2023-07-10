@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.OrganizerDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
@@ -46,7 +47,7 @@ public class OrganizersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetOrganizers()
+    public async Task<ActionResult<ApiResponse>> GetOrganizers(int? page, int? size)
     {
         try
         {
@@ -58,7 +59,11 @@ public class OrganizersController : ControllerBase
                 return new NotFoundObjectResult(errorResponse);
             }
 
-            var response = new ApiResponse<List<Organizer>>(organizers);
+            var organizerDtos = _service.ToDto(organizers!);
+
+            var paginationResult = _service.Paginate(page, size, organizerDtos);
+
+            var response = new ApiResponse<PaginationResult<OrganizerDto>>(paginationResult);
 
             return new ObjectResult(response);
         }
