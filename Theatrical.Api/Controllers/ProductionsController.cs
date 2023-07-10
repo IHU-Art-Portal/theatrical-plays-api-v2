@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
@@ -52,7 +53,7 @@ public class ProductionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetProductions()
+    public async Task<ActionResult<ApiResponse>> GetProductions(int? page, int? size)
     {
         try
         {
@@ -66,7 +67,9 @@ public class ProductionsController : ControllerBase
 
             var productionsDto = _service.ConvertToDto(productions);
 
-            var response = new ApiResponse<List<ProductionDto>>(productionsDto);
+            var paginationResult = _service.Paginate(page, size, productionsDto);
+
+            var response = new ApiResponse<PaginationResult<ProductionDto>>(paginationResult);
 
             return new OkObjectResult(response);
         }

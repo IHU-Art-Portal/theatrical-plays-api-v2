@@ -1,5 +1,7 @@
 ﻿using Theatrical.Data.Models;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
+using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services;
@@ -10,14 +12,17 @@ public interface IProductionService
     List<ProductionDto> ConvertToDto(List<Production> productions);
     Task<ProductionDto> Get(int productionId);
     Task Delete(Production production);
+    PaginationResult<ProductionDto> Paginate(int? page, int? size, List<ProductionDto> productionsDto);
 }
 public class ProductionService : IProductionService
 {
     private readonly IProductionRepository _repo;
+    private readonly IPaginationService _pagination;
 
-    public ProductionService(IProductionRepository repo)
+    public ProductionService(IProductionRepository repo, IPaginationService paginationService)
     {
         _repo = repo;
+        _pagination = paginationService;
     }
 
     public async Task<ProductionDto> Get(int productionId)
@@ -95,6 +100,26 @@ public class ProductionService : IProductionService
         }
 
         return productionsDto;
+    }
+
+    public PaginationResult<ProductionDto> Paginate(int? page, int? size, List<ProductionDto> productionsDto)
+    {
+        var paginationResult = _pagination.GetPaginated(page, size, productionsDto, items =>
+        {
+            return items.Select(prod => new ProductionDto
+            {
+                Description = prod.Description,
+                Id = prod.Id,
+                Duration = prod.Duration,
+                MediaUrl = prod.MediaUrl,
+                OrganizerId = prod.OrganizerId,
+                Producer = prod.Producer,
+                Title = prod.Title,
+                Url = prod.Url
+            });
+        });
+
+        return paginationResult;
     }
 }
 
