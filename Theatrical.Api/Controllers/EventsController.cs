@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
+using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
@@ -24,7 +25,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetEvents()
+    public async Task<ActionResult<ApiResponse>> GetEvents(int? page, int? size)
     {
         try
         {
@@ -36,7 +37,11 @@ public class EventsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var response = new ApiResponse<List<Event>>(events);
+            var eventDtos = _service.ToDto(events);
+
+            var paginationResult = _service.Paginate(page, size, eventDtos);
+            
+            var response = new ApiResponse<PaginationResult<EventDto>>(paginationResult);
             return new OkObjectResult(response);
         }
         catch (Exception e)

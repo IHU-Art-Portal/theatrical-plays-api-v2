@@ -1,42 +1,40 @@
 ﻿using Theatrical.Data.Models;
+using Theatrical.Dto.ContributionDtos;
 using Theatrical.Dto.EventDtos;
+using Theatrical.Dto.Pagination;
+using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services;
 
 public interface IEventService
 {
-    Task<List<EventDto>?> Get();
     Task Create(CreateEventDto createEventDto);
+    List<EventDto> ToDto(List<Event> events);
+    PaginationResult<EventDto> Paginate(int? page, int? size, List<EventDto> eventDtos);
 }
 
 public class EventService : IEventService
 {
     private readonly IEventRepository _repository;
+    private readonly IPaginationService _pagination;
 
-    public EventService(IEventRepository repository)
+    public EventService(IEventRepository repository, IPaginationService paginationService)
     {
         _repository = repository;
+        _pagination = paginationService;
     }
 
-    public async Task<List<EventDto>?> Get()
+  
+    public List<EventDto> ToDto(List<Event> events)
     {
-        var events = await _repository.Get();
-        var eventsDto = new List<EventDto>();
-
-        foreach (var newEvent in events)
+        return events.Select(event1 => new EventDto
         {
-            var tempEvent = new EventDto
-            {
-                DateEvent = newEvent.DateEvent,
-                PriceRange = newEvent.PriceRange,
-                ProductionId = newEvent.ProductionId,
-                VenueId = newEvent.VenueId
-            };
-            eventsDto.Add(tempEvent);
-        }
-
-        return eventsDto;
+            PriceRange = event1.PriceRange,
+            DateEvent = event1.DateEvent,
+            ProductionId = event1.ProductionId,
+            VenueId = event1.VenueId
+        }).ToList();
     }
 
     public async Task Create(CreateEventDto createEventDto)
@@ -51,6 +49,22 @@ public class EventService : IEventService
         };
         
         await _repository.Create(eventNew);
+    }
+    
+    public PaginationResult<EventDto> Paginate(int? page, int? size, List<EventDto> eventDtos)
+    {
+        var paginationResult = _pagination.GetPaginated(page, size, eventDtos, items =>
+        {
+            return items.Select(ev => new EventDto
+            {
+                ProductionId = ev.ProductionId,
+                DateEvent = ev.DateEvent,
+                PriceRange = ev.PriceRange,
+                VenueId = ev.VenueId
+            });
+        });
+
+        return paginationResult;
     }
 }
 
