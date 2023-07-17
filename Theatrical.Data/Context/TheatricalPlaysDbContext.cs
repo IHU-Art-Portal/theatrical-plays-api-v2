@@ -6,9 +6,12 @@ namespace Theatrical.Data.Context;
 
 public class TheatricalPlaysDbContext : DbContext
 {
+    private readonly IConfiguration _config;
+
     public TheatricalPlaysDbContext(DbContextOptions<TheatricalPlaysDbContext> options, IConfiguration configuration) :
         base(options)
     {
+        _config = configuration;
     }
 
     public virtual DbSet<Authority> Authorities { get; set; } = null!;
@@ -29,8 +32,7 @@ public class TheatricalPlaysDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseMySQL(
-                "Server=195.251.123.174; Port=3306; Database=theatrical_plays_api_db; Uid=aris; Pwd=aris;");
+            optionsBuilder.UseMySQL(_config.GetConnectionString("DefaultConnection"));
         }
     }
 
