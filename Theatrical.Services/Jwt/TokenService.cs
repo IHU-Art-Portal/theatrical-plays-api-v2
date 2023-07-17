@@ -16,7 +16,7 @@ public interface ITokenService
 
 public class TokenService : ITokenService
 {
-    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(1);
     private readonly IConfiguration _config;
 
     public TokenService(IConfiguration config)
