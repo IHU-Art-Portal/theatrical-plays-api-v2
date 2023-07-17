@@ -25,7 +25,7 @@ public class ProductionsController : ControllerBase
     }
     
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
         try

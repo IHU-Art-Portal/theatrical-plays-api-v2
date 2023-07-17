@@ -53,7 +53,7 @@ public class ContributionsController : ControllerBase
     }
 
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
     {
         try

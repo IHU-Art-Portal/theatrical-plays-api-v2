@@ -27,7 +27,7 @@ public class OrganizersController : ControllerBase
     }
     
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
     {
         try

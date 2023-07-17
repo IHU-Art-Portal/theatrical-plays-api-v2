@@ -6,19 +6,18 @@ using Theatrical.Services.Jwt;
 
 namespace Theatrical.Api;
 
-public class CustomAuthorizationFilter : IAuthorizationFilter
+public class UserAuthorizationFilter : IAuthorizationFilter
 {
-    private readonly string _requiredRole = "admin";
+    private readonly string _requiredRole = "user";
     private readonly ITokenService _tokenService;
 
-    public CustomAuthorizationFilter(ITokenService tokenService)
+    public UserAuthorizationFilter(ITokenService tokenService)
     {
         _tokenService = tokenService;
     }
     
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        
         string? bearerToken = context.HttpContext.Request.Headers["Authorization"];
         
         if (string.IsNullOrEmpty(bearerToken))

@@ -53,7 +53,7 @@ public class EventsController : ControllerBase
     }
     
     [HttpPost]
-    [TypeFilter(typeof(CustomAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
     {
         try
