@@ -49,7 +49,7 @@ public class UserAuthorizationFilter : IAuthorizationFilter
         if (!context.HttpContext.User.IsInRole(_requiredRole))
         {
             //Handle forbidden user
-            var errorResponse3 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes");
+            var errorResponse3 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes or see the context of this request");
             context.Result = new ObjectResult(errorResponse3){StatusCode = (int)HttpStatusCode.Forbidden};
             return;
         }
