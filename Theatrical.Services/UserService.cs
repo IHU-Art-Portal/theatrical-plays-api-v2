@@ -42,7 +42,7 @@ public class UserService : IUserService
             Enabled = true
         };
 
-        if (! (registerUserDto.Role.Equals(1) || registerUserDto.Role.Equals(2)) || registerUserDto.Role is null)
+        if (! (registerUserDto.Role.Equals(1) || registerUserDto.Role.Equals(2) || registerUserDto.Role.Equals(3)) || registerUserDto.Role is null)
         {
             registerUserDto.Role = 2;
         }

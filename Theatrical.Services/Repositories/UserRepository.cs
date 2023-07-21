@@ -43,7 +43,7 @@ public class UserRepository : IUserRepository
         var userAuthorities = new UserAuthority
         {
             UserId = userCreated!.Id,
-            AuthorityId = userRole                         //1 for admin, 2 for user.
+            AuthorityId = userRole                         //1 for admin, 2 for user, 3 for developer
         };
 
         await _context.UserAuthorities.AddAsync(userAuthorities);

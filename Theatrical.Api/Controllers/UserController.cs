@@ -24,7 +24,8 @@ public class UserController : ControllerBase
     /// <summary>
     /// Use this method to register.
     /// Use 1 for admin account or
-    /// Use 2 for user account.
+    /// Use 2 for user account or
+    /// Use 3 for developer account.
     /// If you don't define role, user account will be created.
     /// </summary>
     /// <param name="registerUserDto"></param>
