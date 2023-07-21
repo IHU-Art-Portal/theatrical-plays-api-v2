@@ -10,7 +10,8 @@ public enum ErrorCode
     Forbidden,
     BadRequest,
     ServerError,
-    CurationFailure
+    CurationFailure,
+    InvalidEmail
 }
 
 public class ApiResponse

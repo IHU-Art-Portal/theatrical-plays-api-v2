@@ -39,8 +39,8 @@ public class UserController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.AlreadyExists, validation.Message!);
-                return new ConflictObjectResult(errorResponse);
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new BadRequestObjectResult(errorResponse);
             }
 
             var userCreated = await _service.Register(registerUserDto);

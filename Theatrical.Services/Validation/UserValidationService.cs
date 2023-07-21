@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using System.Text.RegularExpressions;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -29,6 +29,17 @@ public class UserValidationService : IUserValidationService
     public async Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto)
     {
         var report = new ValidationReport();
+        
+        var emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+
+        if (!Regex.IsMatch(userdto.Email, emailPattern))
+        {
+            report.Success = false;
+            report.Message = "Please provide a valid email!";
+            report.ErrorCode = ErrorCode.InvalidEmail;
+            return report;
+        }
+        
         var user = await _repository.Get(userdto.Email);
 
         if (user is not null)
