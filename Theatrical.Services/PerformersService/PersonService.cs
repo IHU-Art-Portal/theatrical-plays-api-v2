@@ -37,7 +37,8 @@ public class PersonService : IPersonService
         Person person = new Person
         {
             Fullname = createPersonDto.Fullname,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            SystemId = createPersonDto.System
         };
 
         if (createPersonDto.Images != null && createPersonDto.Images.Any())

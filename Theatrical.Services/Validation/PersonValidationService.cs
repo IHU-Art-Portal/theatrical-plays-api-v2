@@ -39,6 +39,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "Person not found";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -56,6 +57,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "Person not found";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -73,6 +75,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "Not Found any people with the provided role";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -90,6 +93,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = $"Not Found any people with the initials: {initials}";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
         
@@ -105,6 +109,7 @@ public class PersonValidationService : IPersonValidationService
         if (!report.Success)
         {
             report.Message = $"Person with the provided ID not found";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -113,6 +118,7 @@ public class PersonValidationService : IPersonValidationService
         if (!productions.Any())
         {
             report.Message = $"This person does not participate in any productions";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -131,6 +137,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "Person not found";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 
@@ -140,6 +147,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "This person does not have any photos";
+            report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
         }
 

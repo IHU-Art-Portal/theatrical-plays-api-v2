@@ -39,7 +39,7 @@ public class PeopleController : ControllerBase
 
             if (!validation.Success)
             {
-                ApiResponse errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                ApiResponse errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
@@ -82,8 +82,14 @@ public class PeopleController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Use this method to create a person
+    /// System 2 for Python, 3 for C#, 10 for Spring, 11 for Android, 12 for iOS, 13 for Web App.
+    /// </summary>
+    /// <param name="createPersonDto">Fullname, ImageLinks (if any), System ID</param>
+    /// <returns></returns>
     [HttpPost]
-    //[TypeFilter(typeof(CustomAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
         try
@@ -128,7 +134,7 @@ public class PeopleController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
@@ -229,21 +235,22 @@ public class PeopleController : ControllerBase
         }
     }
     
-    /*[HttpDelete]
+    [HttpDelete]
     [Route("{id}")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DeletePerformer(int id)
     {
         var (validation, performer) = await _validation.ValidateForDelete(id);
 
         if (!validation.Success)
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
             return new ObjectResult(errorResponse){StatusCode = 404};
         }
         
-        await _service.Delete(performer);
+        await _service.Delete(performer!);
         ApiResponse response = new ApiResponse(message: $"Person with ID: {id} has been deleted!");
         
         return new OkObjectResult(response);
-    }*/
+    }
 }
