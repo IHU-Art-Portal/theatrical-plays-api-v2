@@ -27,6 +27,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<Models.System> Systems { get; set; } = null!;
     public virtual DbSet<User> Users { get; set; } = null!;
     public virtual DbSet<Venue> Venues { get; set; } = null!;
+    public virtual DbSet<Transaction> Transactions { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -411,6 +412,15 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasConstraintName("venue_ibfk_1");
         });
 
-        
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.ToTable("transactions");
+            entity.HasOne(t => t.User)
+                .WithMany(u => u.UserTransactions)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("usertransactions_ut1");
+        });
+
     }
 }

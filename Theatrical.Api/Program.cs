@@ -102,6 +102,8 @@ builder.Services.AddTransient<IContributionService, ContributionService>();
 builder.Services.AddTransient<ILogRepository, LogRepository>();
 builder.Services.AddTransient<ILogService, LogService>();
 
+builder.Services.AddTransient<ITransactionRepository, TransactionRepository>();
+
 //Jwt Token service
 builder.Services.AddTransient<ITokenService, TokenService>();
 

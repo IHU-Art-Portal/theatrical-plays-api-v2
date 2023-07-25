@@ -11,4 +11,5 @@ public class User
     public bool? Enabled { get; set; }
 
     public virtual List<UserAuthority> UserAuthorities { get; set; }
+    public virtual List<Transaction> UserTransactions { get; set; }
 }
