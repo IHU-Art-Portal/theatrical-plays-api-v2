@@ -40,5 +40,4 @@ public class TransactionRepository : ITransactionRepository
         var transcation = await _context.Transactions.FindAsync(transactionId);
         return transcation;
     }
-
 }

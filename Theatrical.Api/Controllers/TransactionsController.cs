@@ -40,4 +40,19 @@ public class TransactionsController : ControllerBase
             return new ObjectResult(e.Message);
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ApiResponse>> GetTransaction([FromRoute] int id)
+    {
+        var transaction = await _repo.GetTransaction(id);
+        var response = new ApiResponse<Transaction>(transaction);
+        return new OkObjectResult(response);
+    }
+
+    [HttpGet("user/{id}")]
+    public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
+    {
+        var transactions = await _repo.GetTransactions(id);
+        return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions, "Successfully returned user's transactions"));
+    }
 }
