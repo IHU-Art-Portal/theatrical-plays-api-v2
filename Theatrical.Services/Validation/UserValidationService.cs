@@ -11,6 +11,7 @@ public interface IUserValidationService
 {
     Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
     Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
+    Task<(ValidationReport, decimal)> ValidateBalance(int id);
 }
 
 public class UserValidationService : IUserValidationService
@@ -81,5 +82,25 @@ public class UserValidationService : IUserValidationService
         return (report, user);
 
     }
-    
+
+    public async Task<(ValidationReport, decimal)> ValidateBalance(int id)
+    {
+        var report = new ValidationReport();
+        var user = await _repository.Get(id);
+
+        if (user is null)
+        {
+            report.Message = "User not found";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, 0m);
+        }
+
+        var credits = await _repository.GetUserBalance(id);
+        
+        report.Success = true;
+        report.Message = "Success";
+        
+        return (report, credits);
+    }
 }

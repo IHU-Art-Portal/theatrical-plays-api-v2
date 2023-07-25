@@ -7,8 +7,10 @@ namespace Theatrical.Services.Repositories;
 public interface IUserRepository
 {
     Task<User?> Get(string email);
+    Task<User?> Get(int id);
     Task<User> Register(User user, int userRole);
     Task<User?> GetUserIncludingAuthorities(string email);
+    Task<decimal> GetUserBalance(int id);
 }
 
 public class UserRepository : IUserRepository
@@ -23,6 +25,11 @@ public class UserRepository : IUserRepository
     public async Task<User?> Get(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task<User?> Get(int id)
+    {
+        return await _context.Users.FindAsync(id);
     }
     
     public async Task<User?> GetUserIncludingAuthorities(string email)
@@ -50,5 +57,14 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
         
         return userCreated;
+    }
+
+    public async Task<decimal> GetUserBalance(int id)
+    {
+        var credits = await _context.Transactions
+            .Where(t => t.UserId == id)
+            .SumAsync(t => t.CreditAmount);
+
+        return credits;
     }
 }

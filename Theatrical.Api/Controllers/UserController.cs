@@ -83,4 +83,27 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+
+    [HttpGet("{id}/balance")]
+    public async Task<ActionResult<ApiResponse>> Balance([FromRoute]int id)
+    {
+        try
+        {
+            var (validationReport, credits) = await _validation.ValidateBalance(id);
+
+            if (!validationReport.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validationReport.ErrorCode!, validationReport.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            var response = new ApiResponse<string>($"You have {credits} credits.");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
+        }
+    }
 }
