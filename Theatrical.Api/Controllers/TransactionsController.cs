@@ -53,6 +53,6 @@ public class TransactionsController : ControllerBase
     public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
     {
         var transactions = await _repo.GetTransactions(id);
-        return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions, "Successfully returned user's transactions"));
+        return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions));
     }
 }
