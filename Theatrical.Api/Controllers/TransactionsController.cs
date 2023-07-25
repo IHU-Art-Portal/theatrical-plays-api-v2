@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services.Repositories;
 
@@ -17,7 +18,7 @@ public class TransactionsController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult> PostTransaction([FromBody]TransactionDto transactionDto)
+    public async Task<ActionResult<ApiResponse>> PostTransaction([FromBody]TransactionDto transactionDto)
     {
         try
         {
@@ -25,13 +26,14 @@ public class TransactionsController : ControllerBase
             {
                 UserId = transactionDto.UserId,
                 CreditAmount = transactionDto.CreditAmount,
-                Reason = transactionDto.Reason,
-                DateCreated = DateTime.Now
+                Reason = transactionDto.Reason
             };
 
             await _repo.PostTransaction(transaction);
-
-            return Ok();
+            
+            var response = new ApiResponse("Transaction Successful!");
+            
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
