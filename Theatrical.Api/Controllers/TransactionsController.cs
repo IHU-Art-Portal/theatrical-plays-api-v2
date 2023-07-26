@@ -37,22 +37,39 @@ public class TransactionsController : ControllerBase
         }
         catch (Exception e)
         {
-            return new ObjectResult(e.Message);
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
+            return new ObjectResult(exceptionResponse) { StatusCode = 500 };
         }
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse>> GetTransaction([FromRoute] int id)
     {
-        var transaction = await _repo.GetTransaction(id);
-        var response = new ApiResponse<Transaction>(transaction);
-        return new OkObjectResult(response);
+        try
+        {
+            var transaction = await _repo.GetTransaction(id);
+            var response = new ApiResponse<Transaction>(transaction);
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
+            return new ObjectResult(exceptionResponse) { StatusCode = 500 };
+        }
     }
 
     [HttpGet("user/{id}")]
     public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
     {
-        var transactions = await _repo.GetTransactions(id);
-        return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions));
+        try
+        {
+            var transactions = await _repo.GetTransactions(id);
+            return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions));
+        }
+        catch (Exception e)
+        {
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
+            return new ObjectResult(exceptionResponse) { StatusCode = 500 };
+        }
     }
 }
