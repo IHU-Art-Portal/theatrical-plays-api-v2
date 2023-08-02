@@ -1,4 +1,6 @@
-﻿namespace Theatrical.Dto.ResponseWrapperFolder;
+﻿using System.Text.Json;
+
+namespace Theatrical.Dto.ResponseWrapperFolder;
 
 public enum ErrorCode
 {
@@ -31,6 +33,11 @@ public class ApiResponse
     {
         Success = true;
         Message = message;
+    }
+    
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this);
     }
 }
 

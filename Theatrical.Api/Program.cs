@@ -12,6 +12,7 @@ using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
 using Theatrical.Services.Curators;
+using Theatrical.Services.Exceptions;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
@@ -139,7 +140,7 @@ builder.Logging.AddSerilog(logger);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
+//app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v2/swagger.json", "Theatrical.Api v2"));
 app.UseCors("AllowOrigin");
