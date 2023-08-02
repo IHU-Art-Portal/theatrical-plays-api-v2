@@ -28,16 +28,9 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transaction = new Transaction
-            {
-                UserId = transactionDto.UserId,
-                CreditAmount = transactionDto.CreditAmount,
-                Reason = transactionDto.Reason
-            };
-
-            await _repo.PostTransaction(transaction);
+            var transaction = await _service.PostTransaction(transactionDto);
             
-            var response = new ApiResponse("Transaction Successful!");
+            var response = new ApiResponse<Transaction>(transaction, "Transaction Successful!");
             
             return new OkObjectResult(response);
         }

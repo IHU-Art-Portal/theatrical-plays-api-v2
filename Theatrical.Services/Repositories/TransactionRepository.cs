@@ -6,7 +6,7 @@ namespace Theatrical.Services.Repositories;
 
 public interface ITransactionRepository
 {
-    Task PostTransaction(Transaction transaction);
+    Task<Transaction> PostTransaction(Transaction transaction);
     Task<List<Transaction>> GetTransactions(int userId);
     Task<Transaction?> GetTransaction(int transactionId);
 }
@@ -20,12 +20,13 @@ public class TransactionRepository : ITransactionRepository
         _context = context;
     }
 
-    public async Task PostTransaction(Transaction transaction)
+    public async Task<Transaction> PostTransaction(Transaction transaction)
     {
         await _context.Transactions.AddAsync(transaction);
         await _context.SaveChangesAsync();
+        return transaction;
     }
-
+    
     public async Task<List<Transaction>> GetTransactions(int userId)
     {
         var transactions = await _context.Transactions
