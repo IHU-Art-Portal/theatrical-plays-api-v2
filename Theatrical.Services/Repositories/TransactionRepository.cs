@@ -8,7 +8,7 @@ public interface ITransactionRepository
 {
     Task PostTransaction(Transaction transaction);
     Task<List<Transaction>> GetTransactions(int userId);
-    Task<Transaction> GetTransaction(int transactionId);
+    Task<Transaction?> GetTransaction(int transactionId);
 }
 
 public class TransactionRepository : ITransactionRepository
@@ -35,9 +35,9 @@ public class TransactionRepository : ITransactionRepository
         return transactions;
     }
 
-    public async Task<Transaction> GetTransaction(int transactionId)
+    public async Task<Transaction?> GetTransaction(int transactionId)
     {
-        var transcation = await _context.Transactions.FindAsync(transactionId);
-        return transcation;
+        var transaction = await _context.Transactions.FindAsync(transactionId);
+        return transaction;
     }
 }

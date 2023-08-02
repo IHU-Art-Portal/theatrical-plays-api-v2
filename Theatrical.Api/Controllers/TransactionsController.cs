@@ -3,6 +3,7 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services.Repositories;
+using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
@@ -11,10 +12,12 @@ namespace Theatrical.Api.Controllers;
 public class TransactionsController : ControllerBase
 {
     private readonly ITransactionRepository _repo;
+    private readonly ITransactionValidationService _validation;
 
-    public TransactionsController(ITransactionRepository repository)
+    public TransactionsController(ITransactionRepository repository, ITransactionValidationService validationService)
     {
         _repo = repository;
+        _validation = validationService;
     }
     
     [HttpPost]
@@ -47,7 +50,14 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transaction = await _repo.GetTransaction(id);
+            var (validation, transaction) = await _validation.ValidateForFetch(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode) validation.ErrorCode!, validation.Message!);
+                return new NotFoundObjectResult(errorResponse);
+            }
+            
             var response = new ApiResponse<Transaction>(transaction);
             return new OkObjectResult(response);
         }
@@ -63,8 +73,17 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transactions = await _repo.GetTransactions(id);
-            return new OkObjectResult(new ApiResponse<List<Transaction>>(transactions));
+            var (validation, transactions) = await _validation.ValidateUserTransactions(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode) validation.ErrorCode!, validation.Message!);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var response = new ApiResponse<List<Transaction>>(transactions);
+            
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
