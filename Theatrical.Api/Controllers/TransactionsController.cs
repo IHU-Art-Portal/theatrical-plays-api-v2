@@ -2,6 +2,7 @@
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
+using Theatrical.Services;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
@@ -13,11 +14,13 @@ public class TransactionsController : ControllerBase
 {
     private readonly ITransactionRepository _repo;
     private readonly ITransactionValidationService _validation;
+    private readonly ITransactionService _service;
 
-    public TransactionsController(ITransactionRepository repository, ITransactionValidationService validationService)
+    public TransactionsController(ITransactionRepository repository, ITransactionValidationService validationService, ITransactionService transactionService)
     {
         _repo = repository;
         _validation = validationService;
+        _service = transactionService;
     }
     
     [HttpPost]
@@ -57,8 +60,10 @@ public class TransactionsController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode) validation.ErrorCode!, validation.Message!);
                 return new NotFoundObjectResult(errorResponse);
             }
+
+            var transactionDto = _service.TransactionToDto(transaction!);
             
-            var response = new ApiResponse<Transaction>(transaction);
+            var response = new ApiResponse<TransactionDtoFetch>(transactionDto);
             return new OkObjectResult(response);
         }
         catch (Exception e)
@@ -81,7 +86,9 @@ public class TransactionsController : ControllerBase
                 return new NotFoundObjectResult(errorResponse);
             }
 
-            var response = new ApiResponse<List<Transaction>>(transactions);
+            var transactionDtos = _service.TransactionListToDto(transactions!);
+            
+            var response = new ApiResponse<List<TransactionDtoFetch>>(transactionDtos);
             
             return new OkObjectResult(response);
         }
