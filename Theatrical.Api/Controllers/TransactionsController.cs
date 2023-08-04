@@ -4,7 +4,6 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services;
-using Theatrical.Services.Repositories;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -14,13 +13,11 @@ namespace Theatrical.Api.Controllers;
 [EnableCors("AllowOrigin")]
 public class TransactionsController : ControllerBase
 {
-    private readonly ITransactionRepository _repo;
     private readonly ITransactionValidationService _validation;
     private readonly ITransactionService _service;
 
-    public TransactionsController(ITransactionRepository repository, ITransactionValidationService validationService, ITransactionService transactionService)
+    public TransactionsController(ITransactionValidationService validationService, ITransactionService transactionService)
     {
-        _repo = repository;
         _validation = validationService;
         _service = transactionService;
     }
