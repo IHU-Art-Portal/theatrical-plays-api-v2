@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
@@ -10,6 +11,7 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors("AllowOrigin")]
 public class TransactionsController : ControllerBase
 {
     private readonly ITransactionRepository _repo;
