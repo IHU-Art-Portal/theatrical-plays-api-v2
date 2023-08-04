@@ -12,6 +12,7 @@ public interface IUserValidationService
     Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
     Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
+    Task<(ValidationReport, User?)> VerifyEmailToken(string email, string token);
 }
 
 public class UserValidationService : IUserValidationService
@@ -102,5 +103,24 @@ public class UserValidationService : IUserValidationService
         report.Message = "Success";
         
         return (report, credits);
+    }
+
+    public async Task<(ValidationReport, User?)> VerifyEmailToken(string email, string token)
+    {
+        var user = await _repository.Get(email);
+        var report = new ValidationReport();
+
+        if (user is null || !token.Equals(user!.VerificationCode))
+        {
+            report.Success = false;
+            report.Message = "Verification Code Incorrect";
+            report.ErrorCode = ErrorCode.InvalidToken;
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Verification Completed";
+
+        return (report, user);
     }
 }

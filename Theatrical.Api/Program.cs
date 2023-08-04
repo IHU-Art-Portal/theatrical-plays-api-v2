@@ -12,7 +12,7 @@ using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
 using Theatrical.Services.Curators;
-using Theatrical.Services.Exceptions;
+using Theatrical.Services.Email;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
@@ -117,6 +117,9 @@ builder.Services.AddTransient<IPaginationService, PaginationService>();
 
 //Curator service
 builder.Services.AddTransient<IDataCurator, DataCurator>();
+
+//Email service
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 //cors
 builder.Services.AddCors(options =>

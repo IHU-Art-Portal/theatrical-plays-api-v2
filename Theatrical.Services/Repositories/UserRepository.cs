@@ -11,6 +11,7 @@ public interface IUserRepository
     Task<User> Register(User user, int userRole);
     Task<User?> GetUserIncludingAuthorities(string email);
     Task<decimal> GetUserBalance(int id);
+    Task EnableAccount(User user);
 }
 
 public class UserRepository : IUserRepository
@@ -42,21 +43,19 @@ public class UserRepository : IUserRepository
 
     public async Task<User> Register(User user, int userRole)
     {
-        await _context.Users.AddAsync(user);
+        await _context.Users.AddAsync(user);            //adds user
         await _context.SaveChangesAsync();
-        
-        var userCreated = await Get(user.Email);
 
-        var userAuthorities = new UserAuthority
+        var userAuthorities = new UserAuthority         //adds user authorities
         {
-            UserId = userCreated!.Id,
-            AuthorityId = userRole                         //1 for admin, 2 for user, 3 for developer
+            UserId = user.Id,
+            AuthorityId = userRole                      //1 for admin, 2 for user, 3 for developer
         };
 
         await _context.UserAuthorities.AddAsync(userAuthorities);
         await _context.SaveChangesAsync();
         
-        return userCreated;
+        return user;
     }
 
     public async Task<decimal> GetUserBalance(int id)
@@ -66,5 +65,11 @@ public class UserRepository : IUserRepository
             .SumAsync(t => t.CreditAmount);
 
         return credits;
+    }
+
+    public async Task EnableAccount(User user)
+    {
+        user.Enabled = true;
+        await _context.SaveChangesAsync();
     }
 }

@@ -349,6 +349,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
+
+            entity.Property(e => e.VerificationCode).HasColumnName("verification_code");
         });
         
         modelBuilder.Entity<Authority>(entity =>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
+using Theatrical.Services.Email;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -14,11 +15,13 @@ public class UserController : ControllerBase
 {
     private readonly IUserValidationService _validation;
     private readonly IUserService _service;
+    private readonly IEmailService _emailService;
 
-    public UserController(IUserValidationService validation, IUserService service)
+    public UserController(IUserValidationService validation, IUserService service, IEmailService emailService)
     {
         _validation = validation;
         _service = service;
+        _emailService = emailService;
     }
     
     /// <summary>
@@ -29,7 +32,6 @@ public class UserController : ControllerBase
     /// If you don't define role, user account will be created.
     /// </summary>
     /// <param name="registerUserDto"></param>
-    /// <param name="role">Integer number for role</param>
     /// <returns></returns>
     [HttpPost("register")]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterUserDto registerUserDto)
@@ -44,19 +46,54 @@ public class UserController : ControllerBase
                 return new BadRequestObjectResult(errorResponse);
             }
 
-            var userCreated = await _service.Register(registerUserDto);
-            var response = new ApiResponse<UserDtoRole>(userCreated, "Successfully Registered!");
+            //Generate the verification token
+            string verificationToken = Guid.NewGuid().ToString();
 
+            //Send confirmation email to the registered user.
+            await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationToken);
+            
+            
+            var userCreated = await _service.Register(registerUserDto, verificationToken);
+            var response = new ApiResponse<UserDtoRole>(userCreated, "Successfully Registered!");
+            
             return new OkObjectResult(response);
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse<Exception>(e);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
-    
+
+    [HttpGet("verify")]
+    public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token, [FromQuery]string email)
+    {
+        try
+        {
+            
+            var (verification, user) = await _validation.VerifyEmailToken(email, token);
+            
+            if (!verification.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
+                return new ObjectResult(errorResponse){StatusCode = 400};
+            }
+
+            await _service.EnableAccount(user!);
+            
+            var response = new ApiResponse(verification.Message!);
+            
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError}; 
+        }
+    }
+
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse>> Login([FromBody]LoginUserDto loginUserDto)
     {
@@ -78,7 +115,7 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
@@ -106,4 +143,6 @@ public class UserController : ControllerBase
             return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
         }
     }
+
+    
 }
