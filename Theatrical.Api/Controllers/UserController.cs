@@ -162,6 +162,4 @@ public class UserController : ControllerBase
         }
     }
 
-    //test
-    
 }
