@@ -66,6 +66,12 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Verification link points to this endpoint.
+    /// Verifies the user and enabled the account.
+    /// </summary>
+    /// <param name="token">verification code</param>
+    /// <returns></returns>
     [HttpGet("verify")]
     public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token)
     {
@@ -94,6 +100,13 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Use this to login in.
+    /// Logging in provides a JWT to user.
+    /// Use the token for locked actions.
+    /// </summary>
+    /// <param name="loginUserDto"></param>
+    /// <returns></returns>
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse>> Login([FromBody]LoginUserDto loginUserDto)
     {
@@ -121,6 +134,11 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Provides the balance of a user.
+    /// </summary>
+    /// <param name="id">user's id</param>
+    /// <returns>Available User Credits</returns>
     [HttpGet("{id}/balance")]
     public async Task<ActionResult<ApiResponse>> Balance([FromRoute]int id)
     {

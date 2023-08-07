@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.RoleDtos;
@@ -24,6 +22,11 @@ public class RolesController : ControllerBase
         _validation = validation;
     }
     
+    /// <summary>
+    /// Endpoint to creating a new role.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("{role}")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
@@ -48,12 +51,20 @@ public class RolesController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching all roles.
+    /// Pagination available.
+    /// Oldest to newest
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetRoles(int? page,  int? size)
     {
@@ -77,7 +88,7 @@ public class RolesController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }

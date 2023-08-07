@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
@@ -24,6 +22,13 @@ public class VenuesController : ControllerBase
         _validation = validation;
     }
 
+    /// <summary>
+    /// Endpoint to all venues.
+    /// Customizable with page and size.
+    /// </summary>
+    /// <param name="page">page number</param>
+    /// <param name="size">size capacity for a page</param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size)
     {
@@ -33,7 +38,7 @@ public class VenuesController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new NotFoundObjectResult(errorResponse);
             }
 
@@ -47,12 +52,18 @@ public class VenuesController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to specific Venue.
+    /// Search a Venue by its Id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> GetVenue(int id)
@@ -63,7 +74,7 @@ public class VenuesController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new NotFoundObjectResult(errorResponse);
             }
 
@@ -73,12 +84,17 @@ public class VenuesController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to creating a venue.
+    /// </summary>
+    /// <param name="venueCreateDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
@@ -93,13 +109,18 @@ public class VenuesController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
-
-    /*[HttpDelete]
+    
+    /*/// <summary>
+    /// Endpoint to deleting a venue.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<ApiResponse>> DeleteVenue(int id)
     {
@@ -118,7 +139,12 @@ public class VenuesController : ControllerBase
         return new ObjectResult(response);
     }*/
 
-    /*[HttpPut]
+    /*/// <summary>
+    /// Endpoint to updating a Venue
+    /// </summary>
+    /// <param name="venueDto"></param>
+    /// <returns></returns>
+    [HttpPut]
     public async Task<ActionResult<ApiResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
     {
         var validation = await _validation.ValidateForUpdate(venueDto);

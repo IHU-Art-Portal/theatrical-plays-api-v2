@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -43,7 +42,7 @@ public class PeopleController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var performerDto = _service.ToDto(person);
+            var performerDto = _service.ToDto(person!);
 
             ApiResponse response = new ApiResponse<PersonDto>(performerDto);
 
@@ -51,7 +50,7 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
@@ -76,14 +75,14 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
     /// <summary>
-    /// Use this method to create a person
+    /// Endpoint to creating a new Person.
     /// System 2 for Python, 3 for C#, 10 for Spring, 11 for Android, 12 for iOS, 13 for Web App.
     /// </summary>
     /// <param name="createPersonDto">Fullname, ImageLinks (if any), System ID</param>
@@ -111,12 +110,19 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Search function not implemented yet.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("search")]
     public ActionResult GetPerformersRole(string? role, int? page, int? size)
@@ -124,6 +130,14 @@ public class PeopleController : ControllerBase
         return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
     }
 
+    /// <summary>
+    /// Endpoint to fetching all Person(s) by a specific role.
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="role"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("role/{role}")]
     public async Task<ActionResult<ApiResponse>> GetPeopleByRole(string role, int? page, int? size)
@@ -145,12 +159,19 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching a Person by their initials.
+    /// </summary>
+    /// <param name="letters"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("initials/{letters}")]
     public async Task<ActionResult<ApiResponse>> GetPeopleByInitialLetter(string letters, int? page, int? size)
@@ -173,12 +194,20 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching all Productions a Person participates in.
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("{id}/productions")]
     public async Task<ActionResult<ApiResponse>> GetPersonProductions(int id, int? page, int? size)
@@ -201,12 +230,17 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching all photos by Person's Id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("{id}/photos")]
     public async Task<ActionResult<ApiResponse>> GetPersonsPhotos(int id)
@@ -229,16 +263,21 @@ public class PeopleController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
     
+    /// <summary>
+    /// Endpoint to deleting a Person by id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete]
     [Route("{id}")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
-    public async Task<ActionResult<ApiResponse>> DeletePerformer(int id)
+    public async Task<ActionResult<ApiResponse>> DeletePerson(int id)
     {
         var (validation, performer) = await _validation.ValidateForDelete(id);
 

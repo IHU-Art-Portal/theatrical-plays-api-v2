@@ -22,6 +22,11 @@ public class TransactionsController : ControllerBase
         _service = transactionService;
     }
     
+    /// <summary>
+    /// Endpoint to making a new transaction.
+    /// </summary>
+    /// <param name="transactionDto"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<ActionResult<ApiResponse>> PostTransaction([FromBody]TransactionDto transactionDto)
     {
@@ -40,6 +45,11 @@ public class TransactionsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get a specific transaction
+    /// </summary>
+    /// <param name="id">transaction id</param>
+    /// <returns>TransactionDtoFetch</returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse>> GetTransaction([FromRoute] int id)
     {
@@ -65,6 +75,11 @@ public class TransactionsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get all the transactions of a specific user.
+    /// </summary>
+    /// <param name="id">user's id</param>
+    /// <returns>List&lt;TransactionsDtoFetch&gt;</returns>
     [HttpGet("user/{id}")]
     public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
     {

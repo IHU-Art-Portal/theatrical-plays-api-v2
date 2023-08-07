@@ -19,6 +19,13 @@ public class LogsController : ControllerBase
         _service = service;
     }
     
+    /// <summary>
+    /// Endpoint to fetching all Logs.
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> GetLogs(int? page, int? size)

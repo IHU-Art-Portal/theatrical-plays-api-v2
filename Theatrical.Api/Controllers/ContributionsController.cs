@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.ContributionDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -23,6 +22,13 @@ public class ContributionsController : ControllerBase
         _validation = validation;
     }
     
+    /// <summary>
+    /// Endpoint to fetching all Contribution(s).
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetContributions(int? page, int? size)
     {
@@ -46,12 +52,17 @@ public class ContributionsController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to creating a new Contribution.
+    /// </summary>
+    /// <param name="contributionDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
@@ -74,7 +85,7 @@ public class ContributionsController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }

@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -24,6 +22,11 @@ public class ProductionsController : ControllerBase
         _validation = validation;
     }
     
+    /// <summary>
+    /// Endpoint to creating a new Production.
+    /// </summary>
+    /// <param name="createProductionDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
@@ -34,7 +37,7 @@ public class ProductionsController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
@@ -46,12 +49,19 @@ public class ProductionsController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching all productions
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetProductions(int? page, int? size)
     {
@@ -61,7 +71,7 @@ public class ProductionsController : ControllerBase
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
@@ -75,7 +85,7 @@ public class ProductionsController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }

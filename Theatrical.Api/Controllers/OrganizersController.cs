@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.OrganizerDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -26,6 +22,11 @@ public class OrganizersController : ControllerBase
         _validation = validation;
     }
     
+    /// <summary>
+    /// Endpoint to creating a new Organizer.
+    /// </summary>
+    /// <param name="organizerCreateDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CreateOrganizer([FromBody] OrganizerCreateDto organizerCreateDto)
@@ -40,12 +41,19 @@ public class OrganizersController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
 
+    /// <summary>
+    /// Endpoint to fetching all Organizer(s).
+    /// Pagination Available.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetOrganizers(int? page, int? size)
     {
@@ -55,7 +63,7 @@ public class OrganizersController : ControllerBase
 
             if (!report.Success)
             {
-                var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message);
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, report.Message!);
                 return new NotFoundObjectResult(errorResponse);
             }
 
@@ -69,7 +77,7 @@ public class OrganizersController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message.ToString());
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
