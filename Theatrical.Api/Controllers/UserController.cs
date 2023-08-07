@@ -67,12 +67,12 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("verify")]
-    public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token, [FromQuery]string email)
+    public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token)
     {
         try
         {
             
-            var (verification, user) = await _validation.VerifyEmailToken(email, token);
+            var (verification, user) = await _validation.VerifyEmailToken(token);
             
             if (!verification.Success)
             {

@@ -23,7 +23,7 @@ public class EmailService : IEmailService
         message.Subject = "Account Confirmation";
 
         
-        var confirmationLink = $"https://localhost:7042/api/user/verify?token={confirmationToken}&email={email}";
+        var confirmationLink = $"https://localhost:7042/api/user/verify?token={confirmationToken}";
         message.Body = $"Please confirm your email address by clicking the following link: {confirmationLink}";
 
         using (var client = new SmtpClient("smtp.gmail.com", 587))

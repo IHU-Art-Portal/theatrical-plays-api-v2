@@ -12,7 +12,7 @@ public interface IUserValidationService
     Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
     Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
-    Task<(ValidationReport, User?)> VerifyEmailToken(string email, string token);
+    Task<(ValidationReport, User?)> VerifyEmailToken(string token);
 }
 
 public class UserValidationService : IUserValidationService
@@ -105,15 +105,15 @@ public class UserValidationService : IUserValidationService
         return (report, credits);
     }
 
-    public async Task<(ValidationReport, User?)> VerifyEmailToken(string email, string token)
+    public async Task<(ValidationReport, User?)> VerifyEmailToken(string token)
     {
-        var user = await _repository.Get(email);
+        var user = await _repository.SearchToken(token);
         var report = new ValidationReport();
 
-        if (user is null || !token.Equals(user!.VerificationCode))
+        if (user is null)
         {
             report.Success = false;
-            report.Message = "Verification Code Incorrect";
+            report.Message = "Verification Process Failed. Invalid Token";
             report.ErrorCode = ErrorCode.InvalidToken;
             return (report, null);
         }

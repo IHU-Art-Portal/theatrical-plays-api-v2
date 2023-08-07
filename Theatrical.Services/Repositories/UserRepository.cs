@@ -12,6 +12,7 @@ public interface IUserRepository
     Task<User?> GetUserIncludingAuthorities(string email);
     Task<decimal> GetUserBalance(int id);
     Task EnableAccount(User user);
+    Task<User?> SearchToken(string token);
 }
 
 public class UserRepository : IUserRepository
@@ -71,5 +72,10 @@ public class UserRepository : IUserRepository
     {
         user.Enabled = true;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<User?> SearchToken(string token)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.VerificationCode == token);
     }
 }
