@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Net;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -47,7 +48,7 @@ public class UserController : ControllerBase
             }
 
             //Generate the verification token
-            string verificationToken = Guid.NewGuid().ToString();
+            var verificationToken = Guid.NewGuid().ToString();
 
             //Send confirmation email to the registered user.
             await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationToken);
@@ -60,9 +61,9 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse<Exception>(e);
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
-            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
         }
     }
 
@@ -83,7 +84,7 @@ public class UserController : ControllerBase
             if (!verification.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
-                return new ObjectResult(errorResponse){StatusCode = 400};
+                return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
             }
 
             await _service.EnableAccount(user!);
@@ -96,7 +97,7 @@ public class UserController : ControllerBase
         {
             var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
-            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError}; 
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
         }
     }
 
@@ -117,7 +118,7 @@ public class UserController : ControllerBase
             if (!report.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)report.ErrorCode!, report.Message!);
-                return new ObjectResult(errorResponse) { StatusCode = 404 };
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
             var jwtDto = _service.GenerateToken(user!);
@@ -130,7 +131,7 @@ public class UserController : ControllerBase
         {
             var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
-            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
 
@@ -149,7 +150,7 @@ public class UserController : ControllerBase
             if (!validationReport.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)validationReport.ErrorCode!, validationReport.Message!);
-                return new ObjectResult(errorResponse) { StatusCode = 404 };
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
             var response = new ApiResponse<string>($"You have {credits} credits.");
@@ -158,7 +159,9 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
 
