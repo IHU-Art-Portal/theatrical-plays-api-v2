@@ -8,7 +8,7 @@ namespace Theatrical.Api;
 
 public class AdminAuthorizationFilter : IAuthorizationFilter
 {
-    private readonly string _requiredRole = "admin";
+    private const string RequiredRole = "admin";
     private readonly ITokenService _tokenService;
 
     public AdminAuthorizationFilter(ITokenService tokenService)
@@ -47,7 +47,7 @@ public class AdminAuthorizationFilter : IAuthorizationFilter
             return;
         }
 
-        if (!context.HttpContext.User.IsInRole(_requiredRole))
+        if (!context.HttpContext.User.IsInRole(RequiredRole))
         {
             //Handle forbidden user
             var errorResponse3 = new ApiResponse(ErrorCode.Forbidden, "You are not allowed to make changes or see the context of this request");
