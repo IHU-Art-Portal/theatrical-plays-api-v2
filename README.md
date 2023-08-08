@@ -270,17 +270,17 @@ It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code
 
 ----
 
-# Logs
+# 📜 Logs
 
 The `LogsController` is responsible for managing requests related to logs.
 
-## Methods
+## 📚 Methods
 
 | Method  | Endpoint                               |
 |---------|----------------------------------------|
 | **GET** | `/api/logs`                            |
 
-### Get Logs
+### 🔍 Get Logs
 
 Retrieve a list of all logs with optional pagination.
 
@@ -289,27 +289,28 @@ Retrieve a list of all logs with optional pagination.
 | `page`    | Query parameter | Page number for pagination.        |
 | `size`    | Query parameter | Number of items per page.          |
 
-**Authorization:**
-Requires admin authorization.
+🔐 **Authorization:**
+Requires admin authorization. 👑
 
 **Response:**
 
 An `ApiResponse` containing a paginated list of `LogDto` objects wrapped in a `PaginationResult`.
 
+
 ----
 
-# Events Controller
+# 🎉 Event
 
 The `EventsController` is responsible for managing requests related to events.
 
-## Methods
+## 📚 Methods
 
 | Method   | Endpoint           |
 |----------|--------------------|
 | **GET**  | `/api/events`      |
 | **POST** | `/api/events`      |
 
-### Get Events
+### 📅 Get Events
 
 | Method   | Endpoint           |
 |----------|--------------------|
@@ -327,8 +328,7 @@ Retrieve a list of all events with optional pagination.
 - If successful, returns an `ApiResponse` containing a paginated list of `EventDto` objects wrapped in a `PaginationResult`.
 - If validation fails, returns an `ApiResponse` with an appropriate error message.
 
-### Create Event
-
+### 🎉 Create Event
 
 | Method   | Endpoint           |
 |----------|--------------------|
@@ -340,8 +340,318 @@ Create a new event.
 |------------------|----------------|------------------------------|
 | `createEventDto` | Request body   | Data for creating the event. |
 
-**Authorization:**
-Requires admin authorization.
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+# 🏛️ Venues
+
+The `VenuesController` is responsible for managing requests related to venues.
+
+## Methods
+
+### 📜 Get Venues
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **GET**  | `/api/venues`        |
+
+Retrieve a list of all venues with optional pagination.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `VenueDto` objects wrapped in a `PaginationResult`.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+
+### 🏛️ Get Venue
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **GET**  | `/api/venues/{id}`   |
+
+Retrieve a specific venue by its ID.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `id`      | Path parameter  | ID of the venue to retrieve.       |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a `VenueDto` object.
+- If validation fails or the venue is not found, returns an `ApiResponse` with an appropriate error message.
+
+### 🏟️ Create Venue
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **POST** | `/api/venues`        |
+
+Create a new venue.
+
+| Parameter        | Type           | Description                    |
+|------------------|----------------|--------------------------------|
+| `venueCreateDto` | Request body   | Data for creating the venue.   |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If an error occurs, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+# 💰 Transactions
+
+The `TransactionsController` is responsible for managing requests related to transactions.
+
+## Methods
+
+### 📤 Post Transaction
+
+| Method   | Endpoint                  |
+|----------|---------------------------|
+| **POST** | `/api/transactions`       |
+
+Make a new transaction.
+
+| Parameter        | Type           | Description                    |
+|------------------|----------------|--------------------------------|
+| `transactionDto` | Request body   | Data for the transaction.      |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a `Transaction` object wrapped in a success message.
+- If an error occurs, returns an `ApiResponse` with an appropriate error message.
+### 📥 Get Transaction
+
+| Method   | Endpoint                  |
+|----------|---------------------------|
+| **GET**  | `/api/transactions/{id}`  |
+
+Get details of a specific transaction.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `id`      | Path parameter  | ID of the transaction to retrieve. |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a `TransactionDtoFetch` object.
+- If the transaction is not found, returns an `ApiResponse` with an appropriate error message.
+
+### 🛒 Get User Transactions
+
+| Method   | Endpoint                         |
+|----------|----------------------------------|
+| **GET**  | `/api/transactions/user/{id}`    |
+
+Get all transactions of a specific user.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `id`      | Path parameter  | ID of the user.                    |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a list of `TransactionDtoFetch` objects.
+- If the user's transactions are not found, returns an `ApiResponse` with an appropriate error message.
+
+---
+# 👑 Roles
+
+The `RolesController` is responsible for managing requests related to roles.
+
+## Methods
+
+### ➕ Create Role
+
+| Method   | Endpoint                  |
+|----------|---------------------------|
+| **POST** | `/api/roles/{role}`       |
+
+Create a new role.
+
+| Parameter | Type            | Description                           |
+|-----------|-----------------|---------------------------------------|
+| `role`    | Path parameter  | The name of the role to be created.   |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If the role already exists, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+### 🎭 Get Roles
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **GET**  | `/api/roles`         |
+
+Retrieve a list of all roles with optional pagination (oldest to newest).
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `RoleDto` objects wrapped in a `PaginationResult`.
+- If no roles are found, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+# 🎬 Productions
+
+The `ProductionsController` is responsible for managing requests related to productions.
+
+## Methods
+
+### 🌟 Create Production
+
+| Method   | Endpoint                  |
+|----------|---------------------------|
+| **POST** | `/api/productions`        |
+
+Create a new production.
+
+| Parameter              | Type             | Description                         |
+|------------------------|------------------|-------------------------------------|
+| `createProductionDto`  | Request body     | Data for creating the production.   |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing the created `ProductionDto` object wrapped in a success message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+### 🎬 **Get Productions** 🎥
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **GET**  | `/api/productions`   |
+
+🔍 Retrieve a list of all productions with optional pagination. 📜
+
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `ProductionDto` objects wrapped in a `PaginationResult`.
+- If no productions are found, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+# 📋 Organizers 📅
+
+The `OrganizersController` is responsible for managing requests related to organizers. 📊
+
+## 📌 Methods 🛠️
+
+### 🔹 Create Organizer ➕
+
+| Method   | Endpoint                  |
+|----------|---------------------------|
+| **POST** | `/api/organizers`         |
+
+Create a new organizer.
+
+| Parameter             | Type             | Description                       |
+|-----------------------|------------------|-----------------------------------|
+| `organizerCreateDto`  | Request body     | Data for creating the organizer.  |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If an error occurs, returns an `ApiResponse` with an appropriate error message.
+
+### 📋 Get Organizers 📅
+
+| Method   | Endpoint             |
+|----------|----------------------|
+| **GET**  | `/api/organizers`    |
+
+Retrieve a list of all organizers with optional pagination.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `OrganizerDto` objects wrapped in a `PaginationResult`.
+- If no organizers are found, returns an `ApiResponse` with an appropriate error message.
+
+---
+
+# 📜 Contributions 🤝
+
+The `ContributionsController` is responsible for managing requests related to contributions.💡
+
+## 📌 Methods 🛠️
+
+### 📜 Get Contributions
+
+| Method   | Endpoint                 |
+|----------|--------------------------|
+| **GET**  | `/api/contributions`     |
+
+🔍 Retrieves a list of all contributions with optional pagination. 📄
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `ContributionDto` objects wrapped in a `PaginationResult`.
+- If no contributions are found, returns an `ApiResponse` with an appropriate error message.
+
+### 📝 Create Contribution 🌟
+
+| Method   | Endpoint                 |
+|----------|--------------------------|
+| **POST** | `/api/contributions`     |
+
+Creates a new contribution. 🚀
+
+| Parameter          | Type           | Description                     |
+|--------------------|----------------|---------------------------------|
+| `contributionDto`  | Request body   | Data for creating the contribution.|
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
 
 **Response:**
 
