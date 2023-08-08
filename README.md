@@ -267,3 +267,85 @@ It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code
 |                | The Id of the person.                   |
 | **Responses**  |                                         |
 | ApiResponse    | message: overriden with success message |
+
+----
+
+# Logs
+
+The `LogsController` is responsible for managing requests related to logs.
+
+## Methods
+
+| Method  | Endpoint                               |
+|---------|----------------------------------------|
+| **GET** | `/api/logs`                            |
+
+### Get Logs
+
+Retrieve a list of all logs with optional pagination.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Authorization:**
+Requires admin authorization.
+
+**Response:**
+
+An `ApiResponse` containing a paginated list of `LogDto` objects wrapped in a `PaginationResult`.
+
+----
+
+# Events Controller
+
+The `EventsController` is responsible for managing requests related to events.
+
+## Methods
+
+| Method   | Endpoint           |
+|----------|--------------------|
+| **GET**  | `/api/events`      |
+| **POST** | `/api/events`      |
+
+### Get Events
+
+| Method   | Endpoint           |
+|----------|--------------------|
+| **GET**  | `/api/events`      |
+
+Retrieve a list of all events with optional pagination.
+
+| Parameter | Type            | Description                        |
+|-----------|-----------------|------------------------------------|
+| `page`    | Query parameter | Page number for pagination.        |
+| `size`    | Query parameter | Number of items per page.          |
+
+**Response:**
+
+- If successful, returns an `ApiResponse` containing a paginated list of `EventDto` objects wrapped in a `PaginationResult`.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+### Create Event
+
+
+| Method   | Endpoint           |
+|----------|--------------------|
+| **POST** | `/api/events`      |
+
+Create a new event.
+
+| Parameter        | Type           | Description                  |
+|------------------|----------------|------------------------------|
+| `createEventDto` | Request body   | Data for creating the event. |
+
+**Authorization:**
+Requires admin authorization.
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+---
