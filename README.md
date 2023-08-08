@@ -60,7 +60,72 @@ instead of one provided letter.</li>
 <I>New changes will be listed here.</I><br>
 <I>This text will be removed when everything is implemented and working.</I>
 
+## User
+
+---
+This controller manages all the requests regarding user registration, login, verify, balance.
+
+---
+
+This endpoint is used by the users to register.
+It returns a `UserDtoRole` wrapped in `ApiResponse`.
+
+**Register**
+
+| POST                             | /api/user/register                                    |
+|----------------------------------|-------------------------------------------------------|
+| **Parameters**                   |                                                       |
+| *RegisterUserDto*                | {string: Email, string: Password, int Role}           |
+| **Responses**                    |                                                       |
+| *ApiResponse&lt;UserDtoRole&gt;* | {int: Id, string: Email, bool: Enabled, string: Note} |
+
 ----
+
+This endpoint is used to verify their email.
+It returns a message wrapped in `ApiResponse`.
+
+**Verify**
+
+| GET            | /api/user/verify                                       |
+|----------------|--------------------------------------------------------|
+| **Parameters** |                                                        |
+| *string*       | <u>Query parameter</u>                                 |
+|                | *token* from user's email.                             |
+| **Responses**  |                                                        |
+| *ApiResponse*  | {Message field overrides with the appropriate message} |
+
+---
+
+**Login**
+
+This endpoint is used to login.
+It returns a `JwtDto` wrapped in `ApiResponse`.
+
+| POST                  | /api/user/login                                             |
+|-----------------------|-------------------------------------------------------------|
+| **Parameters**        |                                                             |
+| *LoginUserDto*        | <u>JSON object</u>                                          |
+|                       | {string: Email, string Password}                            |
+| **Responses**         |                                                             |
+| *ApiResponse<JwtDto>* | {string: access_token, string: token_type, int: expires_in} |
+
+---
+
+**Balance**
+
+This endpoint is used to find someone's balance (credits).
+It returns a message wrapped in `ApiResponse`. The message overrides the data field.
+
+| GET                   | /api/user/{id}/balance                    |
+|-----------------------|-------------------------------------------|
+| **Parameters**        |                                           |
+| int                   | Id of the user                            |
+| **Responses**         |                                           |
+| *ApiResponse<string>* | {data field is overridden with a message} |
+
+
+----
+
 ## Person
 
 ---
