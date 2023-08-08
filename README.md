@@ -63,212 +63,302 @@ instead of one provided letter.</li>
 ## User
 
 ---
-This controller manages all the requests regarding user registration, login, verify, balance.
+The `UserController` is responsible for managing request like registration, login, verify, balance.
 
----
+## 📚 Methods
 
-This endpoint is used by the users to register.
-It returns a `UserDtoRole` wrapped in `ApiResponse`.
 
-**Register**
+| Method   | Endpoint                 |
+|----------|--------------------------|
+| **POST** | `/api/user`              |
+| **GET**  | `/api/user/verify`       |
+| **POST** | `/api/user/login`        |
+| **GET**  | `/api/user/{id}/balance` |
 
-| POST                             | /api/user/register                                    |
-|----------------------------------|-------------------------------------------------------|
-| **Parameters**                   |                                                       |
-| *RegisterUserDto*                | {string: Email, string: Password, int Role}           |
-| **Responses**                    |                                                       |
-| *ApiResponse&lt;UserDtoRole&gt;* | {int: Id, string: Email, bool: Enabled, string: Note} |
+### Register
+
+| Method   | Endpoint    |
+|----------|-------------|
+| **POST** | `/api/user` |
+
+Use this method to register to the service.
+
+| Parameter         | Type         | Description                         |
+|-------------------|--------------|-------------------------------------|
+| `RegisterUserDto` | Request body | Data for creating a user.           |
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
 
 ----
 
-This endpoint is used to verify their email.
-It returns a message wrapped in `ApiResponse`.
+### Verify
 
-**Verify**
+| Method  | Endpoint           |
+|---------|--------------------|
+| **GET** | `/api/user/verify` |
 
-| GET            | /api/user/verify                                       |
-|----------------|--------------------------------------------------------|
-| **Parameters** |                                                        |
-| *string*       | <u>Query parameter</u>                                 |
-|                | *token* from user's email.                             |
-| **Responses**  |                                                        |
-| *ApiResponse*  | {Message field overrides with the appropriate message} |
+Use this method to verify an account.
+
+| Parameter  | Type            | Description                      |
+|------------|-----------------|----------------------------------|
+| `token`    | Query Parameter | Verification code sent by email. |
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
 
 ---
 
-**Login**
+### Login
+
+| Method   | Endpoint          |
+|----------|-------------------|
+| **POST** | `/api/user/login` |
 
 This endpoint is used to login.
 It returns a `JwtDto` wrapped in `ApiResponse`.
 
-| POST                  | /api/user/login                                             |
-|-----------------------|-------------------------------------------------------------|
-| **Parameters**        |                                                             |
-| *LoginUserDto*        | <u>JSON object</u>                                          |
-|                       | {string: Email, string Password}                            |
-| **Responses**         |                                                             |
-| *ApiResponse<JwtDto>* | {string: access_token, string: token_type, int: expires_in} |
+| Parameter      | Type         | Description                       |
+|----------------|--------------|-----------------------------------|
+| `LoginUserDto` | Request body | {string: Email, string: Password} |
+
+**Responses:**
+
+- If successful, returns a `JwtDto` wrapped in `ApiResponse`.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
+
 
 ---
 
-**Balance**
+### Balance
+
+| Method  | Endpoint                 |
+|---------|--------------------------|
+| **GET** | `/api/user/{id}/balance` |
 
 This endpoint is used to find someone's balance (credits).
 It returns a message wrapped in `ApiResponse`. The message overrides the data field.
 
-| GET                   | /api/user/{id}/balance                    |
-|-----------------------|-------------------------------------------|
-| **Parameters**        |                                           |
-| int                   | Id of the user                            |
-| **Responses**         |                                           |
-| *ApiResponse<string>* | {data field is overridden with a message} |
+| Parameter | Type           | Description     |
+|-----------|----------------|-----------------|
+| `Id`      | Path parameter | ID of the user  |
+
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
 
 
 ----
 
 ## Person
 
+The `PeopleController` all the requests regarding a person. 👤<br>
+
+## 📚 Methods
+
+| Method     | Endpoint                         |
+|------------|----------------------------------|
+| **GET**    | `/api/people`                    |
+| **GET**    | `/api/people/{id}`               |
+| **DELETE** | `/api/people/{id}`               |
+| **GET**    | `/api/people/{id}/photos`        |
+| **GET**    | `/api/people/{id}/productions`   |
+| **POST**   | `/api/people`                    |
+| **GET**    | `/api/people/initials/{letters}` |
+| **GET**    | `/api/people/role/{role}`        |
+
+
 ---
-This controller manages all the requests regarding a person. 👤<br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>ApiResponse</code> 📦.
 
-**Create Person**
+### Get People
 
-| POST                           | /api/person                                                                |
-|--------------------------------|----------------------------------------------------------------------------|
-| **Parameters**                 |                                                                            |
-| *CreatePersonDto*              | {string: FullName, List&lt;string&gt;: url of image (if any), int: System} |
-| **Responses**                  |                                                                            |
-| *ApiResponse&lt;PersonDto&gt;* | {int: Id, string: FullName, int: SystemID, DateTime: Timestamp}            |
+| Method   | Endpoint      |
+|----------|---------------|
+| **GET**  | `/api/people` |
+
+Retrieves a list of all people. 👥
+Pagination is available for this request. 📄<br>
+
+| Parameter | Type            | Description                             |
+|-----------|-----------------|-----------------------------------------|
+| `page`    | Query parameter | (Optional) Page number for pagination.  |
+| `size`    | Query parameter | (Optional) Number of items per page.    |
+
+**Response:**
+
+- If successful, returns an `ApiResponse`📦 containing a list of `PersonDto`🧍 objects wrapped in a `PaginationResult`📜.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and data.
+
+---
+
+### Get Person
+
+| Method   | Endpoint          |
+|----------|-------------------|
+| **GET**  | `/api/people{id}` |
+
+This request is used to retrieve a person. 👤<br>
+
+| Parameter | Type            | Description     |
+|-----------|-----------------|-----------------|
+| `id`      | Path parameter  | ID of a person. |
+
+**Response:**
+
+- If successful, returns a `PersonDto`🧍 wrapped in `ApiResponse`📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message and data.
+
+---
+
+### Delete Person
+
+| Method     | Endpoint          |
+|------------|-------------------|
+| **DELETE** | `/api/people{id}` |
+
+This request 🔥 deletes 🔥 a Person by their ID. 👤<br>
+⚠️ Use with caution ⚠️<br>
+
+| Parameter  |  Type          | Description                 |
+|------------|----------------|-----------------------------|
+| `id`       | Path parameter | Id of the person to delete. |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns an `ApiResponse` with a success message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
 
 ----
 
-**Get Person**
 
-This request is used to retrieve a person. 👤<br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>ApiResponse</code> 📦.
+## Get Person Photos
 
-| GET                     | /api/person/{id}                                                |
-|-------------------------|-----------------------------------------------------------------|
-| **Parameters**          |                                                                 |
-| *id*                    | <u>Path variable</u>                                            |
-|                         | The integer identifier of the performer to retrieve.            |
-| **Responses**           |                                                                 |
-| ApiResponse\<PersonDto> | {int: Id, string: FullName, int: SystemID, DateTime: Timestamp} |
+| Method    | Endpoint                  |
+|-----------|---------------------------|
+| **GET**   | `/api/people/{id}/photos` |
+
+This request returns a `Person`'s `Images`. 📸<br>
+Pagination is available for this request. 📄<br>
+
+
+| Parameter | Type             | Description                            |
+|-----------|------------------|----------------------------------------|
+| `id`      | Path parameter   | Id of the person                       |
+| `page`    | Query parameter  | (Optional) Page number for pagination. |
+| `size`    | Query parameter  | (Optional) Number of items per page.   |
+
+**Response:**
+
+- If successful, returns a `PersonDto` 🧍 wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
 
 ---
 
-**Get People**
 
-This request is used to retrieve all people. 👥<br>
-Pagination available. 📄<br>
-<i>If neither of page and size is specified, all results are returned.</i><br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+### Get Person Productions
 
-| GET                                                  | /api/people                                                     |
-|------------------------------------------------------|-----------------------------------------------------------------|
-| **Parameters**                                       |                                                                 |
-| *page*                                               | <u>Query parameter</u>                                          |
-|                                                      | The index of the page to return. Optional                       |
-| *size*                                               | <u>Query parameter</u>                                          |
-|                                                      | The size of the page. Optional                                  |
-| **Responses**                                        |                                                                 |
-| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | {List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize} |
+| Method    | Endpoint                       |
+|-----------|--------------------------------|
+| **GET**   | `/api/people/{id}/productions` |
+
+This request returns all the `Productions` that one `Person` partakes in. 🎬<br>
+Pagination is available for this request. 📄<br>
+
+| Parameter | Type             | Description                            |
+|-----------|------------------|----------------------------------------|
+| `id`      | Path parameter   | Id of the person                       |
+| `page`    | Query parameter  | (Optional) Page number for pagination. |
+| `size`    | Query parameter  | (Optional) Number of items per page.   |
+
+**Response:**
+
+- If successful, returns a `PersonProductionsRoleInfo` 🧍 for every item, wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+
+---
+
+### Create Person
+
+| Method   | Endpoint        |
+|----------|-----------------|
+| **POST** | `/api/people/`  |
+
+This request creates a new person.
+
+| Parameter         | Type         | Description                                                                |
+|-------------------|--------------|----------------------------------------------------------------------------|
+| `CreatePersonDto` | Request body | {string: FullName, List&lt;string&gt;: url of image (if any), int: System} |
+
+🔐 **Authorization:**
+Requires admin authorization. 👑
+
+**Response:**
+
+- If successful, returns a `PersonDto` 🧍 for the newly created entry, wrapped in `ApiResponse` 📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
+
+----
+
+
+### Get People By Initial Letter
+
+| Method  | Endpoint                         |
+|---------|----------------------------------|
+| **GET** | `/api/people/initials/{letters}` |
+
+
+This request returns people filtered by the provided initial letters. 👥<br>
+Pagination available for this request. 📄<br>
+
+| Parameter | Type             | Description                            |
+|-----------|------------------|----------------------------------------|
+| `letters` | Path parameter   | Initials of a person's name.           |
+| `page`    | Query parameter  | (Optional) Page number for pagination. |
+| `size`    | Query parameter  | (Optional) Number of items per page.   |
+
+**Response:**
+
+- If successful, returns a `PersonDto` 🧍 wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
 
 ---
 
 **Get People By Role**
 
+| Method  | Endpoint                  |
+|---------|---------------------------|
+| **GET** | `/api/people/role/{role}` |
+
 This request returns people filtered by the provided role. 👥<br>
-Pagination available. 📄<br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+Pagination available for this request. 📄<br>
+It 
+
+| Parameter | Type               | Description                            |
+|-----------|--------------------|----------------------------------------|
+| `role`    | Path parameter     | Search people by role.                 |
+| `page`    | Query parameter    | (Optional) Page number for pagination. |
+| `size`    | Query parameter    | (Optional) Number of items per page.   |
 
 
-| GET                                                  | /api/people/role/{role}                                         |
-|------------------------------------------------------|-----------------------------------------------------------------|
-| **Parameters**                                       |                                                                 |
-| *role*                                               | <u>Path parameter</u>                                           |
-|                                                      | The role provided to filter the results                         |
-| *page*                                               | <u>Query parameter</u>                                          |
-|                                                      | The index of the page to return. Optional                       |
-| *size*                                               | <u>Query parameter</u>                                          |
-|                                                      | The size of the page. Optional                                  |
 | **Responses**                                        |                                                                 |
 | ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | {List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize} |
 
----
+**Response:**
 
-**Get People By Initial Letter**
-
-This request returns people filtered by the provided role. 👥<br>
-Pagination available. 📄<br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
-
-
-| GET                                                  | /api/people/initials/{letters}                                |
-|------------------------------------------------------|---------------------------------------------------------------|
-| **Parameters**                                       |                                                               |
-| *letters*                                            | <u>Path parameter</u>                                         |
-|                                                      | The initials of the name.                                     |
-| *page*                                               | <u>Query parameter</u>                                        |
-|                                                      | The index of the page to return. Optional                     |
-| *size*                                               | <u>Query parameter</u>                                        |
-|                                                      | The size of the page. Optional                                |
-| **Responses**                                        |                                                               |
-| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize |
+- If successful, returns a `PersonDto` 🧍 for each item (if pagination was initiated), wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
+- If validation fails, returns an `ApiResponse` with an appropriate error message.
 
 ---
-
-**Get Person Productions**
-
-This request returns all the productions that one <code>Person</code> partakes in. 🎬<br>
-Pagination available. 📄<br>
-It returns a <code>PersonProductionsRoleInfo</code> 🧑‍🎬 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
-
-
-| GET                                                                  | /api/people/{id}/productions                                                  |
-|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| **Parameters**                                                       |                                                                               |
-| *id*                                                                 | <u>Path parameter</u>                                                         |
-|                                                                      | The Id of a person.                                                           |
-| **Responses**                                                        |                                                                               |
-| ApiResponse&lt;PaginationResult&lt;PersonProductionsRoleInfo&gt;&gt; | List&lt;PersonProductionsRoleInfo&gt;: Results, int CurrentPage, int PageSize |
-
----
-
-**Get Person Photos**
-
-This request returns a <code>Person</code>'s photos. 📸<br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
-
-
-| GET                                     | /api/people/{id}/photos                 |
-|-----------------------------------------|-----------------------------------------|
-| **Parameters**                          |                                         |
-| *id*                                    | <u>Path parameter</u>                   |
-|                                         | The Id of a person.                     |
-| **Responses**                           |                                         |
-| ApiResponse&lt;List&lt;ImageDto&gt;&gt; | int: Id, string ImageIrl, int: PersonId |
-
----
-
-**Delete Person**
-
-This request 🔥 deletes 🔥 a Person by their ID. 👤<br>
-Only available to Admin accounts 👑<br>
-<span>⚠️ Use with caution ⚠️</span><br>
-It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
-
-
-| DELETE         | /api/people/{id}                        |
-|----------------|-----------------------------------------|
-| **Parameters** |                                         |
-| *id*           | <u>Path parameter</u>                   |
-|                | The Id of the person.                   |
-| **Responses**  |                                         |
-| ApiResponse    | message: overriden with success message |
-
-----
 
 # 📜 Logs
 
@@ -282,7 +372,7 @@ The `LogsController` is responsible for managing requests related to logs.
 
 ### 🔍 Get Logs
 
-Retrieve a list of all logs with optional pagination.
+Retrieves a list of all logs with optional pagination.
 
 | Parameter | Type            | Description                        |
 |-----------|-----------------|------------------------------------|
@@ -309,6 +399,8 @@ The `EventsController` is responsible for managing requests related to events.
 |----------|--------------------|
 | **GET**  | `/api/events`      |
 | **POST** | `/api/events`      |
+
+---
 
 ### 📅 Get Events
 
@@ -355,6 +447,12 @@ Requires admin authorization. 👑
 The `VenuesController` is responsible for managing requests related to venues.
 
 ## Methods
+
+| Method    | Endpoint            |
+|-----------|---------------------|
+| **GET**   | `/api/venues`       |
+| **GET**   | `/api/venues/{id}`  |
+| **POST**  | `/api/venues/`      |
 
 ### 📜 Get Venues
 
@@ -420,6 +518,12 @@ The `TransactionsController` is responsible for managing requests related to tra
 
 ## Methods
 
+| Method   | Endpoint                      |
+|----------|-------------------------------|
+| **POST** | `/api/transactions`           |
+| **GET**  | `/api/transactions/{id}`      |
+| **GET**  | `/api/transactions/user/{id}` |
+
 ### 📤 Post Transaction
 
 | Method   | Endpoint                  |
@@ -477,6 +581,12 @@ The `RolesController` is responsible for managing requests related to roles.
 
 ## Methods
 
+| Method   | Endpoint               |
+|----------|------------------------|
+| **POST** | `/api/roles/{role}`    |
+| **GET**  | `/api/roles`           |
+
+
 ### ➕ Create Role
 
 | Method   | Endpoint                  |
@@ -524,6 +634,11 @@ Retrieve a list of all roles with optional pagination (oldest to newest).
 The `ProductionsController` is responsible for managing requests related to productions.
 
 ## Methods
+
+| Method   | Endpoint               |
+|----------|------------------------|
+| **POST** | `/api/productions`     |
+| **GET**  | `/api/productions`     |
 
 ### 🌟 Create Production
 
@@ -574,6 +689,11 @@ The `OrganizersController` is responsible for managing requests related to organ
 
 ## 📌 Methods 🛠️
 
+| Method   | Endpoint              |
+|----------|-----------------------|
+| **POST** | `/api/organizers`     |
+| **GET**  | `/api/organizers`     |
+
 ### 🔹 Create Organizer ➕
 
 | Method   | Endpoint                  |
@@ -620,6 +740,12 @@ The `ContributionsController` is responsible for managing requests related to co
 
 ## 📌 Methods 🛠️
 
+| Method   | Endpoint                 |
+|----------|--------------------------|
+| **GET**  | `/api/contributions`     |
+| **POST** | `/api/contributions`     |
+
+
 ### 📜 Get Contributions
 
 | Method   | Endpoint                 |
@@ -646,9 +772,9 @@ The `ContributionsController` is responsible for managing requests related to co
 
 Creates a new contribution. 🚀
 
-| Parameter          | Type           | Description                     |
-|--------------------|----------------|---------------------------------|
-| `contributionDto`  | Request body   | Data for creating the contribution.|
+| Parameter          | Type           | Description                         |
+|--------------------|----------------|-------------------------------------|
+| `contributionDto`  | Request body   | Data for creating the contribution. |
 
 🔐 **Authorization:**
 Requires admin authorization. 👑
