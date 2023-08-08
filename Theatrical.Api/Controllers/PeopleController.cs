@@ -104,8 +104,9 @@ public class PeopleController : ControllerBase
             }
             
             var createdPerson = await _service.Create(createPersonDto);
+            var createdPersonDto = _service.ToDto(createdPerson);
 
-            var response = new ApiResponse<Person>(createdPerson,"Successfully Created Person");
+            var response = new ApiResponse<PersonDto>(createdPersonDto,"Successfully Created Person");
 
             return new OkObjectResult(response);
         }
