@@ -60,13 +60,12 @@ instead of one provided letter.</li>
 <I>New changes will be listed here.</I><br>
 <I>This text will be removed when everything is implemented and working.</I>
 
-## User
+# 🙋‍♂️ User
 
 ---
-The `UserController` is responsible for managing request like registration, login, verify, balance.
+The `UserController` is responsible for managing requests like registration, login, verify, and balance.
 
 ## 📚 Methods
-
 
 | Method   | Endpoint                 |
 |----------|--------------------------|
@@ -75,13 +74,13 @@ The `UserController` is responsible for managing request like registration, logi
 | **POST** | `/api/user/login`        |
 | **GET**  | `/api/user/{id}/balance` |
 
-### Register
+### 🌟 Register
 
 | Method   | Endpoint    |
 |----------|-------------|
 | **POST** | `/api/user` |
 
-Use this method to register to the service.
+Use this method to register for the service.
 
 | Parameter         | Type         | Description                         |
 |-------------------|--------------|-------------------------------------|
@@ -94,13 +93,14 @@ Use this method to register to the service.
 
 ----
 
-### Verify
+
+### 🔒 Verify
 
 | Method  | Endpoint           |
 |---------|--------------------|
 | **GET** | `/api/user/verify` |
 
-Use this method to verify an account.
+Use this method to verify an account. ✅
 
 | Parameter  | Type            | Description                      |
 |------------|-----------------|----------------------------------|
@@ -108,18 +108,18 @@ Use this method to verify an account.
 
 **Responses:**
 
-- If successful, returns an `ApiResponse` with a success message and related data.
-- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
+- If successful, returns an `ApiResponse` with a success message and related data. 👍
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
 
 ---
 
-### Login
+### 🚀 Login
 
 | Method   | Endpoint          |
 |----------|-------------------|
 | **POST** | `/api/user/login` |
 
-This endpoint is used to login.
+This endpoint is used to login. 📝
 It returns a `JwtDto` wrapped in `ApiResponse`.
 
 | Parameter      | Type         | Description                       |
@@ -128,37 +128,35 @@ It returns a `JwtDto` wrapped in `ApiResponse`.
 
 **Responses:**
 
-- If successful, returns a `JwtDto` wrapped in `ApiResponse`.
-- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
+- If successful, returns a `JwtDto` wrapped in `ApiResponse`. ✅
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
 
 
 ---
 
-### Balance
+### ⚖️ Balance
 
 | Method  | Endpoint                 |
 |---------|--------------------------|
 | **GET** | `/api/user/{id}/balance` |
 
-This endpoint is used to find someone's balance (credits).
+This endpoint is used to find someone's balance (credits). 💰
 It returns a message wrapped in `ApiResponse`. The message overrides the data field.
 
 | Parameter | Type           | Description     |
 |-----------|----------------|-----------------|
 | `Id`      | Path parameter | ID of the user  |
 
-
 **Responses:**
 
-- If successful, returns an `ApiResponse` with a success message and related data.
-- If validation fails, returns an `ApiResponse` with an appropriate error message and related data.
-
+- If successful, returns an `ApiResponse` with a success message and related data. 👍
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
 
 ----
 
-## Person
+# 👤 Person
 
-The `PeopleController` all the requests regarding a person. 👤<br>
+The `PeopleController` manages all the requests regarding a person. 👤
 
 ## 📚 Methods
 
@@ -173,17 +171,16 @@ The `PeopleController` all the requests regarding a person. 👤<br>
 | **GET**    | `/api/people/initials/{letters}` |
 | **GET**    | `/api/people/role/{role}`        |
 
-
 ---
 
-### Get People
+### 🔍 Get People
 
 | Method   | Endpoint      |
 |----------|---------------|
 | **GET**  | `/api/people` |
 
 Retrieves a list of all people. 👥
-Pagination is available for this request. 📄<br>
+Pagination is available for this request. 📄
 
 | Parameter | Type            | Description                             |
 |-----------|-----------------|-----------------------------------------|
@@ -197,13 +194,13 @@ Pagination is available for this request. 📄<br>
 
 ---
 
-### Get Person
+### 👤 Get Person
 
 | Method   | Endpoint          |
 |----------|-------------------|
 | **GET**  | `/api/people{id}` |
 
-This request is used to retrieve a person. 👤<br>
+This request is used to retrieve a person. 👤
 
 | Parameter | Type            | Description     |
 |-----------|-----------------|-----------------|
@@ -214,86 +211,88 @@ This request is used to retrieve a person. 👤<br>
 - If successful, returns a `PersonDto`🧍 wrapped in `ApiResponse`📦.
 - If validation fails, returns an `ApiResponse` with an appropriate error message and data.
 
+
 ---
 
-### Delete Person
+### 🗑️ Delete Person
 
 | Method     | Endpoint          |
 |------------|-------------------|
 | **DELETE** | `/api/people{id}` |
 
-This request 🔥 deletes 🔥 a Person by their ID. 👤<br>
-⚠️ Use with caution ⚠️<br>
+🔥 This request deletes a Person by their ID. 👤</br>
+⚠️ Use with caution ⚠️
 
 | Parameter  |  Type          | Description                 |
 |------------|----------------|-----------------------------|
-| `id`       | Path parameter | Id of the person to delete. |
+| `id`       | Path parameter | ID of the person to delete. |
 
 🔐 **Authorization:**
 Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` with a success message.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` with a success message. 🎉
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
+
 
 ----
 
 
-## Get Person Photos
+### 📸 Get Person Photos
 
 | Method    | Endpoint                  |
 |-----------|---------------------------|
 | **GET**   | `/api/people/{id}/photos` |
 
-This request returns a `Person`'s `Images`. 📸<br>
-Pagination is available for this request. 📄<br>
-
+This request returns a `Person`'s `Images`. 📸 <br>
+Pagination is available for this request. 📄 <br>
 
 | Parameter | Type             | Description                            |
 |-----------|------------------|----------------------------------------|
-| `id`      | Path parameter   | Id of the person                       |
+| `id`      | Path parameter   | ID of the person                       |
 | `page`    | Query parameter  | (Optional) Page number for pagination. |
 | `size`    | Query parameter  | (Optional) Number of items per page.   |
 
 **Response:**
 
 - If successful, returns a `PersonDto` 🧍 wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
+
 
 ---
 
 
-### Get Person Productions
+### 🎬 Get Person Productions
 
 | Method    | Endpoint                       |
 |-----------|--------------------------------|
 | **GET**   | `/api/people/{id}/productions` |
 
-This request returns all the `Productions` that one `Person` partakes in. 🎬<br>
-Pagination is available for this request. 📄<br>
+This request returns all the `Productions` that one `Person` partakes in. 🎬 <br>
+Pagination is available for this request. 📄 <br>
 
 | Parameter | Type             | Description                            |
 |-----------|------------------|----------------------------------------|
-| `id`      | Path parameter   | Id of the person                       |
+| `id`      | Path parameter   | ID of the person                       |
 | `page`    | Query parameter  | (Optional) Page number for pagination. |
 | `size`    | Query parameter  | (Optional) Number of items per page.   |
 
 **Response:**
 
 - If successful, returns a `PersonProductionsRoleInfo` 🧍 for every item, wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
 
 
 ---
 
-### Create Person
+### 🎉 Create Person
 
 | Method   | Endpoint        |
 |----------|-----------------|
 | **POST** | `/api/people/`  |
 
-This request creates a new person.
+🌟 This request creates a new person.
 
 | Parameter         | Type         | Description                                                                |
 |-------------------|--------------|----------------------------------------------------------------------------|
@@ -305,20 +304,20 @@ Requires admin authorization. 👑
 **Response:**
 
 - If successful, returns a `PersonDto` 🧍 for the newly created entry, wrapped in `ApiResponse` 📦.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
+
 
 ----
 
 
-### Get People By Initial Letter
+### 📝 Get People By Initial Letter
 
 | Method  | Endpoint                         |
 |---------|----------------------------------|
 | **GET** | `/api/people/initials/{letters}` |
 
-
-This request returns people filtered by the provided initial letters. 👥<br>
-Pagination available for this request. 📄<br>
+🔎 This request returns people filtered by the provided initial letters. 👥
+Pagination available for this request. 📄
 
 | Parameter | Type             | Description                            |
 |-----------|------------------|----------------------------------------|
@@ -329,19 +328,19 @@ Pagination available for this request. 📄<br>
 **Response:**
 
 - If successful, returns a `PersonDto` 🧍 wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
+
 
 ---
 
-**Get People By Role**
+### 🔎 Get People By Role
 
 | Method  | Endpoint                  |
 |---------|---------------------------|
 | **GET** | `/api/people/role/{role}` |
 
-This request returns people filtered by the provided role. 👥<br>
-Pagination available for this request. 📄<br>
-It 
+🔍 This request returns people filtered by the provided role. 👥
+Pagination available for this request. 📄
 
 | Parameter | Type               | Description                            |
 |-----------|--------------------|----------------------------------------|
@@ -350,13 +349,11 @@ It
 | `size`    | Query parameter    | (Optional) Number of items per page.   |
 
 
-| **Responses**                                        |                                                                 |
-| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | {List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize} |
-
 **Response:**
 
 - If successful, returns a `PersonDto` 🧍 for each item (if pagination was initiated), wrapped in `PaginationResult` 📜 which is wrapped in `ApiResponse` 📦.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌
+
 
 ---
 
@@ -514,7 +511,7 @@ Requires admin authorization. 👑
 
 # 💰 Transactions
 
-The `TransactionsController` is responsible for managing requests related to transactions.
+🕊️ The `TransactionsController` is responsible for managing requests related to transactions. 📊💸
 
 ## Methods
 
@@ -530,7 +527,7 @@ The `TransactionsController` is responsible for managing requests related to tra
 |----------|---------------------------|
 | **POST** | `/api/transactions`       |
 
-Make a new transaction.
+🌟 Make a new transaction. 💰📄
 
 | Parameter        | Type           | Description                    |
 |------------------|----------------|--------------------------------|
@@ -538,15 +535,18 @@ Make a new transaction.
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a `Transaction` object wrapped in a success message.
-- If an error occurs, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a `Transaction` object wrapped in a success message. ✅📦
+- If an error occurs, returns an `ApiResponse` with an appropriate error message. ❌🚫
+
+---
+
 ### 📥 Get Transaction
 
 | Method   | Endpoint                  |
 |----------|---------------------------|
 | **GET**  | `/api/transactions/{id}`  |
 
-Get details of a specific transaction.
+🔍 Get details of a specific transaction. 💼💳
 
 | Parameter | Type            | Description                        |
 |-----------|-----------------|------------------------------------|
@@ -554,8 +554,10 @@ Get details of a specific transaction.
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a `TransactionDtoFetch` object.
-- If the transaction is not found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a `TransactionDtoFetch` object. ✅📋
+- If the transaction is not found, returns an `ApiResponse` with an appropriate error message. ❌🔍
+
+---
 
 ### 🛒 Get User Transactions
 
@@ -563,7 +565,7 @@ Get details of a specific transaction.
 |----------|----------------------------------|
 | **GET**  | `/api/transactions/user/{id}`    |
 
-Get all transactions of a specific user.
+📚 Get all transactions of a specific user. 👤📊
 
 | Parameter | Type            | Description                        |
 |-----------|-----------------|------------------------------------|
@@ -571,13 +573,14 @@ Get all transactions of a specific user.
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a list of `TransactionDtoFetch` objects.
-- If the user's transactions are not found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a list of `TransactionDtoFetch` objects. ✅📋📊
+- If the user's transactions are not found, returns an `ApiResponse` with an appropriate error message. ❌👤📊
 
 ---
 # 👑 Roles
 
-The `RolesController` is responsible for managing requests related to roles.
+🎭 The `RolesController` is responsible for managing requests related to roles. 👥🔧
+
 
 ## Methods
 
@@ -593,7 +596,7 @@ The `RolesController` is responsible for managing requests related to roles.
 |----------|---------------------------|
 | **POST** | `/api/roles/{role}`       |
 
-Create a new role.
+🌟 Create a new role. 🆕🎭
 
 | Parameter | Type            | Description                           |
 |-----------|-----------------|---------------------------------------|
@@ -604,8 +607,9 @@ Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` with a success message.
-- If the role already exists, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` with a success message. ✅🎉
+- If the role already exists, returns an `ApiResponse` with an appropriate error message. ❌🎭🔑
+
 
 ---
 
@@ -615,7 +619,7 @@ Requires admin authorization. 👑
 |----------|----------------------|
 | **GET**  | `/api/roles`         |
 
-Retrieve a list of all roles with optional pagination (oldest to newest).
+📜 Retrieve a list of all roles with optional pagination (oldest to newest). 📃🔄
 
 | Parameter | Type            | Description                        |
 |-----------|-----------------|------------------------------------|
@@ -624,16 +628,17 @@ Retrieve a list of all roles with optional pagination (oldest to newest).
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a paginated list of `RoleDto` objects wrapped in a `PaginationResult`.
-- If no roles are found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a paginated list of `RoleDto` objects wrapped in a `PaginationResult`. ✅📜📄
+- If no roles are found, returns an `ApiResponse` with an appropriate error message. ❌🔍🎭
+
 
 ---
 
 # 🎬 Productions
 
-The `ProductionsController` is responsible for managing requests related to productions.
+The `ProductionsController` is responsible for managing requests related to productions. 🎥
 
-## Methods
+## 📚 Methods
 
 | Method   | Endpoint               |
 |----------|------------------------|
@@ -646,7 +651,8 @@ The `ProductionsController` is responsible for managing requests related to prod
 |----------|---------------------------|
 | **POST** | `/api/productions`        |
 
-Create a new production.
+🌟 Creates a new production. 🆕🎬
+
 
 | Parameter              | Type             | Description                         |
 |------------------------|------------------|-------------------------------------|
@@ -657,8 +663,8 @@ Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing the created `ProductionDto` object wrapped in a success message.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing the created `ProductionDto` object wrapped in a success message. ✅🎬📦
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌🚫📋
 
 ---
 
@@ -678,8 +684,9 @@ Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a paginated list of `ProductionDto` objects wrapped in a `PaginationResult`.
-- If no productions are found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a paginated list of `ProductionDto` objects wrapped in a `PaginationResult`. ✅🎬📜📋
+- If no productions are found, returns an `ApiResponse` with an appropriate error message. ❌🎬🔍
+
 
 ---
 
@@ -700,7 +707,8 @@ The `OrganizersController` is responsible for managing requests related to organ
 |----------|---------------------------|
 | **POST** | `/api/organizers`         |
 
-Create a new organizer.
+🌟 Create a new organizer. 🆕👤
+
 
 | Parameter             | Type             | Description                       |
 |-----------------------|------------------|-----------------------------------|
@@ -711,8 +719,9 @@ Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` with a success message.
-- If an error occurs, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` with a success message. ✅🎉
+- If an error occurs, returns an `ApiResponse` with an appropriate error message. ❌🚫
+
 
 ### 📋 Get Organizers 📅
 
@@ -720,17 +729,18 @@ Requires admin authorization. 👑
 |----------|----------------------|
 | **GET**  | `/api/organizers`    |
 
-Retrieve a list of all organizers with optional pagination.
+📜 Retrieve a list of all organizers with optional pagination. 📃👤🔄
 
-| Parameter | Type            | Description                        |
-|-----------|-----------------|------------------------------------|
-| `page`    | Query parameter | Page number for pagination.        |
-| `size`    | Query parameter | Number of items per page.          |
+
+| Parameter | Type            | Description                            |
+|-----------|-----------------|----------------------------------------|
+| `page`    | Query parameter | (Optional) Page number for pagination. |
+| `size`    | Query parameter | (Optional) Number of items per page.   |
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a paginated list of `OrganizerDto` objects wrapped in a `PaginationResult`.
-- If no organizers are found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a paginated list of `OrganizerDto` objects wrapped in a `PaginationResult`. ✅👤📜📋
+- If no organizers are found, returns an `ApiResponse` with an appropriate error message. ❌👤🔍
 
 ---
 
@@ -761,8 +771,9 @@ The `ContributionsController` is responsible for managing requests related to co
 
 **Response:**
 
-- If successful, returns an `ApiResponse` containing a paginated list of `ContributionDto` objects wrapped in a `PaginationResult`.
-- If no contributions are found, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` containing a paginated list of `ContributionDto` objects wrapped in a `PaginationResult`. ✅📜📋
+- If no contributions are found, returns an `ApiResponse` with an appropriate error message. ❌🔍
+
 
 ---
 
@@ -783,7 +794,7 @@ Requires admin authorization. 👑
 
 **Response:**
 
-- If successful, returns an `ApiResponse` with a success message.
-- If validation fails, returns an `ApiResponse` with an appropriate error message.
+- If successful, returns an `ApiResponse` with a success message. ✅🎉
+- If validation fails, returns an `ApiResponse` with an appropriate error message. ❌🚫📋
 
 ---
