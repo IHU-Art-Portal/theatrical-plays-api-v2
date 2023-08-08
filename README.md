@@ -1,8 +1,9 @@
 ﻿# Documentation for Theatrical Plays Api
 
-This document pertains to my thesis, which focuses on developing an API for managing theatrical play data.
-Its primary objective is to support the implementation of a web-based, front end, an Android application, and an iOS application.
-The API was built utilizing the .Net Framework and the C# programming language.
+📜 This document pertains to my thesis, which focuses on developing an API for managing theatrical play data. 🎭📊
+Its primary objective is to support the implementation of a web-based, front end, an Android application, and an iOS application. 🌐📱
+The API was built utilizing the .Net Framework and the C# programming language. ⚙️🔧
+
 
 -------
 ## Api Response
