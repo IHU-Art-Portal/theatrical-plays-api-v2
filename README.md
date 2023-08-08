@@ -129,63 +129,141 @@ It returns a message wrapped in `ApiResponse`. The message overrides the data fi
 ## Person
 
 ---
-This controller manages all the requests regarding a person.
+This controller manages all the requests regarding a person. 👤<br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>ApiResponse</code> 📦.
 
 **Create Person**
 
-| POST              | /api/person                                |
-|-------------------|--------------------------------------------|
-| **Parameters**    |                                            |
-| *CreatePersonDto* | {string: FullName, string: Image}          |
-| **Responses**     |                                            |
-| *PersonDto*       | {int: Id, string: FullName, string: Image} |
+| POST                           | /api/person                                                                |
+|--------------------------------|----------------------------------------------------------------------------|
+| **Parameters**                 |                                                                            |
+| *CreatePersonDto*              | {string: FullName, List&lt;string&gt;: url of image (if any), int: System} |
+| **Responses**                  |                                                                            |
+| *ApiResponse&lt;PersonDto&gt;* | {int: Id, string: FullName, int: SystemID, DateTime: Timestamp}            |
 
 ----
 
 **Get Person**
 
-This request is used to retrieve a performer <s>and their image</s>.
-It returns a `PersonDto` wrapped in `ApiResponse`.
+This request is used to retrieve a person. 👤<br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>ApiResponse</code> 📦.
 
-| GET                     | /api/person/{id}                                     |
-|-------------------------|------------------------------------------------------|
-| **Parameters**          |                                                      |
-| *id*                    | <u>Path variable</u>                                 |
-|                         | The integer identifier of the performer to retrieve. |
-| **Responses**           |                                                      |
-| ApiResponse\<PersonDto> | {id: Int, fullName: String, image: String}           |
-
----
-
-**Get Persons**
-
-This request is used to retrieve all people.\
-<I>If neither of page and size is specified, all results are returned.</I>
-
-| GET                                    | /api/people                                |
-|----------------------------------------|--------------------------------------------|
-| **Parameters**                         |                                            |
-| *page*                                 | <u>Query parameter</u>                     |
-|                                        | The index of the page to return. Optional  |
-| *size*                                 | <u>Query parameter</u>                     |
-|                                        | The size of the page. Optional             |
-| **Responses**                          |                                            |
-| ApiResponse<<List\<PersonResponseDto>> | {id: Int, fullName: String, image: String} |
+| GET                     | /api/person/{id}                                                |
+|-------------------------|-----------------------------------------------------------------|
+| **Parameters**          |                                                                 |
+| *id*                    | <u>Path variable</u>                                            |
+|                         | The integer identifier of the performer to retrieve.            |
+| **Responses**           |                                                                 |
+| ApiResponse\<PersonDto> | {int: Id, string: FullName, int: SystemID, DateTime: Timestamp} |
 
 ---
 
-**Get Persons By Role**
+**Get People**
 
-This request returns performers filtered by the provided role.
+This request is used to retrieve all people. 👥<br>
+Pagination available. 📄<br>
+<i>If neither of page and size is specified, all results are returned.</i><br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
 
-| GET                                   | /api/people/role                           |
-|---------------------------------------|--------------------------------------------|
-| **Parameters**                        |                                            |
-| *value*                               | <u>Path parameter</u>                      |
-|                                       | The role provided to filter the results    |
-| *page*                                | <u>Query parameter</u>                     |
-|                                       | The index of the page to return. Optional  |
-| *size*                                | <u>Query parameter</u>                     |
-|                                       | The size of the page. Optional             |
-| **Responses**                         |                                            |
-| ApiResponse\<List\<PersonResponseDto> | {id: Int, fullName: String, image: String} |
+| GET                                                  | /api/people                                                     |
+|------------------------------------------------------|-----------------------------------------------------------------|
+| **Parameters**                                       |                                                                 |
+| *page*                                               | <u>Query parameter</u>                                          |
+|                                                      | The index of the page to return. Optional                       |
+| *size*                                               | <u>Query parameter</u>                                          |
+|                                                      | The size of the page. Optional                                  |
+| **Responses**                                        |                                                                 |
+| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | {List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize} |
+
+---
+
+**Get People By Role**
+
+This request returns people filtered by the provided role. 👥<br>
+Pagination available. 📄<br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+
+
+| GET                                                  | /api/people/role/{role}                                         |
+|------------------------------------------------------|-----------------------------------------------------------------|
+| **Parameters**                                       |                                                                 |
+| *role*                                               | <u>Path parameter</u>                                           |
+|                                                      | The role provided to filter the results                         |
+| *page*                                               | <u>Query parameter</u>                                          |
+|                                                      | The index of the page to return. Optional                       |
+| *size*                                               | <u>Query parameter</u>                                          |
+|                                                      | The size of the page. Optional                                  |
+| **Responses**                                        |                                                                 |
+| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | {List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize} |
+
+---
+
+**Get People By Initial Letter**
+
+This request returns people filtered by the provided role. 👥<br>
+Pagination available. 📄<br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+
+
+| GET                                                  | /api/people/initials/{letters}                                |
+|------------------------------------------------------|---------------------------------------------------------------|
+| **Parameters**                                       |                                                               |
+| *letters*                                            | <u>Path parameter</u>                                         |
+|                                                      | The initials of the name.                                     |
+| *page*                                               | <u>Query parameter</u>                                        |
+|                                                      | The index of the page to return. Optional                     |
+| *size*                                               | <u>Query parameter</u>                                        |
+|                                                      | The size of the page. Optional                                |
+| **Responses**                                        |                                                               |
+| ApiResponse&lt;PaginationResult&lt;PersonDto&gt;&gt; | List&lt;PersonDto&gt;: Results, int CurrentPage, int PageSize |
+
+---
+
+**Get Person Productions**
+
+This request returns all the productions that one <code>Person</code> partakes in. 🎬<br>
+Pagination available. 📄<br>
+It returns a <code>PersonProductionsRoleInfo</code> 🧑‍🎬 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+
+
+| GET                                                                  | /api/people/{id}/productions                                                  |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| **Parameters**                                                       |                                                                               |
+| *id*                                                                 | <u>Path parameter</u>                                                         |
+|                                                                      | The Id of a person.                                                           |
+| **Responses**                                                        |                                                                               |
+| ApiResponse&lt;PaginationResult&lt;PersonProductionsRoleInfo&gt;&gt; | List&lt;PersonProductionsRoleInfo&gt;: Results, int CurrentPage, int PageSize |
+
+---
+
+**Get Person Photos**
+
+This request returns a <code>Person</code>'s photos. 📸<br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+
+
+| GET                                     | /api/people/{id}/photos                 |
+|-----------------------------------------|-----------------------------------------|
+| **Parameters**                          |                                         |
+| *id*                                    | <u>Path parameter</u>                   |
+|                                         | The Id of a person.                     |
+| **Responses**                           |                                         |
+| ApiResponse&lt;List&lt;ImageDto&gt;&gt; | int: Id, string ImageIrl, int: PersonId |
+
+---
+
+**Delete Person**
+
+This request 🔥 deletes 🔥 a Person by their ID. 👤<br>
+Only available to Admin accounts 👑<br>
+<span>⚠️ Use with caution ⚠️</span><br>
+It returns a <code>PersonDto</code> 🧍 wrapped in <code>PaginationResult</code> 📜 which is wrapped in <code>ApiResponse</code> 📦.
+
+
+| DELETE         | /api/people/{id}                        |
+|----------------|-----------------------------------------|
+| **Parameters** |                                         |
+| *id*           | <u>Path parameter</u>                   |
+|                | The Id of the person.                   |
+| **Responses**  |                                         |
+| ApiResponse    | message: overriden with success message |
