@@ -8,7 +8,7 @@ namespace Theatrical.Services.Repositories;
 
 public interface IPersonRepository
 {
-    Task Create(Person person);
+    Task<Person> Create(Person person);
     Task<List<Person>> Get();
     Task Delete(Person person);
     Task<Person?> Get(int id);
@@ -28,10 +28,11 @@ public class PersonRepository : IPersonRepository
         _context = context;
     }
 
-    public async Task Create(Person person)
+    public async Task<Person> Create(Person person)
     {
         await _context.Persons.AddAsync(person);
         await _context.SaveChangesAsync();
+        return person;
     }
     
     public async Task<List<Person>> Get()

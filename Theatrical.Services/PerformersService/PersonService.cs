@@ -8,7 +8,7 @@ namespace Theatrical.Services.PerformersService;
 
 public interface IPersonService
 {
-    Task Create(CreatePersonDto createPersonDto);
+    Task<Person> Create(CreatePersonDto createPersonDto);
     Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
@@ -32,7 +32,7 @@ public class PersonService : IPersonService
         _pagination = paginationService;
     }
 
-    public async Task Create(CreatePersonDto createPersonDto)
+    public async Task<Person> Create(CreatePersonDto createPersonDto)
     {
         Person person = new Person
         {
@@ -43,19 +43,14 @@ public class PersonService : IPersonService
 
         if (createPersonDto.Images != null && createPersonDto.Images.Any())
         {
-            List<Image> images = new List<Image>();
-            
-            foreach (string imageUrl in createPersonDto.Images)
-            {
-                Image image = new Image { ImageUrl = imageUrl };
-                images.Add(image);
-            }
+            List<Image> images = createPersonDto.Images.Select(imageUrl => new Image { ImageUrl = imageUrl }).ToList();
 
             person.Images = images;
         }
         
         
-        await _repository.Create(person);
+        var createdPerson = await _repository.Create(person);
+        return createdPerson;
     }
 
     public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size)

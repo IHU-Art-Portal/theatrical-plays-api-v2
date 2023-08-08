@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -102,9 +103,9 @@ public class PeopleController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status400BadRequest};
             }
             
-            await _service.Create(createPersonDto);
+            var createdPerson = await _service.Create(createPersonDto);
 
-            var response = new ApiResponse("Successfully Created Person");
+            var response = new ApiResponse<Person>(createdPerson,"Successfully Created Person");
 
             return new OkObjectResult(response);
         }
