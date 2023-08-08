@@ -764,6 +764,8 @@ The `ContributionsController` is responsible for managing requests related to co
 - If successful, returns an `ApiResponse` containing a paginated list of `ContributionDto` objects wrapped in a `PaginationResult`.
 - If no contributions are found, returns an `ApiResponse` with an appropriate error message.
 
+---
+
 ### 📝 Create Contribution 🌟
 
 | Method   | Endpoint                 |
