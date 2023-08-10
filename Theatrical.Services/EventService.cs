@@ -43,9 +43,10 @@ public class EventService : IEventService
         {
             ProductionId = createEventDto.ProductionId,
             VenueId = createEventDto.VenueId,
-            //DateEvent = createEventDto.DateEvent,
+            DateEvent = DateTime.Parse(createEventDto.DateEvent),
             PriceRange = createEventDto.PriceRange,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            SystemId = createEventDto.SystemId
         };
         
         await _repository.Create(eventNew);

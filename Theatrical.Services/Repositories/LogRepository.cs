@@ -7,7 +7,7 @@ namespace Theatrical.Services.Repositories;
 public interface ILogRepository
 {
     Task<List<ChangeLog>> GetLogs();
-    Task UpdateLogs(string eventType, string tableName, string value, string collumnName);
+    Task UpdateLogs(string eventType, string tableName, List<(string ColumnName, string Value)> columns);
 }
 
 public class LogRepository : ILogRepository
@@ -26,23 +26,19 @@ public class LogRepository : ILogRepository
     }
 
     /// <summary>
-    /// Function to update the changeLog table.
-    /// This function should be called after a delete/update/insert command.
-    /// Use this on other repositories after executing one of the aforementioned events, in order to update the logs.
-    /// Can be used more than once if that's necessary.
+    /// Updating logs method.
     /// </summary>
-    /// <param name="eventType">string, insert or update or delete</param>
-    /// <param name="tableName">string, name of the table</param>
-    /// <param name="value">string, value that was effected</param>
-    /// <param name="collumnName">string, collumn that was effected</param>
-    public async Task UpdateLogs(string eventType, string tableName, string value, string collumnName)
+    /// <param name="eventType"></param>
+    /// <param name="tableName"></param>
+    /// <param name="columns"></param>
+    public async Task UpdateLogs(string eventType, string tableName, List<(string ColumnName, string Value)> columns)
     {
         var newLog = new ChangeLog
         {
             EventType = eventType,
             TableName = tableName,
-            Value = value,
-            CollumnName = collumnName
+            Value = string.Join(", ", columns.Select(col => col.Value)),
+            CollumnName = string.Join(", ", columns.Select(col => col.ColumnName))
         };
 
         await _context.ChangeLogs.AddAsync(newLog);

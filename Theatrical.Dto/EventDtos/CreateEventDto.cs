@@ -6,4 +6,5 @@ public class CreateEventDto
     public string PriceRange { get; set; }
     public int ProductionId { get; set; }
     public int VenueId { get; set; }
+    public int SystemId { get; set; }
 }
