@@ -8,6 +8,7 @@ namespace Theatrical.Services.Repositories;
 public interface IEventRepository
 {
     Task<List<Event>?> Get();
+    Task<Event?> GetEvent(int id);
     Task Create(Event newEvent);
     Task Delete(Event deletingEvent);
 }
@@ -54,6 +55,16 @@ public class EventRepository : IEventRepository
     {
         _context.Events.Remove(deletingEvent);
         await _context.SaveChangesAsync();
+        
+        await _logRepository.UpdateLogs("delete", "events", new List<(string ColumnName, string Value)>
+        {
+            ("ID", deletingEvent.Id.ToString()),
+            ("ProductionID", deletingEvent.ProductionId.ToString()),
+            ("VenueID", deletingEvent.VenueId.ToString()),
+            ("DateEvent", deletingEvent.DateEvent.ToString(CultureInfo.CurrentCulture)),
+            ("PriceRange", deletingEvent.PriceRange),
+            ("SystemId", deletingEvent.SystemId.ToString())
+        });
     }
 }
 
