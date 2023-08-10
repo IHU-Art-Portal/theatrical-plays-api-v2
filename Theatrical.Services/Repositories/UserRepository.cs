@@ -18,10 +18,12 @@ public interface IUserRepository
 public class UserRepository : IUserRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ILogRepository _logRepository;
 
-    public UserRepository(TheatricalPlaysDbContext context)
+    public UserRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
     {
         _context = context;
+        _logRepository = logRepository;
     }
 
     public async Task<User?> Get(string email)
@@ -47,6 +49,12 @@ public class UserRepository : IUserRepository
         await _context.Users.AddAsync(user);            //adds user
         await _context.SaveChangesAsync();
 
+        await _logRepository.UpdateLogs("insert", "users", new List<(string ColumnName, string Value)>
+        {
+            ("id", user.Id.ToString()),
+            ("email", user.Email)
+        });
+        
         var userAuthorities = new UserAuthority         //adds user authorities
         {
             UserId = user.Id,
