@@ -9,7 +9,7 @@ public interface IVenueRepository
 {
     Task<List<Venue>>? Get();
     Task<Venue?> Get(int id);
-    Task Create(Venue venue);
+    Task<Venue> Create(Venue venue);
     Task Delete(Venue venue);
     Task Update(Venue venue);
 }
@@ -17,10 +17,12 @@ public interface IVenueRepository
 public class VenueRepository : IVenueRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ILogRepository _logRepository;
 
-    public VenueRepository(TheatricalPlaysDbContext context)
+    public VenueRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
     {
         _context = context;
+        _logRepository = logRepository;
     }
 
     public async Task<List<Venue>>? Get()
@@ -35,10 +37,20 @@ public class VenueRepository : IVenueRepository
         return venue;
     }
 
-    public async Task Create(Venue venue)
+    public async Task<Venue> Create(Venue venue)
     {
         await _context.Venues.AddAsync(venue);
         await _context.SaveChangesAsync();
+
+        await _logRepository.UpdateLogs("insert", "venue", new List<(string ColumnName, string Value)>
+        {
+            ("ID", venue.Id.ToString()),
+            ("Title", venue.Title),
+            ("Address", venue.Address),
+            ("SystemID", venue.SystemId.ToString())
+        });
+
+        return venue;
     }
 
     public async Task Delete(Venue venue)
@@ -57,5 +69,11 @@ public class VenueRepository : IVenueRepository
         _context.Venues.Update(venueToUpdate);
         await _context.SaveChangesAsync();
         
+        await _logRepository.UpdateLogs("update", "venue", new List<(string ColumnName, string Value)>
+        {
+            ("ID", venue.Id.ToString()),
+            ("Title", venue.Title),
+            ("Address", venue.Address)
+        });
     }
 }

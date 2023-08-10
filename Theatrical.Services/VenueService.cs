@@ -8,7 +8,7 @@ namespace Theatrical.Services;
 
 public interface IVenueService
 {
-    Task Create(VenueCreateDto venueCreateDto);
+    Task<Venue> Create(VenueCreateDto venueCreateDto);
     Task Delete(Venue venue);
     Task Update(VenueUpdateDto venue);
     List<VenueDto> ToDto(List<Venue> venue);
@@ -27,7 +27,7 @@ public class VenueService : IVenueService
         _pagination = paginationService;
     }
     
-    public async Task Create(VenueCreateDto venueCreateDto)
+    public async Task<Venue> Create(VenueCreateDto venueCreateDto)
     {
         Venue venue = new Venue
         {
@@ -36,7 +36,8 @@ public class VenueService : IVenueService
             Timestamp = DateTime.UtcNow
         }; 
         
-        await _repository.Create(venue);
+        var createdVenue = await _repository.Create(venue);
+        return createdVenue;
     }
 
     public async Task Delete(Venue venue)

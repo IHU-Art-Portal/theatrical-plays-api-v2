@@ -101,11 +101,13 @@ public class VenuesController : ControllerBase
     {
         try
         {
-            await _service.Create(venueCreateDto);
+            var createdVenue = await _service.Create(venueCreateDto);
 
-            var response = new ApiResponse("Venue successfully added");
+            var createdVenueDto = _service.ToDto(createdVenue);
 
-            return new ObjectResult(response);
+            var response = new ApiResponse<VenueDto>(createdVenueDto, "Venue successfully added");
+
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
