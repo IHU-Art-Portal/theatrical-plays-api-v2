@@ -7,7 +7,7 @@ namespace Theatrical.Services.Repositories;
 public interface IContributionRepository
 {
     Task<List<Contribution>> Get();
-    Task Create(Contribution contribution);
+    Task<Contribution> Create(Contribution contribution);
     Task<List<Contribution>> GetSpecific(int personId, int productionId, int roleId);
     Task<List<Contribution>> GetByRole(int roleId);
     Task<List<Contribution>> GetByProduction(int productionId);
@@ -20,16 +20,35 @@ public interface IContributionRepository
 public class ContributionRepository : IContributionRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ILogRepository _logRepository;
 
-    public ContributionRepository(TheatricalPlaysDbContext context)
+    public ContributionRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
     {
         _context = context;
+        _logRepository = logRepository;
     }
 
-    public async Task Create(Contribution contribution)
+    public async Task<Contribution> Create(Contribution contribution)
     {
         await _context.Contributions.AddAsync(contribution);
         await _context.SaveChangesAsync();
+
+        var columns = new List<(string ColumnName, string Value)>
+        {
+            ("ID", contribution.Id.ToString()),
+            ("PeopleID", contribution.PeopleId.ToString()),
+            ("ProductionID", contribution.ProductionId.ToString()),
+            ("RoleID", contribution.RoleId.ToString())
+        };
+
+        if (contribution.SubRole != null)
+        {
+            columns.Add(("subRole", contribution.SubRole));
+        }
+        
+        await _logRepository.UpdateLogs("insert", "contributions", columns);
+
+        return contribution;
     }
     
     public async Task<List<Contribution>> Get()

@@ -77,9 +77,10 @@ public class ContributionsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound };
             }
 
-            await _service.Create(contributionDto);
+            var createdContribution = await _service.Create(contributionDto);
+            var createdContributionDto = _service.ToDto(createdContribution);
 
-            var response = new ApiResponse("Successfully Created Contribution");
+            var response = new ApiResponse<ContributionDto>(createdContributionDto,"Successfully Created Contribution");
 
             return new OkObjectResult(response);
         }
