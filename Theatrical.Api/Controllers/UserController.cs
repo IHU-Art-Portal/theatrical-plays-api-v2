@@ -87,6 +87,12 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
             }
 
+            if (verification.ErrorCode == ErrorCode.AlreadyVerified)
+            {
+                var responseVerified = new ApiResponse(verification.Message!);
+                return new OkObjectResult(responseVerified);
+            }
+
             await _service.EnableAccount(user!);
             
             var response = new ApiResponse(verification.Message!);

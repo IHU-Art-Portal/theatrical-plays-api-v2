@@ -118,6 +118,14 @@ public class UserValidationService : IUserValidationService
             return (report, null);
         }
 
+        if ((bool)user.Enabled!)
+        {
+            report.Success = true;
+            report.Message = "You have already verified your email address";
+            report.ErrorCode = ErrorCode.AlreadyVerified;
+            return (report, null);
+        }
+
         report.Success = true;
         report.Message = "Verification Completed";
 

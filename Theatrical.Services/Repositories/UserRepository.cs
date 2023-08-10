@@ -80,6 +80,11 @@ public class UserRepository : IUserRepository
     {
         user.Enabled = true;
         await _context.SaveChangesAsync();
+
+        await _logRepository.UpdateLogs("update", "users", new List<(string ColumnName, string Value)>
+        {
+            ("enabled", $"User {user.Id} has enabled their account through email verification")
+        });
     }
 
     public async Task<User?> SearchToken(string token)

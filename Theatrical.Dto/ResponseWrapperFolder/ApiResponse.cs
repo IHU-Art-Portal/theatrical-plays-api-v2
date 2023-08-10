@@ -13,7 +13,8 @@ public enum ErrorCode
     BadRequest,
     ServerError,
     CurationFailure,
-    InvalidEmail
+    InvalidEmail,
+    AlreadyVerified
 }
 
 public class ApiResponse
