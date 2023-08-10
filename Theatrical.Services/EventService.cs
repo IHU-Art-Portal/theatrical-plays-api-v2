@@ -9,9 +9,10 @@ namespace Theatrical.Services;
 
 public interface IEventService
 {
-    Task Create(CreateEventDto createEventDto);
+    Task<Event> Create(CreateEventDto createEventDto);
     List<EventDto> ToDto(List<Event> events);
     PaginationResult<EventDto> Paginate(int? page, int? size, List<EventDto> eventDtos);
+    Task UpdatePriceRange(Event @event, UpdateEventDto eventDto);
 }
 
 public class EventService : IEventService
@@ -37,7 +38,7 @@ public class EventService : IEventService
         }).ToList();
     }
 
-    public async Task Create(CreateEventDto createEventDto)
+    public async Task<Event> Create(CreateEventDto createEventDto)
     {
         var eventNew = new Event
         {
@@ -49,7 +50,8 @@ public class EventService : IEventService
             SystemId = createEventDto.SystemId
         };
         
-        await _repository.Create(eventNew);
+        var newEvent = await _repository.Create(eventNew);
+        return newEvent;
     }
     
     public PaginationResult<EventDto> Paginate(int? page, int? size, List<EventDto> eventDtos)
@@ -66,6 +68,11 @@ public class EventService : IEventService
         });
 
         return paginationResult;
+    }
+
+    public async Task UpdatePriceRange(Event @event, UpdateEventDto eventDto)
+    {
+        await _repository.UpdatePriceEvent(@event, eventDto);
     }
 }
 

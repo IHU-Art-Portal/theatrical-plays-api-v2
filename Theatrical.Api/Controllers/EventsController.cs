@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Net;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -76,8 +78,8 @@ public class EventsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            await _service.Create(createEventDto);
-            var response = new ApiResponse("Successfully Created Event");
+            var newEvent = await _service.Create(createEventDto);
+            var response = new ApiResponse<Event>(newEvent,"Successfully Created Event");
 
             return new ObjectResult(response);
         }
@@ -87,6 +89,25 @@ public class EventsController : ControllerBase
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
+    }
+
+    [HttpPut("update/price")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> UpdateEventPrice([FromBody] UpdateEventDto eventDto)
+    {
+        var (validation, @event) = await _validation.ValidateForFetch(eventDto.EventId);
+
+        if (!validation.Success)
+        {
+            var errorResponse = new ApiResponse((ErrorCode) validation.ErrorCode!, validation.Message!);
+            return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+        }
+
+        await _service.UpdatePriceRange(@event!, eventDto);
+
+        var response = new ApiResponse("Successfully updated event's price!");
+
+        return new OkObjectResult(response);
     }
     
 }

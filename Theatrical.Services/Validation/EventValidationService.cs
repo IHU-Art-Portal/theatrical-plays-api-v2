@@ -1,5 +1,6 @@
 ﻿using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -7,7 +8,8 @@ namespace Theatrical.Services.Validation;
 public interface IEventValidationService
 {
     Task<ValidationReport> ValidateForCreate(CreateEventDto createEventDto);
-    Task<(ValidationReport report, List<Event> events)> FetchAndValidate();
+    Task<(ValidationReport report, List<Event>? events)> FetchAndValidate();
+    Task<(ValidationReport, Event?)> ValidateForFetch(int eventId);
 }
 
 public class EventValidationService : IEventValidationService
@@ -49,7 +51,7 @@ public class EventValidationService : IEventValidationService
         return report;
     }
 
-    public async Task<(ValidationReport report, List<Event> events)> FetchAndValidate()
+    public async Task<(ValidationReport report, List<Event>? events)> FetchAndValidate()
     {
         var events = await _repository.Get();
         var report = new ValidationReport();
@@ -64,6 +66,25 @@ public class EventValidationService : IEventValidationService
         report.Success = true;
         report.Message = "Events Found";
         return (report, events);
+    }
+
+    public async Task<(ValidationReport, Event?)> ValidateForFetch(int eventId)
+    {
+        var eventFromDb = await _repository.GetEvent(eventId);
+        var report = new ValidationReport();
+        
+        if (eventFromDb is null)
+        {
+            report.Success = false;
+            report.Message = $"Event with id: {eventId} not found";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Event found";
+
+        return (report, eventFromDb);
     }
 }
 

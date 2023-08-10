@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Dto.EventDtos;
 
 namespace Theatrical.Services.Repositories;
 
@@ -9,8 +10,9 @@ public interface IEventRepository
 {
     Task<List<Event>?> Get();
     Task<Event?> GetEvent(int id);
-    Task Create(Event newEvent);
+    Task<Event> Create(Event newEvent);
     Task Delete(Event deletingEvent);
+    Task UpdatePriceEvent(Event @event, UpdateEventDto eventDto);
 }
 
 public class EventRepository : IEventRepository
@@ -34,7 +36,7 @@ public class EventRepository : IEventRepository
         return await _context.Events.FindAsync(id);
     }
     
-    public async Task Create(Event newEvent)
+    public async Task<Event> Create(Event newEvent)
     {
         await _context.Events.AddAsync(newEvent);
         await _context.SaveChangesAsync();
@@ -48,6 +50,8 @@ public class EventRepository : IEventRepository
             ("PriceRange", newEvent.PriceRange),
             ("SystemId", newEvent.SystemId.ToString())
         });
+
+        return newEvent;
 
     }
 
@@ -64,6 +68,21 @@ public class EventRepository : IEventRepository
             ("DateEvent", deletingEvent.DateEvent.ToString(CultureInfo.CurrentCulture)),
             ("PriceRange", deletingEvent.PriceRange),
             ("SystemId", deletingEvent.SystemId.ToString())
+        });
+    }
+
+    public async Task UpdatePriceEvent(Event @event, UpdateEventDto eventDto)
+    {
+        var oldPriceRange = @event.PriceRange;
+        
+        @event.PriceRange = eventDto.PriceRange;
+        
+        await _context.SaveChangesAsync();
+
+        await _logRepository.UpdateLogs("update", "events", new List<(string ColumnName, string Value)>
+        {
+            ("ID", @event.Id.ToString()),
+            ("PriceRange", $"From {oldPriceRange} to {eventDto.PriceRange}")
         });
     }
 }
