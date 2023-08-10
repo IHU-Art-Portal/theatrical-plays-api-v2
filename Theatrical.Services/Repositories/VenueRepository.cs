@@ -42,13 +42,22 @@ public class VenueRepository : IVenueRepository
         await _context.Venues.AddAsync(venue);
         await _context.SaveChangesAsync();
 
-        await _logRepository.UpdateLogs("insert", "venue", new List<(string ColumnName, string Value)>
+        var columns = new List<(string ColumnName, string Value)>
         {
-            ("ID", venue.Id.ToString()),
-            ("Title", venue.Title),
-            ("Address", venue.Address),
-            ("SystemID", venue.SystemId.ToString())
-        });
+            ("ID", venue.Id.ToString())
+        };
+
+        if (venue.Title != null)
+        {
+            columns.Add(("Title", venue.Title));
+        }
+
+        if (venue.Address != null)
+        {
+            columns.Add(("Address", venue.Address));
+        }
+
+        await _logRepository.UpdateLogs("insert", "venue", columns);
 
         return venue;
     }
@@ -57,6 +66,23 @@ public class VenueRepository : IVenueRepository
     {
         _context.Venues.Remove(venue);
         await _context.SaveChangesAsync();
+        
+        var columns = new List<(string ColumnName, string Value)>
+        {
+            ("ID", venue.Id.ToString())
+        };
+
+        if (venue.Title != null)
+        {
+            columns.Add(("Title", venue.Title));
+        }
+
+        if (venue.Address != null)
+        {
+            columns.Add(("Address", venue.Address));
+        }
+
+        await _logRepository.UpdateLogs("delete", "venue", columns);
     }
 
     public async Task Update(Venue venue)
