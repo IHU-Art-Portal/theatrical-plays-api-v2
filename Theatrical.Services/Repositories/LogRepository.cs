@@ -33,15 +33,19 @@ public class LogRepository : ILogRepository
     /// <param name="columns"></param>
     public async Task UpdateLogs(string eventType, string tableName, List<(string ColumnName, string Value)> columns)
     {
-        var newLog = new ChangeLog
+        foreach (var column in columns)
         {
-            EventType = eventType,
-            TableName = tableName,
-            Value = string.Join(", ", columns.Select(col => col.Value)),
-            CollumnName = string.Join(", ", columns.Select(col => col.ColumnName))
-        };
-
-        await _context.ChangeLogs.AddAsync(newLog);
+            var newLog = new ChangeLog
+            {
+                EventType = eventType,
+                TableName = tableName,
+                Value = column.Value,
+                CollumnName = column.ColumnName
+            };
+            
+            await _context.ChangeLogs.AddAsync(newLog);
+        }
+        
         await _context.SaveChangesAsync();
     }
 }

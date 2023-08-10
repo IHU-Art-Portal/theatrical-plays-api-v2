@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 
@@ -14,10 +15,12 @@ public interface IEventRepository
 public class EventRepository : IEventRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ILogRepository _logRepository;
 
-    public EventRepository(TheatricalPlaysDbContext context)
+    public EventRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
     {
         _context = context;
+        _logRepository = logRepository;
     }
 
     public async Task<List<Event>?> Get()
@@ -34,6 +37,17 @@ public class EventRepository : IEventRepository
     {
         await _context.Events.AddAsync(newEvent);
         await _context.SaveChangesAsync();
+
+        await _logRepository.UpdateLogs("insert", "events", new List<(string ColumnName, string Value)>
+        {
+            ("ID", newEvent.Id.ToString()),
+            ("ProductionID", newEvent.ProductionId.ToString()),
+            ("VenueID", newEvent.VenueId.ToString()),
+            ("DateEvent", newEvent.DateEvent.ToString(CultureInfo.CurrentCulture)),
+            ("PriceRange", newEvent.PriceRange),
+            ("SystemId", newEvent.SystemId.ToString())
+        });
+
     }
 
     public async Task Delete(Event deletingEvent)
