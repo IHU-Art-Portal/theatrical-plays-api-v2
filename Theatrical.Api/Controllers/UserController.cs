@@ -123,6 +123,22 @@ public class UserController : ControllerBase
 
             if (!report.Success)
             {
+                if (report.ErrorCode.Equals(ErrorCode._2FaEnabled))
+                {
+                    var errorResponse2Fa = new ApiResponse((ErrorCode)report.ErrorCode, report.Message!);
+
+                    //Creates the 2fa code
+                    var totpCode = _service.GenerateOTP(user!);
+                    
+                    //Sends an email to the user with the 2fa code
+                    await _emailService.Send2FaVerificationCode(user!, totpCode);
+                    
+                    //Saves the code.
+                    await _service.Save2FaCode(user!, totpCode);
+                        
+                    return new ObjectResult(errorResponse2Fa){StatusCode = (int) HttpStatusCode.Conflict};
+                }
+                
                 var errorResponse = new ApiResponse((ErrorCode)report.ErrorCode!, report.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
@@ -139,6 +155,32 @@ public class UserController : ControllerBase
 
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
+    }
+
+    /// <summary>
+    /// Use this after getting your f2a code from email.
+    /// Verifies the code,
+    /// Generates a login token (jwt),
+    /// Sends appropriate reply.
+    /// </summary>
+    /// <param name="code"></param>
+    /// <returns></returns>
+    [HttpPost("login/2fa/{code}")]
+    public async Task<ActionResult<ApiResponse>> Login2Fa([FromRoute]int code)
+    {
+        var (validation, user) = await _validation.VerifyOtp(code.ToString());
+
+        if (!validation.Success)
+        {
+            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+            return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.Unauthorized};
+        }
+
+        var jwtDto = _service.GenerateToken(user!);
+        
+        var response = new ApiResponse<JwtDto>(jwtDto, validation.Message!);
+        
+        return new OkObjectResult(response);
     }
 
     /// <summary>

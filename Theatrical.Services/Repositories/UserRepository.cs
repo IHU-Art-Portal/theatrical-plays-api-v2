@@ -13,6 +13,8 @@ public interface IUserRepository
     Task<decimal> GetUserBalance(int id);
     Task EnableAccount(User user);
     Task<User?> SearchToken(string token);
+    Task<User?> SearchOtp(string otp);
+    Task Update2Fa(User user, string otp);
 }
 
 public class UserRepository : IUserRepository
@@ -90,5 +92,16 @@ public class UserRepository : IUserRepository
     public async Task<User?> SearchToken(string token)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.VerificationCode == token);
+    }
+
+    public async Task<User?> SearchOtp(string otp)
+    {
+        return await _context.Users.Include(u => u.UserAuthorities).FirstOrDefaultAsync(u => u._2FA_code == otp);
+    }
+
+    public async Task Update2Fa(User user, string otp)
+    {
+        user._2FA_code = otp;
+        await _context.SaveChangesAsync();
     }
 }

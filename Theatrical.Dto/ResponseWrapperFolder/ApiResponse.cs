@@ -14,7 +14,9 @@ public enum ErrorCode
     ServerError,
     CurationFailure,
     InvalidEmail,
-    AlreadyVerified
+    AlreadyVerified,
+    _2FaEnabled,
+    _2FaFailure
 }
 
 public class ApiResponse

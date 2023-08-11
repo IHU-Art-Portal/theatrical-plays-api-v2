@@ -1,8 +1,7 @@
-﻿using System.Security.Claims;
-using Theatrical.Data.Models;
+﻿using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
-using BCrypt.Net;
+using OtpNet;
 using Theatrical.Services.Jwt;
 
 namespace Theatrical.Services;
@@ -13,6 +12,8 @@ public interface IUserService
     bool VerifyPassword(string hashedPassword, string providedPassword);
     JwtDto GenerateToken(User user);
     Task EnableAccount(User user);
+    string GenerateOTP(User user);
+    Task Save2FaCode(User user, string totpCode);
 }
 
 public class UserService : IUserService
@@ -27,8 +28,10 @@ public class UserService : IUserService
     }
 
     /// <summary>
-    /// This function is used to has the password of the user.
-    /// Then calls the register of users repository to add the user.
+    /// Creates a hashed password based on the user's actual password
+    /// Some logic...
+    /// Calls the repository method to register the user.
+    /// Returns a Dto Reply.
     /// </summary>
     /// <param name="registerUserDto"></param>
     /// <param name="verificationToken"></param>
@@ -36,7 +39,7 @@ public class UserService : IUserService
     public async Task<UserDtoRole> Register(RegisterUserDto registerUserDto, string verificationToken)
     {
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
-        
+
         User user = new User
         {
             Email = registerUserDto.Email,
@@ -63,11 +66,22 @@ public class UserService : IUserService
         return userDtoRole;
     }
 
+    /// <summary>
+    /// Verifies the hashed passwords.
+    /// </summary>
+    /// <param name="hashedPassword">The correct password.</param>
+    /// <param name="providedPassword">The provided password by the user who attempted to log in.</param>
+    /// <returns></returns>
     public bool VerifyPassword(string hashedPassword, string providedPassword)
     {
         return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 
+    /// <summary>
+    /// Generates a jwt token.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public JwtDto GenerateToken(User user)
     {
         var jwtDto = _tokenService.GenerateToken(user);
@@ -75,10 +89,42 @@ public class UserService : IUserService
         return jwtDto;
     }
     
+    /// <summary>
+    /// Enabled a account.
+    /// Triggered after clicking the email link.
+    /// </summary>
+    /// <param name="user"></param>
     public async Task EnableAccount(User user)
     {
         await _repository.EnableAccount(user);
     }
 
+    /// <summary>
+    /// Generates a new 2fa code.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public string GenerateOTP(User user)
+    {
+        var verificationCodeGuid = Guid.Parse(user.VerificationCode!);
+
+        byte[] secretKeyBytes = verificationCodeGuid.ToByteArray();
+
+        var totp = new Totp(secretKeyBytes);
+
+        var totpCode = totp.ComputeTotp();
+
+        return totpCode;
+    }
+
+    /// <summary>
+    /// Saves the temporary 2fa code to the db.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="totpCode"></param>
+    public async Task Save2FaCode(User user, string totpCode)
+    {
+        await _repository.Update2Fa(user, totpCode);
+    }
 }
 

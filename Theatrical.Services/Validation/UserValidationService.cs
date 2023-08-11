@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using OtpNet;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -13,19 +14,18 @@ public interface IUserValidationService
     Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
     Task<(ValidationReport, User?)> VerifyEmailToken(string token);
+    Task<(ValidationReport, User?)> VerifyOtp(string otpCode);
 }
 
 public class UserValidationService : IUserValidationService
 {
     private readonly IUserRepository _repository;
     private readonly IUserService _userService;
-    private readonly ITokenService _tokenService;
 
-    public UserValidationService(IUserRepository repository, IUserService userService, ITokenService tokenService)
+    public UserValidationService(IUserRepository repository, IUserService userService)
     {
         _repository = repository;
         _userService = userService;
-        _tokenService = tokenService;
     }
 
     public async Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto)
@@ -76,6 +76,14 @@ public class UserValidationService : IUserValidationService
             report.Success = false;
             report.ErrorCode = ErrorCode.NotFound;
             return (report, null);
+        }
+
+        if (user._2FA_enabled)
+        {
+            report.Message = "2FA is enabled, check your email for your one time code to log in.";
+            report.Success = false;
+            report.ErrorCode = ErrorCode._2FaEnabled;
+            return (report, user);
         }
         
         report.Message = "User Verified";
@@ -129,6 +137,47 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         report.Message = "Verification Completed";
 
+        return (report, user);
+    }
+
+    /// <summary>
+    /// Verifies the 2fa otp.
+    /// </summary>
+    /// <param name="otpCode"></param>
+    /// <returns>boolean</returns>
+    public async Task<(ValidationReport, User?)> VerifyOtp(string otpCode)
+    {
+        var user = await _repository.SearchOtp(otpCode);
+        var report = new ValidationReport();
+
+        if (user is null)
+        {
+            report.Success = false;
+            report.Message = "Authentication failed. User not found";
+            report.ErrorCode = ErrorCode._2FaFailure;
+            return (report, null);
+        }
+
+        var verificationCodeGuide = Guid.Parse(user.VerificationCode!);
+
+        byte[] secretKeyBytes = verificationCodeGuide.ToByteArray();
+
+        var totp = new Totp(secretKeyBytes);
+
+        bool isCodeValid = totp.VerifyTotp(otpCode, out long timeStepMatched);
+        
+        if (!isCodeValid)
+        {
+            report.Success = false;
+            report.Message = "Authentication failed.";
+            report.ErrorCode = ErrorCode._2FaFailure;
+
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Authentication successful!";
+        
         return (report, user);
     }
 }

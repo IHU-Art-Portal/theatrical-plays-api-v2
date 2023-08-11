@@ -14,5 +14,5 @@ public class User
     public virtual List<Transaction> UserTransactions { get; set; }
     
     public bool _2FA_enabled { get; set; }
-    public string _2FA_code { get; set; }
+    public string? _2FA_code { get; set; }
 }

@@ -1,13 +1,14 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
+using OtpNet;
+using Theatrical.Data.Models;
 
 namespace Theatrical.Services.Email;
 
 public interface IEmailService
 {
     Task SendConfirmationEmailAsync(string email, string confirmationToken);
+    Task Send2FaVerificationCode(User user, string totpCode);
 }
 
 public class EmailService : IEmailService
@@ -15,6 +16,11 @@ public class EmailService : IEmailService
     private readonly string _userEmail = "theatricalportalv2@gmail.com";
     private readonly string _emailPassword = "lyhommmmlgekezed";
     
+    /// <summary>
+    /// Sends a verification code to the registering user.
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="confirmationToken"></param>
     public async Task SendConfirmationEmailAsync(string email, string confirmationToken)
     {
         var message = new MailMessage();
@@ -34,5 +40,28 @@ public class EmailService : IEmailService
 
             await client.SendMailAsync(message);
         }
+    }
+
+    /// <summary>
+    /// Sends the code to the user's email.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="totpCode"></param>
+    public async Task Send2FaVerificationCode(User user, string totpCode)
+    {
+        var message = new MailMessage();
+        message.From = new MailAddress(_userEmail);
+        message.To.Add(user.Email);
+        message.Subject = "Log in with 2FA code.";
+        
+        message.Body = $"Your 2FA password is: {totpCode}" +
+                       $"\nThe code expires in 30 seconds.";
+
+        using var client = new SmtpClient("smtp.gmail.com", 587);
+        client.UseDefaultCredentials = false;
+        client.EnableSsl = true;
+        client.Credentials = new NetworkCredential(_userEmail, _emailPassword);
+
+        await client.SendMailAsync(message);
     }
 }
