@@ -42,7 +42,8 @@ public class UserService : IUserService
             Email = registerUserDto.Email,
             Password = hashedPassword,
             Enabled = false,
-            VerificationCode = verificationToken
+            VerificationCode = verificationToken,
+            _2FA_enabled = false
         };
 
         if (! (registerUserDto.Role.Equals(1) || registerUserDto.Role.Equals(2) || registerUserDto.Role.Equals(3)) || registerUserDto.Role is null)

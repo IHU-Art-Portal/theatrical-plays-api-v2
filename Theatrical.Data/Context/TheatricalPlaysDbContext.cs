@@ -351,6 +351,10 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasColumnName("password");
 
             entity.Property(e => e.VerificationCode).HasColumnName("verification_code");
+
+            entity.Property(u => u._2FA_enabled).HasColumnName("2FA_enabled");
+
+            entity.Property(u => u._2FA_code).HasColumnName("2FA_code");
         });
         
         modelBuilder.Entity<Authority>(entity =>
