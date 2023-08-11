@@ -9,6 +9,7 @@ public interface IEmailService
 {
     Task SendConfirmationEmailAsync(string email, string confirmationToken);
     Task Send2FaVerificationCode(User user, string totpCode);
+    Task SendConfirmationEmailTwoFactorActivated(string email);
 }
 
 public class EmailService : IEmailService
@@ -31,6 +32,26 @@ public class EmailService : IEmailService
         
         var confirmationLink = $"https://localhost:7042/api/user/verify?token={confirmationToken}";
         message.Body = $"Please confirm your email address by clicking the following link: {confirmationLink}";
+
+        using (var client = new SmtpClient("smtp.gmail.com", 587))
+        {
+            client.UseDefaultCredentials = false;
+            client.EnableSsl = true;
+            client.Credentials = new NetworkCredential(_userEmail, _emailPassword);
+
+            await client.SendMailAsync(message);
+        }
+    }
+    
+    public async Task SendConfirmationEmailTwoFactorActivated(string email)
+    {
+        var message = new MailMessage();
+        message.From = new MailAddress(_userEmail);
+        message.To.Add(email);
+        message.Subject = "Account 2FA Activated";
+        
+        message.Body = $"You have successfully activated two factor authentication." +
+                       $"\nFrom now on you will be required to enter the 2fa code when attempting to log in.";
 
         using (var client = new SmtpClient("smtp.gmail.com", 587))
         {

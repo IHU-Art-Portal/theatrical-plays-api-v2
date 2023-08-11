@@ -178,6 +178,8 @@ public class UserController : ControllerBase
 
         await _service.ActivateTwoFactorAuthentication(user!);
 
+        await _emailService.SendConfirmationEmailTwoFactorActivated(user!.Email);
+
         var response = new ApiResponse("Two Factor Authentication Activated!");
 
         return new OkObjectResult(response);
