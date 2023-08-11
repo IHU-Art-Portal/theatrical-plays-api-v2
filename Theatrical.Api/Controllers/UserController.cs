@@ -185,6 +185,12 @@ public class UserController : ControllerBase
         return new OkObjectResult(response);
     }
 
+    [HttpOptions("disable2fa")]
+    public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth(LoginUserDto userDto)
+    {
+        return Ok();
+    }
+
     /// <summary>
     /// Use this after getting your f2a code from email.
     /// Verifies the code,
