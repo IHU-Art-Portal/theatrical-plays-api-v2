@@ -14,6 +14,7 @@ public interface IUserService
     Task EnableAccount(User user);
     string GenerateOTP(User user);
     Task Save2FaCode(User user, string totpCode);
+    Task ActivateTwoFactorAuthentication(User user);
 }
 
 public class UserService : IUserService
@@ -125,6 +126,15 @@ public class UserService : IUserService
     public async Task Save2FaCode(User user, string totpCode)
     {
         await _repository.Update2Fa(user, totpCode);
+    }
+
+    /// <summary>
+    /// Activates 2fa.
+    /// </summary>
+    /// <param name="user"></param>
+    public async Task ActivateTwoFactorAuthentication(User user)
+    {
+        await _repository.Activate2Fa(user);
     }
 }
 

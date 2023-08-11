@@ -3,7 +3,6 @@ using OtpNet;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
-using Theatrical.Services.Jwt;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -80,7 +79,7 @@ public class UserValidationService : IUserValidationService
 
         if (user._2FA_enabled)
         {
-            report.Message = "2FA is enabled, check your email for your one time code to log in.";
+            report.Message = "2FA is already enabled, check your email if you attempted to login.";
             report.Success = false;
             report.ErrorCode = ErrorCode._2FaEnabled;
             return (report, user);

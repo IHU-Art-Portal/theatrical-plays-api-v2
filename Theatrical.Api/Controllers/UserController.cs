@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using OtpNet;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
@@ -119,13 +120,13 @@ public class UserController : ControllerBase
     {
         try
         {
-            var (report, user) = await _validation.ValidateForLogin(loginUserDto);
+            var (validationReport, user) = await _validation.ValidateForLogin(loginUserDto);
 
-            if (!report.Success)
+            if (!validationReport.Success)
             {
-                if (report.ErrorCode.Equals(ErrorCode._2FaEnabled))
+                if (validationReport.ErrorCode.Equals(ErrorCode._2FaEnabled))
                 {
-                    var errorResponse2Fa = new ApiResponse((ErrorCode)report.ErrorCode, report.Message!);
+                    var errorResponse2Fa = new ApiResponse((ErrorCode)validationReport.ErrorCode, validationReport.Message!);
 
                     //Creates the 2fa code
                     var totpCode = _service.GenerateOTP(user!);
@@ -139,7 +140,7 @@ public class UserController : ControllerBase
                     return new ObjectResult(errorResponse2Fa){StatusCode = (int) HttpStatusCode.Conflict};
                 }
                 
-                var errorResponse = new ApiResponse((ErrorCode)report.ErrorCode!, report.Message!);
+                var errorResponse = new ApiResponse((ErrorCode)validationReport.ErrorCode!, validationReport.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
@@ -155,6 +156,31 @@ public class UserController : ControllerBase
 
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
+    }
+    
+    
+    [HttpPost("enable2fa")]
+    public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth(LoginUserDto userDto)
+    {
+        var (validation, user) = await _validation.ValidateForLogin(userDto);
+
+        if (!validation.Success)
+        {
+            if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
+            {
+                var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
+            }
+            
+            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+            return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+        }
+
+        await _service.ActivateTwoFactorAuthentication(user!);
+
+        var response = new ApiResponse("Two Factor Authentication Activated!");
+
+        return new OkObjectResult(response);
     }
 
     /// <summary>
