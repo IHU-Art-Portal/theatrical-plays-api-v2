@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using OtpNet;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
@@ -79,7 +78,6 @@ public class UserController : ControllerBase
     {
         try
         {
-            
             var (verification, user) = await _validation.VerifyEmailToken(token);
             
             if (!verification.Success)
@@ -163,33 +161,75 @@ public class UserController : ControllerBase
     [HttpPost("enable2fa")]
     public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth(LoginUserDto userDto)
     {
-        var (validation, user) = await _validation.ValidateForLogin(userDto);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-            return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            var (validation, user) = await _validation.ValidateForLogin(userDto);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
+            {
+                var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
+            }
+
+            await _service.ActivateTwoFactorAuthentication(user!);
+
+            await _emailService.SendConfirmationEmailTwoFactorActivated(user!.Email);
+
+            var response = new ApiResponse("Two Factor Authentication Activated!");
+
+            return new OkObjectResult(response);
         }
-        
-        if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
+        catch (Exception e)
         {
-            var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-            return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
-
-        await _service.ActivateTwoFactorAuthentication(user!);
-
-        await _emailService.SendConfirmationEmailTwoFactorActivated(user!.Email);
-
-        var response = new ApiResponse("Two Factor Authentication Activated!");
-
-        return new OkObjectResult(response);
     }
 
-    [HttpOptions("disable2fa")]
+    [HttpPost("disable2fa")]
     public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth(LoginUserDto userDto)
     {
-        return Ok();
+        try
+        {
+            var (validation, user) = await _validation.ValidateFor2FaDeactivation(userDto);
+
+            //Executes when something fails. Or if two factor authentication is already disabled.
+            if (!validation.Success)
+            {
+                if (validation.ErrorCode.Equals(ErrorCode.NotFound))
+                {
+                    var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                    return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+                }
+
+                if (validation.ErrorCode.Equals(ErrorCode._2FaDisabled))
+                {
+                    var errorResponseAlreadyDisabled =
+                        new ApiResponse((ErrorCode)validation.ErrorCode, validation.Message!);
+                    return new ObjectResult(errorResponseAlreadyDisabled) { StatusCode = (int)HttpStatusCode.Conflict };
+                }
+            }
+
+            //Success Scenario.---------------------------------------------------------------------------------------------
+            await _service.DeactivateTwoFactorAuthentication(user!);
+
+            var response = new ApiResponse("Two Factor Authentication Disabled.");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
     }
 
     /// <summary>
@@ -203,19 +243,28 @@ public class UserController : ControllerBase
     [HttpPost("login/2fa/{code}")]
     public async Task<ActionResult<ApiResponse>> Login2Fa([FromRoute]int code)
     {
-        var (validation, user) = await _validation.VerifyOtp(code.ToString().Trim());
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-            return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.Unauthorized};
-        }
+            var (validation, user) = await _validation.VerifyOtp(code.ToString().Trim());
 
-        var jwtDto = _service.GenerateToken(user!);
-        
-        var response = new ApiResponse<JwtDto>(jwtDto, validation.Message!);
-        
-        return new OkObjectResult(response);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.Unauthorized };
+            }
+
+            var jwtDto = _service.GenerateToken(user!);
+
+            var response = new ApiResponse<JwtDto>(jwtDto, validation.Message!);
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
     }
 
     /// <summary>

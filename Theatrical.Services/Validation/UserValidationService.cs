@@ -14,6 +14,7 @@ public interface IUserValidationService
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
     Task<(ValidationReport, User?)> VerifyEmailToken(string token);
     Task<(ValidationReport, User?)> VerifyOtp(string otpCode);
+    Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(LoginUserDto loginUserDto);
 }
 
 public class UserValidationService : IUserValidationService
@@ -178,5 +179,39 @@ public class UserValidationService : IUserValidationService
         report.Message = "Authentication successful!";
         
         return (report, user);
+    }
+
+    /// <summary>
+    /// Calls login validation.
+    /// Completed checks and returns the appropriate ValidationReport model.
+    /// </summary>
+    /// <param name="loginUserDto"></param>
+    /// <returns></returns>
+    public async Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(LoginUserDto loginUserDto)
+    {
+        var (validation, user) = await ValidateForLogin(loginUserDto);
+        var validationReport = new ValidationReport();
+
+        if (!validation.Success)
+        {
+            //If validation in login fails, it returns the validation model and null user.
+            return (validation, null);
+        }
+        
+        if (!(user!._2FA_enabled))
+        {
+            //If user's 2fa is disabled then it returns as error. and null user.
+            validationReport.Success = false;
+            validationReport.Message = "2FA is not active for your account";
+            validationReport.ErrorCode = ErrorCode._2FaDisabled;
+
+            return (validationReport, null);
+        }
+
+        //Successful case. 2FA is enabled. thus can be deactivated.
+        validationReport.Success = true;
+        validationReport.Message = "2FA is active and can be disabled";
+
+        return (validationReport, user);
     }
 }

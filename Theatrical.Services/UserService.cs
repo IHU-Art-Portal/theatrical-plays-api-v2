@@ -15,6 +15,7 @@ public interface IUserService
     string GenerateOTP(User user);
     Task Save2FaCode(User user, string totpCode);
     Task ActivateTwoFactorAuthentication(User user);
+    Task DeactivateTwoFactorAuthentication(User user);
 }
 
 public class UserService : IUserService
@@ -137,6 +138,15 @@ public class UserService : IUserService
         var hexString = Base32Encoding.ToString(secretKeyBytes);
         
         await _repository.Activate2Fa(user, hexString);
+    }
+
+    /// <summary>
+    /// Deactivates 2fa.
+    /// </summary>
+    /// <param name="user"></param>
+    public async Task DeactivateTwoFactorAuthentication(User user)
+    {
+        await _repository.Deactivate2Fa(user);
     }
 }
 

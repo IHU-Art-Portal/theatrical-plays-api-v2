@@ -16,7 +16,8 @@ public enum ErrorCode
     InvalidEmail,
     AlreadyVerified,
     _2FaEnabled,
-    _2FaFailure
+    _2FaFailure,
+    _2FaDisabled
 }
 
 public class ApiResponse
