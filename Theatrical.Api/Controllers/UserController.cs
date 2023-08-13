@@ -220,6 +220,8 @@ public class UserController : ControllerBase
             //Success Scenario.---------------------------------------------------------------------------------------------
             await _service.DeactivateTwoFactorAuthentication(user!);
 
+            await _emailService.SendConfirmationEmailTwoFactorDeactivated(user!.Email);
+
             var response = new ApiResponse("Two Factor Authentication Disabled.");
 
             return new OkObjectResult(response);
