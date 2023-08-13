@@ -15,7 +15,7 @@ public interface IUserRepository
     Task<User?> SearchToken(string token);
     Task<User?> SearchOtp(string otp);
     Task Update2Fa(User user, string otp);
-    Task Activate2Fa(User user);
+    Task Activate2Fa(User user, string userSecret);
 }
 
 public class UserRepository : IUserRepository
@@ -106,9 +106,10 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task Activate2Fa(User user)
+    public async Task Activate2Fa(User user, string userSecret)
     {
         user._2FA_enabled = true;
+        user.UserSecret = userSecret;
         await _context.SaveChangesAsync();
     }
 }

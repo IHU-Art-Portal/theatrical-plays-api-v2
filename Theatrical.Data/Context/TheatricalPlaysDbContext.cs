@@ -355,6 +355,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u._2FA_enabled).HasColumnName("2FA_enabled");
 
             entity.Property(u => u._2FA_code).HasColumnName("2FA_code");
+            
+            entity.Property(u => u.UserSecret).HasColumnName("user_secret");
         });
         
         modelBuilder.Entity<Authority>(entity =>
