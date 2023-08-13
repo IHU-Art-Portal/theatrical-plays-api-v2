@@ -124,24 +124,25 @@ public class UserController : ControllerBase
 
             if (!validationReport.Success)
             {
-                if (validationReport.ErrorCode.Equals(ErrorCode._2FaEnabled))
-                {
-                    var errorResponse2Fa = new ApiResponse((ErrorCode)validationReport.ErrorCode, validationReport.Message!);
-
-                    //Creates the 2fa code
-                    var totpCode = _service.GenerateOTP(user!);
-                    
-                    //Sends an email to the user with the 2fa code
-                    await _emailService.Send2FaVerificationCode(user!, totpCode);
-                    
-                    //Saves the code.
-                    await _service.Save2FaCode(user!, totpCode);
-                        
-                    return new ObjectResult(errorResponse2Fa){StatusCode = (int) HttpStatusCode.Conflict};
-                }
-                
                 var errorResponse = new ApiResponse((ErrorCode)validationReport.ErrorCode!, validationReport.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            //2fa authentication logic
+            if (validationReport.ErrorCode.Equals(ErrorCode._2FaEnabled))
+            {
+                var errorResponse2Fa = new ApiResponse((ErrorCode)validationReport.ErrorCode, validationReport.Message!);
+
+                //Creates the 2fa code
+                var totpCode = _service.GenerateOTP(user!);
+                    
+                //Sends an email to the user with the 2fa code
+                await _emailService.Send2FaVerificationCode(user!, totpCode);
+                    
+                //Saves the code.
+                await _service.Save2FaCode(user!, totpCode);
+                        
+                return new ObjectResult(errorResponse2Fa){StatusCode = (int) HttpStatusCode.Conflict};
             }
 
             var jwtDto = _service.GenerateToken(user!);
@@ -166,14 +167,14 @@ public class UserController : ControllerBase
 
         if (!validation.Success)
         {
-            if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
-            {
-                var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-                return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
-            }
-            
             var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
             return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+        }
+        
+        if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
+        {
+            var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+            return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
         }
 
         await _service.ActivateTwoFactorAuthentication(user!);
@@ -202,7 +203,7 @@ public class UserController : ControllerBase
     [HttpPost("login/2fa/{code}")]
     public async Task<ActionResult<ApiResponse>> Login2Fa([FromRoute]int code)
     {
-        var (validation, user) = await _validation.VerifyOtp(code.ToString());
+        var (validation, user) = await _validation.VerifyOtp(code.ToString().Trim());
 
         if (!validation.Success)
         {

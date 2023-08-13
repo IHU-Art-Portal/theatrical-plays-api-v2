@@ -80,7 +80,7 @@ public class UserValidationService : IUserValidationService
         if (user._2FA_enabled)
         {
             report.Message = "2FA is already enabled, check your email if you attempted to login.";
-            report.Success = false;
+            report.Success = true;
             report.ErrorCode = ErrorCode._2FaEnabled;
             return (report, user);
         }
@@ -157,13 +157,13 @@ public class UserValidationService : IUserValidationService
             return (report, null);
         }
 
-        var verificationCodeGuide = Guid.Parse(user.VerificationCode!);
-
-        byte[] secretKeyBytes = verificationCodeGuide.ToByteArray();
+        byte[] secretKeyBytes = Base32Encoding.ToBytes(user.UserSecret);
 
         var totp = new Totp(secretKeyBytes);
+        
+        var window = new VerificationWindow(previous: 1, future: 1);
 
-        bool isCodeValid = totp.VerifyTotp(otpCode, out long timeStepMatched);
+        bool isCodeValid = totp.VerifyTotp(otpCode, out var timeWindowUsed, VerificationWindow.RfcSpecifiedNetworkDelay);
         
         if (!isCodeValid)
         {

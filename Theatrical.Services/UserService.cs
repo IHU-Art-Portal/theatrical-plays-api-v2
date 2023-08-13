@@ -107,13 +107,11 @@ public class UserService : IUserService
     /// <returns></returns>
     public string GenerateOTP(User user)
     {
-        var verificationCodeGuid = Guid.Parse(user.VerificationCode!);
-
-        byte[] secretKeyBytes = verificationCodeGuid.ToByteArray();
+        byte[] secretKeyBytes = Base32Encoding.ToBytes(user.UserSecret);
 
         var totp = new Totp(secretKeyBytes);
 
-        var totpCode = totp.ComputeTotp();
+        var totpCode = totp.ComputeTotp(DateTime.UtcNow);
 
         return totpCode;
     }
@@ -134,7 +132,11 @@ public class UserService : IUserService
     /// <param name="user"></param>
     public async Task ActivateTwoFactorAuthentication(User user)
     {
-        await _repository.Activate2Fa(user);
+        var secretKeyBytes = KeyGeneration.GenerateRandomKey(20);
+
+        var hexString = Base32Encoding.ToString(secretKeyBytes);
+        
+        await _repository.Activate2Fa(user, hexString);
     }
 }
 
