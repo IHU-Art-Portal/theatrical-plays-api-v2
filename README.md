@@ -68,12 +68,15 @@ The `UserController` is responsible for managing requests like registration, log
 
 ## 📚 Methods
 
-| Method   | Endpoint                 |
-|----------|--------------------------|
-| **POST** | `/api/user`              |
-| **GET**  | `/api/user/verify`       |
-| **POST** | `/api/user/login`        |
-| **GET**  | `/api/user/{id}/balance` |
+| Method   | Endpoint                     |
+|----------|------------------------------|
+| **POST** | `/api/user`                  |
+| **GET**  | `/api/user/verify`           |
+| **POST** | `/api/user/login`            |
+| **GET**  | `/api/user/{id}/balance`     |
+| **POST** | `/api/user/enabled2fa`       |
+| **POST** | `/api/user/disabled2fa`      |
+| **POST** | `/api/user/login/2fa/{code}` |
 
 ### 🌟 Register
 
@@ -142,11 +145,67 @@ It returns a `JwtDto` wrapped in `ApiResponse`.
 | **GET** | `/api/user/{id}/balance` |
 
 This endpoint is used to find someone's balance (credits). 💰
-It returns a message wrapped in `ApiResponse`. The message overrides the data field.
 
 | Parameter | Type           | Description     |
 |-----------|----------------|-----------------|
 | `Id`      | Path parameter | ID of the user  |
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data. 👍
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
+
+---
+
+### 🔐 Enable 2FA
+
+| Method     | Endpoint               |
+|------------|------------------------|
+| **POST**   | `/api/user/enable2fa`  |
+
+This endpoint is used to enable someone's enabled.
+
+| Parameter      | Type         | Description                       |
+|----------------|--------------|-----------------------------------|
+| `LoginUserDto` | Request Body | {string: Email, string: Password} |
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data. 👍
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
+
+---
+
+### 🔐❌ Disable 2FA
+
+| Method     | Endpoint               |
+|------------|------------------------|
+| **POST**   | `/api/user/disable2fa` |
+
+This endpoint is used to disable someone's enabled.
+
+| Parameter      | Type         | Description                       |
+|----------------|--------------|-----------------------------------|
+| `LoginUserDto` | Request Body | {string: Email, string: Password} |
+
+**Responses:**
+
+- If successful, returns an `ApiResponse` with a success message and related data. 👍
+- If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
+
+---
+
+### 🔐 Login with 2FA Code
+
+| Method     | Endpoint                      |
+|------------|-------------------------------|
+| **POST**   | `/api/user/login/2fa/{code}`  |
+
+This endpoint is used to login with 2FA code.
+
+| Parameter | Type           | Description                                                     |
+|-----------|----------------|-----------------------------------------------------------------|
+| `code`    | Path Parameter | 6 digit code sent to your email after trying to login normally. |
 
 **Responses:**
 
