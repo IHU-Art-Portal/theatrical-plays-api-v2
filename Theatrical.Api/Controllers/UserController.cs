@@ -9,6 +9,8 @@ using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
+
+//test
 [ApiController]
 [Route("api/[controller]")]
 [EnableCors("AllowOrigin")]
