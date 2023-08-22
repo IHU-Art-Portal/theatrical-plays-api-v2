@@ -1,4 +1,5 @@
-﻿using Theatrical.Data.Models;
+﻿using System.Security.Claims;
+using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
 using OtpNet;
@@ -16,6 +17,7 @@ public interface IUserService
     Task Save2FaCode(User user, string totpCode);
     Task ActivateTwoFactorAuthentication(User user);
     Task DeactivateTwoFactorAuthentication(User user);
+    ClaimsPrincipal? VerifyToken(string token);
 }
 
 public class UserService : IUserService
@@ -147,6 +149,11 @@ public class UserService : IUserService
     public async Task DeactivateTwoFactorAuthentication(User user)
     {
         await _repository.Deactivate2Fa(user);
+    }
+
+    public ClaimsPrincipal? VerifyToken(string token)
+    {
+        return _tokenService.VerifyToken(token);
     }
 }
 

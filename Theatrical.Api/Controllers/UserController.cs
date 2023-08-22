@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
@@ -110,7 +109,10 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Use this to login in.
-    /// Logging in provides a JWT to user.
+    /// Checks the request authorization header. (If the user is already logged in).
+    /// Validates the user.
+    /// Two factor authentication logic, for users who have enabled 2fa.
+    /// After these checks, it provides the user with a JWT.
     /// Use the token for locked actions.
     /// </summary>
     /// <param name="loginUserDto"></param>
@@ -120,6 +122,17 @@ public class UserController : ControllerBase
     {
         try
         {
+            var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
+            
+            var authHeaderReport = _validation.ValidateAuthorizationHeader(authorizationHeader);
+
+            if (!authHeaderReport.Success)
+            {
+                var loggedInResponse =
+                    new ApiResponse((ErrorCode)authHeaderReport.ErrorCode!, authHeaderReport.Message!);
+                return new ConflictObjectResult(loggedInResponse);
+            }
+            
             var (validationReport, user) = await _validation.ValidateForLogin(loginUserDto);
 
             if (!validationReport.Success)
@@ -127,7 +140,8 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validationReport.ErrorCode!, validationReport.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
-            
+
+
             //2fa authentication logic
             if (validationReport.ErrorCode.Equals(ErrorCode._2FaEnabled))
             {
@@ -159,7 +173,14 @@ public class UserController : ControllerBase
         }
     }
     
-    
+    /// <summary>
+    /// Enables two factor authentication for the logged in user.
+    /// Checks authorization header and retrieves the email => User validation logic.
+    /// If successful 2fa is enabled!
+    /// If not it provides user with the appropriate message.
+    /// Any role can use this endpoint.
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("enable2fa")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth()
@@ -182,7 +203,6 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponseConflict) { StatusCode = (int)HttpStatusCode.Conflict };
             }
             
-
             await _service.ActivateTwoFactorAuthentication(user!);
 
             await _emailService.SendConfirmationEmailTwoFactorActivated(user!.Email);
@@ -199,6 +219,14 @@ public class UserController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Disables two factor authentication for the logged in user.
+    /// Checks authorization header and retrieves the email => User validation logic.
+    /// If successful 2fa is disabled!
+    /// If not it provides user with the appropriate message.
+    /// Any role can use this endpoint.
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("disable2fa")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth()
@@ -243,7 +271,7 @@ public class UserController : ControllerBase
     }
 
     /// <summary>
-    /// Use this after getting your f2a code from email.
+    /// Use this after getting your one time passcode from email.
     /// Verifies the code,
     /// Generates a login token (jwt),
     /// Sends appropriate reply.
@@ -279,6 +307,7 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Provides the balance of a user.
+    /// Anyone can use this endpoint (22/08/2023).
     /// </summary>
     /// <param name="id">user's id</param>
     /// <returns>Available User Credits</returns>

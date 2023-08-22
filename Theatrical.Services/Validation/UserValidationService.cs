@@ -11,6 +11,7 @@ public interface IUserValidationService
 {
     Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto);
     Task<(ValidationReport report, User? user)> ValidateForLogin(LoginUserDto loginUserDto);
+    ValidationReport ValidateAuthorizationHeader(string? authorizationHeader);
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
     Task<(ValidationReport, User?)> VerifyEmailToken(string token);
     Task<(ValidationReport, User?)> VerifyOtp(string otpCode);
@@ -91,6 +92,31 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         return (report, user);
 
+    }
+
+    public ValidationReport ValidateAuthorizationHeader(string? authorizationHeader)
+    {
+        var report = new ValidationReport();
+        
+        if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+        {
+            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+
+            var principal = _userService.VerifyToken(token);
+
+            if (principal is not null)
+            {
+                report.Success = false;
+                report.Message = "User is already logged in!";
+                report.ErrorCode = ErrorCode.AlreadyLoggedIn;
+
+                return report;
+            }
+        }
+
+        report.Success = true;
+        
+        return report;
     }
 
     public async Task<(ValidationReport, decimal)> ValidateBalance(int id)

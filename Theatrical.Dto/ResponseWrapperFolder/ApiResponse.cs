@@ -17,7 +17,8 @@ public enum ErrorCode
     AlreadyVerified,
     _2FaEnabled,
     _2FaFailure,
-    _2FaDisabled
+    _2FaDisabled,
+    AlreadyLoggedIn
 }
 
 public class ApiResponse
