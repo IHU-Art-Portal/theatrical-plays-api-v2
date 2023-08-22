@@ -69,7 +69,7 @@ public class EmailService : IEmailService
         var message = new MailMessage();
         message.From = new MailAddress(_userEmail);
         message.To.Add(email);
-        message.Subject = "Account 2FA Activated";
+        message.Subject = "Account 2FA Deactivated";
         
         message.Body = $"You have deactivated two factor authentication.";
 
