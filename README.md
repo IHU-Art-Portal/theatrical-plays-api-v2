@@ -86,9 +86,9 @@ The `UserController` is responsible for managing requests like registration, log
 
 Use this method to register for the service.
 
-| Parameter         | Type         | Description                         |
-|-------------------|--------------|-------------------------------------|
-| `RegisterUserDto` | Request body | Data for creating a user.           |
+| Parameter         | Type         | Description                                                                                                                                      |
+|-------------------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `RegisterUserDto` | Request body | {string: Email, string: Password, int: Role}<br/><br/>Role = 1 for admin, Role = 2 for user, Role = 3 for developer, Role = 4 for claims manager |
 
 **Responses:**
 
@@ -104,7 +104,7 @@ Use this method to register for the service.
 |---------|--------------------|
 | **GET** | `/api/user/verify` |
 
-Use this method to verify an account. ✅
+Use this method to verify your email address. ✅
 
 | Parameter  | Type            | Description                      |
 |------------|-----------------|----------------------------------|
@@ -134,6 +134,11 @@ It returns a `JwtDto` wrapped in `ApiResponse`.
 
 - If successful, returns a `JwtDto` wrapped in `ApiResponse`. ✅
 - If validation fails, returns an `ApiResponse` with an appropriate error message and related data. ❌
+
+| Responses | Type         | Description                                                 |
+|-----------|--------------|-------------------------------------------------------------|
+| `JwtDto`  | Successful ✅ | {string: access_token, string: token_type, int: expires_in} |
+|           | Failed ❌     | {Error data}                                                |
 
 
 ---
@@ -165,10 +170,10 @@ This endpoint is used to find someone's balance (credits). 💰
 
 This endpoint is used to enable someone's enabled.
 
-| Parameter      | Type         | Description                       |
-|----------------|--------------|-----------------------------------|
-| `LoginUserDto` | Request Body | {string: Email, string: Password} |
-
+| Parameter | Type                         | Description                                                                                                             |
+|-----------|------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `JWT`     | Request Authorization Header | JWT from authorization Header.<br/><br/>This Ensures that a user must be logged in, and can change his own status only. |
+ 
 **Responses:**
 
 - If successful, returns an `ApiResponse` with a success message and related data. 👍
@@ -184,9 +189,10 @@ This endpoint is used to enable someone's enabled.
 
 This endpoint is used to disable someone's enabled.
 
-| Parameter      | Type         | Description                       |
-|----------------|--------------|-----------------------------------|
-| `LoginUserDto` | Request Body | {string: Email, string: Password} |
+| Parameter | Type                         | Description                                                                                                             |
+|-----------|------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| `JWT`     | Request Authorization Header | JWT from authorization Header.<br/><br/>This Ensures that a user must be logged in, and can change his own status only. |
+
 
 **Responses:**
 
