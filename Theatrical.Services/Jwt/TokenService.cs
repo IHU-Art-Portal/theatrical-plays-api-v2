@@ -43,6 +43,8 @@ public class TokenService : ITokenService
             claims.Add(new Claim(ClaimTypes.Role, "user"));
         else if (userIntRole == 3)
             claims.Add(new Claim(ClaimTypes.Role, "developer"));
+        else if (userIntRole == 4)
+            claims.Add(new Claim(ClaimTypes.Role, "claims manager"));
         
         var securityKey = new SymmetricSecurityKey(key);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

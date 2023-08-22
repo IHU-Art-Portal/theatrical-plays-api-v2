@@ -126,6 +126,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddScoped<AdminAuthorizationFilter>();
 builder.Services.AddScoped<UserAuthorizationFilter>();
 builder.Services.AddScoped<AnyRoleAuthorizationFilter>();
+builder.Services.AddScoped<ClaimsManagerAuthorizationFilter>();
 
 //cors
 builder.Services.AddCors(options =>
