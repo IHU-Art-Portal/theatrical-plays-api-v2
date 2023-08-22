@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
@@ -83,14 +85,13 @@ public class UserController : ControllerBase
             
             if (!verification.Success)
             {
+                if (verification.ErrorCode == ErrorCode.AlreadyVerified)
+                {
+                    var responseVerified = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
+                    return new ConflictObjectResult(responseVerified);
+                }
                 var errorResponse = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
                 return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
-            }
-
-            if (verification.ErrorCode == ErrorCode.AlreadyVerified)
-            {
-                var responseVerified = new ApiResponse(verification.Message!);
-                return new OkObjectResult(responseVerified);
             }
 
             await _service.EnableAccount(user!);
@@ -160,23 +161,27 @@ public class UserController : ControllerBase
     
     
     [HttpPost("enable2fa")]
-    public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth(LoginUserDto userDto)
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth()
     {
         try
         {
-            var (validation, user) = await _validation.ValidateForLogin(userDto);
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateFor2FaActivation(email);
 
             if (!validation.Success)
             {
-                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
-            }
+                if (validation.ErrorCode.Equals(ErrorCode.NotFound))
+                {
+                    var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                    return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+                }
 
-            if (validation.ErrorCode.Equals(ErrorCode._2FaEnabled))
-            {
-                var response2FaActivated = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-                return new ObjectResult(response2FaActivated) { StatusCode = (int)HttpStatusCode.Conflict };
+                var errorResponseConflict = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponseConflict) { StatusCode = (int)HttpStatusCode.Conflict };
             }
+            
 
             await _service.ActivateTwoFactorAuthentication(user!);
 
@@ -195,11 +200,14 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("disable2fa")]
-    public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth(LoginUserDto userDto)
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth()
     {
         try
         {
-            var (validation, user) = await _validation.ValidateFor2FaDeactivation(userDto);
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var (validation, user) = await _validation.ValidateFor2FaDeactivation(email);
 
             //Executes when something fails. Or if two factor authentication is already disabled.
             if (!validation.Success)
@@ -212,8 +220,7 @@ public class UserController : ControllerBase
 
                 if (validation.ErrorCode.Equals(ErrorCode._2FaDisabled))
                 {
-                    var errorResponseAlreadyDisabled =
-                        new ApiResponse((ErrorCode)validation.ErrorCode, validation.Message!);
+                    var errorResponseAlreadyDisabled = new ApiResponse((ErrorCode)validation.ErrorCode, validation.Message!);
                     return new ObjectResult(errorResponseAlreadyDisabled) { StatusCode = (int)HttpStatusCode.Conflict };
                 }
             }

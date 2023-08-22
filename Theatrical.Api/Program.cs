@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Theatrical.Api;
 using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
@@ -120,6 +121,11 @@ builder.Services.AddTransient<IDataCurator, DataCurator>();
 
 //Email service
 builder.Services.AddTransient<IEmailService, EmailService>();
+
+//Authorization Filters
+builder.Services.AddScoped<AdminAuthorizationFilter>();
+builder.Services.AddScoped<UserAuthorizationFilter>();
+builder.Services.AddScoped<AnyRoleAuthorizationFilter>();
 
 //cors
 builder.Services.AddCors(options =>

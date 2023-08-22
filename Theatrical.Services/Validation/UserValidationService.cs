@@ -14,7 +14,8 @@ public interface IUserValidationService
     Task<(ValidationReport, decimal)> ValidateBalance(int id);
     Task<(ValidationReport, User?)> VerifyEmailToken(string token);
     Task<(ValidationReport, User?)> VerifyOtp(string otpCode);
-    Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(LoginUserDto loginUserDto);
+    Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email);
+    Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email);
 }
 
 public class UserValidationService : IUserValidationService
@@ -128,7 +129,7 @@ public class UserValidationService : IUserValidationService
 
         if ((bool)user.Enabled!)
         {
-            report.Success = true;
+            report.Success = false;
             report.Message = "You have already verified your email address";
             report.ErrorCode = ErrorCode.AlreadyVerified;
             return (report, null);
@@ -180,38 +181,64 @@ public class UserValidationService : IUserValidationService
         
         return (report, user);
     }
-
+    
     /// <summary>
     /// Calls login validation.
     /// Completed checks and returns the appropriate ValidationReport model.
     /// </summary>
-    /// <param name="loginUserDto"></param>
+    /// <param name="email"></param>
     /// <returns></returns>
-    public async Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(LoginUserDto loginUserDto)
+    public async Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email)
     {
-        var (validation, user) = await ValidateForLogin(loginUserDto);
-        var validationReport = new ValidationReport();
+        var user = await _repository.Get(email);
+        var report = new ValidationReport();
 
-        if (!validation.Success)
+        if (user is null)
         {
-            //If validation in login fails, it returns the validation model and null user.
-            return (validation, null);
+            report.Success = false;
+            report.Message = "Invalid User.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
         }
         
-        if (!(user!._2FA_enabled))
+        if (!user._2FA_enabled)
         {
-            //If user's 2fa is disabled then it returns as error. and null user.
-            validationReport.Success = false;
-            validationReport.Message = "2FA is not active for your account";
-            validationReport.ErrorCode = ErrorCode._2FaDisabled;
+            report.Success = false;
+            report.Message = "2FA is not enabled for your account.";
+            report.ErrorCode = ErrorCode._2FaDisabled;
+            return (report, null);
+        }
+        
+        report.Success = true;
+        report.Message = "2FA is enabled and can be disabled";
 
-            return (validationReport, null);
+        return (report, user);
+    }
+
+    public async Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email)
+    {
+        var user = await _repository.Get(email);
+        var report = new ValidationReport();
+        
+        if (user is null)
+        {
+            report.Success = false;
+            report.Message = "Invalid User.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
         }
 
-        //Successful case. 2FA is enabled. thus can be deactivated.
-        validationReport.Success = true;
-        validationReport.Message = "2FA is active and can be disabled";
+        if (user._2FA_enabled)
+        {
+            report.Success = false;
+            report.Message = "2FA is already active for your account";
+            report.ErrorCode = ErrorCode._2FaEnabled;
+            return (report, null);
+        }
 
-        return (validationReport, user);
+        report.Success = true;
+        report.Message = "2FA is disabled and can be enabled";
+
+        return (report, user);
     }
 }
