@@ -1,13 +1,12 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using OtpNet;
 using Theatrical.Data.Models;
 
 namespace Theatrical.Services.Email;
 
 public interface IEmailService
 {
-    Task SendConfirmationEmailAsync(string email, string confirmationToken);
+    Task SendConfirmationEmailAsync(string email, string url);
     Task Send2FaVerificationCode(User user, string totpCode);
     Task SendConfirmationEmailTwoFactorActivated(string email);
     Task SendConfirmationEmailTwoFactorDeactivated(string email);
@@ -22,17 +21,15 @@ public class EmailService : IEmailService
     /// Sends a verification code to the registering user.
     /// </summary>
     /// <param name="email"></param>
-    /// <param name="confirmationToken"></param>
-    public async Task SendConfirmationEmailAsync(string email, string confirmationToken)
+    /// <param name="url"></param>
+    public async Task SendConfirmationEmailAsync(string email, string url)
     {
         var message = new MailMessage();
         message.From = new MailAddress(_userEmail);
         message.To.Add(email);
         message.Subject = "Account Confirmation";
 
-        
-        var confirmationLink = $"https://localhost:7042/api/user/verify?token={confirmationToken}";
-        message.Body = $"Please confirm your email address by clicking the following link: {confirmationLink}";
+        message.Body = $"Please confirm your email address by clicking the following link: {url}";
 
         using (var client = new SmtpClient("smtp.gmail.com", 587))
         {

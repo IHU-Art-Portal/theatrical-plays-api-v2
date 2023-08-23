@@ -52,9 +52,11 @@ public class UserController : ControllerBase
             //Generate the verification token
             var verificationToken = Guid.NewGuid().ToString();
 
+            //URI to verification endpoint.
+            var verificationUrl = $"{Request.Scheme}://{Request.Host}/api/user/verify?token={verificationToken}";
+
             //Send confirmation email to the registered user.
-            await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationToken);
-            
+            await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationUrl);
             
             var userCreated = await _service.Register(registerUserDto, verificationToken);
             var response = new ApiResponse<UserDtoRole>(userCreated, "Successfully Registered!");
