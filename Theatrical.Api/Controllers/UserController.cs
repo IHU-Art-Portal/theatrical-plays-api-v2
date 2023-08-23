@@ -200,6 +200,12 @@ public class UserController : ControllerBase
                     var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                     return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
                 }
+                
+                if (validation.ErrorCode.Equals(ErrorCode.InvalidEmail))
+                {
+                    var errorEmailResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                    return new BadRequestObjectResult(errorEmailResponse);
+                }
 
                 var errorResponseConflict = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponseConflict) { StatusCode = (int)HttpStatusCode.Conflict };

@@ -254,6 +254,14 @@ public class UserValidationService : IUserValidationService
             return (report, null);
         }
 
+        if (!(bool)user.Enabled!)
+        {
+            report.Success = false;
+            report.Message = "Verify your email in order to activate two factor authentication";
+            report.ErrorCode = ErrorCode.InvalidEmail;
+            return (report, null);
+        }
+
         if (user._2FA_enabled)
         {
             report.Success = false;
