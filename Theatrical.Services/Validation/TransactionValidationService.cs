@@ -8,6 +8,7 @@ public interface ITransactionValidationService
 {
     Task<(ValidationReport, Transaction?)> ValidateForFetch(int transactionId);
     Task<(ValidationReport, List<Transaction>?)> ValidateUserTransactions(int userId);
+    Task<(ValidationReport, User?)> ValidateForPurchase(string email);
 }
 
 public class TransactionValidationService : ITransactionValidationService
@@ -68,6 +69,24 @@ public class TransactionValidationService : ITransactionValidationService
 
         return (report, transactions);
     }
-    
+
+    public async Task<(ValidationReport, User?)> ValidateForPurchase(string email)
+    {
+        var user = await _user.Get(email);
+        var report = new ValidationReport();
+
+        if (user is null)
+        {
+            report.Message = "User is not registered. You need to register with your email in order to make a purchase";
+            report.ErrorCode = ErrorCode.NotFound;
+            report.Success = false;
+            return (report, null);
+        }
+
+        report.Message = "Purchase can be made";
+        report.Success = true;
+        
+        return (report, user);
+    }
 }
 

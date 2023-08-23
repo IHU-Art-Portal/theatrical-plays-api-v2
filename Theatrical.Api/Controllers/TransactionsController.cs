@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
+using Theatrical.Dto.TransactionDtos.PurchaseDtos;
 using Theatrical.Services;
 using Theatrical.Services.Validation;
 
@@ -21,8 +21,49 @@ public class TransactionsController : ControllerBase
         _validation = validationService;
         _service = transactionService;
     }
-    
+
     /// <summary>
+    /// Use this endpoint to purchase the premium package.
+    /// Costs and gives 5.99 in credits.
+    /// Not fully implemented yet.
+    /// </summary>
+    /// <param name="customerInformation"></param>
+    /// <returns></returns>
+    [HttpPost("PurchasePremium")]
+    public async Task<ActionResult<ApiResponse>> PurchasePremium(CustomerInformation customerInformation)
+    {
+        try
+        {
+            var (userValidated, user) = await _validation.ValidateForPurchase(customerInformation.Email);
+
+            if (!userValidated.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)userValidated.ErrorCode!, userValidated.Message!);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var (result, transaction) = await _service.PurchaseSubscription(customerInformation, user!);
+
+            var transactionResponseDto = _service.TransactionToResponseDto(transaction!);
+
+            var transactionResponse = new TransactionResponse
+            {
+                CreateTransactionResponse = result,
+                TransactionResponseDto = transactionResponseDto
+            };
+
+            var response = new ApiResponse<TransactionResponse>(transactionResponse);
+            
+            return new ObjectResult(response);
+        
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(new ApiResponse<Exception>(e));
+        }
+    }
+    
+    /*/// <summary>
     /// Endpoint to making a new transaction.
     /// </summary>
     /// <param name="transactionDto"></param>
@@ -43,7 +84,7 @@ public class TransactionsController : ControllerBase
             var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
             return new ObjectResult(exceptionResponse) { StatusCode = 500 };
         }
-    }
+    }*/
 
     /// <summary>
     /// Get a specific transaction

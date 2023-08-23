@@ -426,8 +426,11 @@ public class TheatricalPlaysDbContext : DbContext
             entity.HasOne(t => t.User)
                 .WithMany(u => u.UserTransactions)
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("usertransactions_ut1");
+
+            entity.Property(t => t.TransactionId).HasColumnName("TransactionID");
+            entity.Property(t => t.NetworkTransactionId).HasColumnName("NetworkTransactionID");
         });
 
     }
