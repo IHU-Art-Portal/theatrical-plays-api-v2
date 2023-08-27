@@ -17,6 +17,7 @@ public interface IUserValidationService
     Task<(ValidationReport, User?)> VerifyOtp(string otpCode);
     Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email);
     Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email);
+    Task<(ValidationReport, User?)> ValidateUser(string email);
 }
 
 public class UserValidationService : IUserValidationService
@@ -273,6 +274,24 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         report.Message = "2FA is disabled and can be enabled";
 
+        return (report, user);
+    }
+
+    public async Task<(ValidationReport, User?)> ValidateUser(string email)
+    {
+        var user = await _repository.GetUserAuthoritiesAndTransactions(email);
+        var report = new ValidationReport();
+        
+        if (user is null)
+        {
+            report.Success = false;
+            report.Message = "Invalid User.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "User Found!";
         return (report, user);
     }
 }

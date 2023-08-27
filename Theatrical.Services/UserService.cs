@@ -3,6 +3,8 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
 using OtpNet;
+using Theatrical.Dto.LoginDtos.ResponseDto;
+using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services.Jwt;
 
 namespace Theatrical.Services;
@@ -18,6 +20,7 @@ public interface IUserService
     Task ActivateTwoFactorAuthentication(User user);
     Task DeactivateTwoFactorAuthentication(User user);
     ClaimsPrincipal? VerifyToken(string token);
+    UserDto ToDto(User user);
 }
 
 public class UserService : IUserService
@@ -154,6 +157,43 @@ public class UserService : IUserService
     public ClaimsPrincipal? VerifyToken(string token)
     {
         return _tokenService.VerifyToken(token);
+    }
+
+    public UserDto ToDto(User user)
+    {
+
+        var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
+
+        string userRole = userIntRole switch
+        {
+            1 => "admin",
+            2 => "user",
+            3 => "developer",
+            4 => "claims manager",
+            _ => "Invalid role"
+        };
+
+        var userDto = new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email,
+            EmailVerified = user.Enabled,
+            _2FA_enabled = user._2FA_enabled,
+            Role = userRole,
+            Transactions = user.UserTransactions.Select(t => new TransactionDtoFetch
+            {
+                UserId = t.UserId,
+                CreditAmount = t.CreditAmount,
+                Reason = t.Reason,
+                DateCreated = t.DateCreated,
+                TransactionId = t.TransactionId.ToString(),
+                AuthCode = t.AuthCode,
+                AccountNumber = t.AccountNumber,
+                AccountType = t.AccountType
+            }).ToList()
+        };
+
+        return userDto;
     }
 }
 

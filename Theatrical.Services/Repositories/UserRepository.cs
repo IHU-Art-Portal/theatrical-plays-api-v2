@@ -17,6 +17,7 @@ public interface IUserRepository
     Task Update2Fa(User user, string otp);
     Task Activate2Fa(User user, string userSecret);
     Task Deactivate2Fa(User user);
+    Task<User?> GetUserAuthoritiesAndTransactions(string email);
 }
 
 public class UserRepository : IUserRepository
@@ -44,6 +45,14 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Include(u => u.UserAuthorities)
+            .FirstOrDefaultAsync(u => u.Email == email);
+    }
+    
+    public async Task<User?> GetUserAuthoritiesAndTransactions(string email)
+    {
+        return await _context.Users
+            .Include(u => u.UserAuthorities)
+            .Include(u => u.UserTransactions)
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Email;
@@ -333,6 +334,36 @@ public class UserController : ControllerBase
             }
 
             var response = new ApiResponse<string>($"You have {credits} credits.");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
+
+    [HttpGet("info")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> GetConnectedUserInfo()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var userDto = _service.ToDto(user!);
+
+            var response = new ApiResponse<UserDto>(userDto);
 
             return new OkObjectResult(response);
         }
