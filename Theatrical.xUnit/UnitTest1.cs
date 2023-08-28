@@ -4,11 +4,11 @@ namespace Theatrical.xUnit;
 
 public class UnitTest1
 {
-    private readonly DataCurator curator;
+    private readonly TestTestCurator _testTestCurator;
 
     public UnitTest1()
     {
-        curator = new DataCurator();
+        _testTestCurator = new TestTestCurator();
     }
     
     [Fact]
@@ -19,8 +19,8 @@ public class UnitTest1
         string invalidFullName = "Α1Β2Γ3";                      //invalid cases: Κώστας παπαδόπουλος, κώστας Παπαδόπουλος, etc.
         
         // Act & Assert
-        Assert.True(curator.ValidateFullName(validFullName));
-        Assert.False(curator.ValidateFullName(invalidFullName));
+        Assert.True(_testTestCurator.ValidateFullName(validFullName));
+        Assert.False(_testTestCurator.ValidateFullName(invalidFullName));
     }
     
     [Fact]
@@ -31,8 +31,8 @@ public class UnitTest1
         string invalidRole = "123";
         
         // Act & Assert
-        Assert.True(curator.ValidateRole(validRole));
-        Assert.False(curator.ValidateRole(invalidRole));
+        Assert.True(_testTestCurator.ValidateRole(validRole));
+        Assert.False(_testTestCurator.ValidateRole(invalidRole));
     }
     
     [Fact]
@@ -43,8 +43,8 @@ public class UnitTest1
         string invalidTitle = "123";
         
         // Act & Assert
-        Assert.True(curator.ValidateVenueTitle(validTitle));
-        Assert.False(curator.ValidateVenueTitle(invalidTitle));
+        Assert.True(_testTestCurator.ValidateVenueTitle(validTitle));
+        Assert.False(_testTestCurator.ValidateVenueTitle(invalidTitle));
     }
     
     [Fact]
@@ -55,7 +55,7 @@ public class UnitTest1
         string invalidTitle = "123";
         
         // Act & Assert
-        Assert.True(curator.ValidateProductionTitle(validTitle));
-        Assert.False(curator.ValidateProductionTitle(invalidTitle));
+        Assert.True(_testTestCurator.ValidateProductionTitle(validTitle));
+        Assert.False(_testTestCurator.ValidateProductionTitle(invalidTitle));
     }
 }

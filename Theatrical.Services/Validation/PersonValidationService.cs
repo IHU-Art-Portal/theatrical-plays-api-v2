@@ -22,12 +22,12 @@ public interface IPersonValidationService
 public class PersonValidationService : IPersonValidationService
 {
     private readonly IPersonRepository _repository;
-    private readonly IDataCurator _curator;
+    private readonly ITestCurator _testCurator;
 
-    public PersonValidationService(IPersonRepository repository, IDataCurator curator)
+    public PersonValidationService(IPersonRepository repository, ITestCurator testCurator)
     {
         _repository = repository;
-        _curator = curator;
+        _testCurator = testCurator;
     }
 
     public async Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId)
@@ -159,7 +159,7 @@ public class PersonValidationService : IPersonValidationService
 
     public async Task<ValidationReport> ValidateForCreate(string fullName)
     {
-        bool isValid = _curator.ValidateFullName(fullName);
+        bool isValid = _testCurator.ValidateFullName(fullName);
         var report = new ValidationReport();
         
         if (!isValid)

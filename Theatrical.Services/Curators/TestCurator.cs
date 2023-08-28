@@ -2,7 +2,7 @@
 
 namespace Theatrical.Services.Curators;
 
-public interface IDataCurator
+public interface ITestCurator
 {
     bool ValidateFullName(string fullName);
     bool ValidateRole(string fullName);
@@ -10,7 +10,7 @@ public interface IDataCurator
     bool ValidateProductionTitle(string title);
 }
 
-public class DataCurator : IDataCurator
+public class TestTestCurator : ITestCurator
 {
     private static readonly Regex FullNameRegex =
         new Regex(@"^[A-ZΑ-Ω][A-Za-zΑ-Ωα-ω\u0370-\u03ff\u1f00-\u1fff]*(?:[- ][A-ZΑ-Ω][A-Za-zΑ-Ωα-ω\u0370-\u03ff\u1f00-\u1fff]*)*$");

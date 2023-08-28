@@ -117,7 +117,7 @@ builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddTransient<IPaginationService, PaginationService>();
 
 //Curator service
-builder.Services.AddTransient<IDataCurator, DataCurator>();
+builder.Services.AddTransient<ITestCurator, TestTestCurator>();
 
 //Email service
 builder.Services.AddTransient<IEmailService, EmailService>();
