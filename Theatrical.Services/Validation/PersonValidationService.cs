@@ -165,7 +165,7 @@ public class PersonValidationService : IPersonValidationService
         if (!isValid)
         {
             report.Success = false;
-            report.Message = "Curation failed. Person's name must follow the template: {Name Surname}, {Name}, or {Surname}";
+            report.Message = "Person's name must follow the template: {Name Surname}, {Name}, or {Surname}";
             report.ErrorCode = ErrorCode.CurationFailure;
             return report;
         }
