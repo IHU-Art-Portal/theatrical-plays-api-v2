@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Theatrical.Data.Models;
 public class Organizer
@@ -18,4 +19,9 @@ public class Organizer
 
     public virtual System System { get; set; } = null!;
     public virtual List<Production> Productions { get; set; }
+
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this);
+    }
 }

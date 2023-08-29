@@ -2,8 +2,9 @@
 
 namespace Theatrical.Services.Curators.Responses;
 
-public class CurateResponse
+public class CurateResponseOrganizers
 {
-    public List<Contribution> Contributions { get; set; }
+    public List<Organizer?> Organizers { get; set; }
     public int CorrectedObjects { get; set; }
+    public int OutOf { get; set; }
 }

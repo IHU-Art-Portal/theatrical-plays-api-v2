@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Theatrical.Data.Models;
 
@@ -19,4 +20,9 @@ public class Production
     public virtual System System { get; set; } = null!;
     public virtual List<Contribution> Contributions { get; set; }
     public virtual List<Event> Events { get; set; }
+
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this);
+    }
 }
