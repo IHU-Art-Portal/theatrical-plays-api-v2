@@ -87,6 +87,7 @@ public class Curator
                     role.Role1 = Regex.Replace(role.Role1, @"\s{2,}", " ");
                     rolesProcessed.Add(role);
                 }
+                role.Role1 = role.Role1.Trim();
             }
         }
         
