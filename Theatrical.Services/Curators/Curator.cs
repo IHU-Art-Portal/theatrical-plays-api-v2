@@ -218,6 +218,8 @@ public class Curator
                 {
                     production.Description = Regex.Replace(production.Description, @"\s{2,}", " ");
                 }
+
+                production.Description = production.Description.Trim();
             }
 
             //Producer

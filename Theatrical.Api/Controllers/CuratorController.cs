@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.Responses;
@@ -43,14 +44,9 @@ public class CuratorController : ControllerBase
         
         var contributionsProcessed = curator.CleanData(contributions);
 
-        var curateResponseContributions = new CurateResponseContributions
-        {
-            Contributions = contributionsProcessed,
-            CorrectedObjects = contributionsProcessed.Count,
-            OutOf = contributions.Count
-        };
+        var curateResponseContributions = new CurateResponseContributions<List<Contribution>>(contributionsProcessed, contributionsProcessed.Count, contributions.Count);
         
-        var response = new ApiResponse<CurateResponseContributions>(curateResponseContributions);
+        var response = new ApiResponse<CurateResponseContributions<List<Contribution>>>(curateResponseContributions);
         
         return Ok(response);
     }
@@ -65,14 +61,9 @@ public class CuratorController : ControllerBase
 
         var organizersProcessed = curator.CleanData(organizers);
 
-        var curateResponseOrganizers = new CurateResponseOrganizers
-        {
-            Organizers = organizersProcessed,
-            CorrectedObjects = organizersProcessed.Count,
-            OutOf = organizers.Count
-        };
+        var curateResponseOrganizers = new CurateResponseOrganizers<List<Organizer>>(organizersProcessed, organizersProcessed.Count, organizers.Count);
 
-        var response = new ApiResponse<CurateResponseOrganizers>(curateResponseOrganizers);
+        var response = new ApiResponse<CurateResponseOrganizers<List<Organizer>>>(curateResponseOrganizers);
         
         return Ok(response);
     }
@@ -87,14 +78,9 @@ public class CuratorController : ControllerBase
 
         var peopleProcessed = curator.CleanData(people);
 
-        var curateResponsePeople = new CurateResponsePeople
-        {
-            People = peopleProcessed,
-            CorrectedObjects = peopleProcessed.Count,
-            OutOf = people.Count
-        };
+        var curateResponsePeople = new CurateResponsePeople<List<Person>>(peopleProcessed, peopleProcessed.Count, people.Count);
 
-        var response = new ApiResponse<CurateResponsePeople>(curateResponsePeople);
+        var response = new ApiResponse<CurateResponsePeople<List<Person>>>(curateResponsePeople);
 
         return new OkObjectResult(response);
     }
@@ -109,14 +95,11 @@ public class CuratorController : ControllerBase
 
         var productionsProcessed = curator.CleanData(productions);
 
-        var curateResponseProductions = new CurateResponseProductions
-        {
-            Productions = productionsProcessed,
-            CorrectedObjects = productionsProcessed.Count,
-            OutOf = productions.Count
-        };
+        var curateResponseProductions =
+            new CurateResponseProductions<List<Production>>(productionsProcessed, productionsProcessed.Count,
+                productions.Count);
         
-        var response = new ApiResponse<CurateResponseProductions>(curateResponseProductions);
+        var response = new ApiResponse<CurateResponseProductions<List<Production>>>(curateResponseProductions);
 
         return new OkObjectResult(response);
     }
@@ -129,16 +112,11 @@ public class CuratorController : ControllerBase
         
         Curator curator = new Curator();
 
-        var productionsProcessed = curator.CleanData(roles);
+        var rolesProcessed = curator.CleanData(roles);
 
-        var curateResponseRoles = new CurateResponseRoles
-        {
-            Roles = productionsProcessed,
-            CorrectedObjects = productionsProcessed.Count,
-            OutOf = roles.Count
-        };
+        var curateResponseRoles = new CurateResponseRoles<List<Role>>(rolesProcessed, rolesProcessed.Count, roles.Count);
         
-        var response = new ApiResponse<CurateResponseRoles>(curateResponseRoles);
+        var response = new ApiResponse<CurateResponseRoles<List<Role>>>(curateResponseRoles);
 
         return new OkObjectResult(response);
     }
@@ -152,15 +130,10 @@ public class CuratorController : ControllerBase
         Curator curator = new Curator();
 
         var venuesProcessed = curator.CleanData(venues);
-
-        var curateResponseVenues = new CurateResponseVenues()
-        {
-            Venues = venuesProcessed,
-            CorrectedObjects = venuesProcessed.Count,
-            OutOf = venues.Count
-        };
         
-        var response = new ApiResponse<CurateResponseVenues>(curateResponseVenues);
+        var curateResponseVenues = new CurateResponseVenues<List<Venue>>(venuesProcessed, venuesProcessed.Count, venues.Count);
+        
+        var response = new ApiResponse<CurateResponseVenues<List<Venue>>>(curateResponseVenues);
 
         return new OkObjectResult(response);
     }

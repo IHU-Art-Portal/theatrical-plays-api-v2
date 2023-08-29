@@ -2,9 +2,12 @@
 
 namespace Theatrical.Services.Curators.Responses;
 
-public class CurateResponseContributions
+public class CurateResponseContributions<T> : CuratorResponse
 {
-    public List<Contribution?> Contributions { get; set; }
-    public int CorrectedObjects { get; set; }
-    public int OutOf { get; set; }
+    public T? ContributionsCorrected { get; set; }
+
+    public CurateResponseContributions(T? data, int correctedObjects, int outOf) : base(correctedObjects, outOf)
+    {
+        ContributionsCorrected = data;
+    }
 }

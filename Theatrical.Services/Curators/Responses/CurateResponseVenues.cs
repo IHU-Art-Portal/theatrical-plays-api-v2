@@ -2,9 +2,12 @@
 
 namespace Theatrical.Services.Curators.Responses;
 
-public class CurateResponseVenues
+public class CurateResponseVenues<T> : CuratorResponse
 {
-    public List<Venue> Venues { get; set; }
-    public int CorrectedObjects { get; set; }
-    public int OutOf { get; set; }
+    public T? CorrectedVenues { get; }
+
+    public CurateResponseVenues(T? data, int correctedVenues, int outOf) : base(correctedVenues, outOf)
+    {
+        CorrectedVenues = data;
+    }
 }
