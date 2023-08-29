@@ -63,9 +63,52 @@ public class Curator
         
     }
 
-    private List<Venue> CleanVenueData(List<Venue> data)
+    private List<Venue> CleanVenueData(List<Venue> venues)
     {
-        throw new NotImplementedException();
+        List<Venue> venuesProcessed = new();
+        Console.WriteLine(venues.Count);
+        foreach (var venue in venues)
+        {
+            if (!string.IsNullOrEmpty(venue.Title))
+            {
+                if (venue.Title.Contains('\"'))
+                {
+                    venue.Title = venue.Title.Replace("\"", "");
+                    venuesProcessed.Add(venue);
+                }
+
+                if (Regex.IsMatch(venue.Title, @"\s{2,}"))
+                {
+                    venue.Title = Regex.Replace(venue.Title, @"\s{2,}", " ");
+                    if (!venuesProcessed.Contains(venue))
+                    {
+                        venuesProcessed.Add(venue);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(venue.Address))
+            {
+                if (venue.Address.Contains('\"'))
+                {
+                    venue.Address = venue.Address.Replace("\"", "");
+                    if (!venuesProcessed.Contains(venue))
+                    {
+                        venuesProcessed.Add(venue);
+                    }
+                }
+                
+                if (Regex.IsMatch(venue.Address, @"\s{2,}"))
+                {
+                    venue.Address = Regex.Replace(venue.Address, @"\s{2,}", " ");
+                    if (!venuesProcessed.Contains(venue))
+                    {
+                        venuesProcessed.Add(venue);
+                    }
+                }
+            }
+        }
+        return venuesProcessed;
     }
 
     /// <summary>

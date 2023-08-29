@@ -2,7 +2,7 @@
 
 namespace Theatrical.Services.Curators.Responses;
 
-public class curateResponseProductions
+public class CurateResponseProductions
 {
     public List<Production?> Productions { get; set; }
     public int CorrectedObjects { get; set; }

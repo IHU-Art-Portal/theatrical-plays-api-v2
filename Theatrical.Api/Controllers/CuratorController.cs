@@ -15,15 +15,17 @@ public class CuratorController : ControllerBase
     private readonly IPersonRepository _person;
     private readonly IProductionRepository _production;
     private readonly IRoleRepository _role;
+    private readonly IVenueRepository _venues;
 
     public CuratorController(IContributionRepository repo, IOrganizerRepository organizerRepository, IPersonRepository personRepository, IProductionRepository productionRepository,
-        IRoleRepository roleRepository)
+        IRoleRepository roleRepository, IVenueRepository venueRepository)
     {
         _repo = repo;
         _organizers = organizerRepository;
         _person = personRepository;
         _production = productionRepository;
         _role = roleRepository;
+        _venues = venueRepository;
     }
     
     [HttpGet]
@@ -107,14 +109,14 @@ public class CuratorController : ControllerBase
 
         var productionsProcessed = curator.CleanData(productions);
 
-        var curateResponseProductions = new curateResponseProductions
+        var curateResponseProductions = new CurateResponseProductions
         {
             Productions = productionsProcessed,
             CorrectedObjects = productionsProcessed.Count,
             OutOf = productions.Count
         };
         
-        var response = new ApiResponse<curateResponseProductions>(curateResponseProductions);
+        var response = new ApiResponse<CurateResponseProductions>(curateResponseProductions);
 
         return new OkObjectResult(response);
     }
@@ -137,6 +139,28 @@ public class CuratorController : ControllerBase
         };
         
         var response = new ApiResponse<CurateResponseRoles>(curateResponseRoles);
+
+        return new OkObjectResult(response);
+    }
+    
+    [HttpGet]
+    [Route("curateVenuesNotSaving")]
+    public async Task<ActionResult> CurateVenues()
+    {
+        var venues = await _venues.Get();
+        
+        Curator curator = new Curator();
+
+        var venuesProcessed = curator.CleanData(venues);
+
+        var curateResponseVenues = new CurateResponseVenues()
+        {
+            Venues = venuesProcessed,
+            CorrectedObjects = venuesProcessed.Count,
+            OutOf = venues.Count
+        };
+        
+        var response = new ApiResponse<CurateResponseVenues>(curateResponseVenues);
 
         return new OkObjectResult(response);
     }
