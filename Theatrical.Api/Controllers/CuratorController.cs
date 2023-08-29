@@ -31,7 +31,7 @@ public class CuratorController : ControllerBase
     
     [HttpGet]
     [Route("curateContributionsNotSaving")]
-    public async Task<ActionResult<ApiResponse>> CurateExistingData()
+    public async Task<ActionResult<ApiResponse>> CurateContributions()
     {
         var contributions = await _repo.Get();
 
