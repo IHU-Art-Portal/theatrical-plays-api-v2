@@ -68,9 +68,29 @@ public class Curator
         throw new NotImplementedException();
     }
 
-    private List<Role> CleanRoleData(List<Role> data)
+    /// <summary>
+    /// Cleans roles data.
+    /// </summary>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    private List<Role> CleanRoleData(List<Role> roles)
     {
-        throw new NotImplementedException();
+        List<Role> rolesProcessed = new();
+
+        foreach (var role in roles)
+        {
+            //Almost everything here is clean.
+            if (!string.IsNullOrEmpty(role.Role1))
+            {
+                if (Regex.IsMatch(role.Role1, @"\s{2,}"))
+                {
+                    role.Role1 = Regex.Replace(role.Role1, @"\s{2,}", " ");
+                    rolesProcessed.Add(role);
+                }
+            }
+        }
+        
+        return rolesProcessed;
     }
 
     /// <summary>
