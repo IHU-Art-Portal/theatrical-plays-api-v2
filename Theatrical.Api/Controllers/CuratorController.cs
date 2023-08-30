@@ -28,18 +28,59 @@ public class CuratorController : ControllerBase
         _role = roleRepository;
         _venues = venueRepository;
     }
-    
+
+    [HttpGet("CurateAllNotSaving")]
+    public async Task<ActionResult<ApiResponse>> CurateAll()
+    {
+        try
+        {
+            var contributions = await _repo.Get();
+            var organizers = await _organizers.Get();
+            var people = await _person.Get();
+            var productions = await _production.Get();
+            var roles = await _role.GetRoles();
+            var venues = await _venues.Get();
+
+            Curator curator = new Curator();
+
+            var contributionsProcessed = curator.CleanData(contributions);
+            
+            var organizersProcessed = curator.CleanData(organizers);
+            
+            var peopleProcessed = curator.CleanData(people);
+
+            var productionsProcessed = curator.CleanData(productions);
+
+            var rolesProcessed = curator.CleanData(roles);
+
+            var venuesProcessed = curator.CleanData(venues);
+            
+            var curateResponse = new CurateResponseEverything
+            {
+                ContributionsCorrected = contributionsProcessed.Count,
+                OrganizersCorrected = organizersProcessed.Count,
+                PeopleCorrected = peopleProcessed.Count,
+                ProductionsCorrected = productionsProcessed.Count,
+                RolesCorrected = rolesProcessed.Count,
+                VenuesCorrected = venuesProcessed.Count
+            };
+
+            var apiresponse = new ApiResponse<CurateResponseEverything>(curateResponse);
+
+            return new OkObjectResult(apiresponse);
+        }
+        catch (Exception e)
+        {
+            return new ObjectResult(e.Message);
+        }
+    }
+
     [HttpGet]
     [Route("curateContributionsNotSaving")]
     public async Task<ActionResult<ApiResponse>> CurateContributions()
     {
         var contributions = await _repo.Get();
 
-        if (contributions.Count == 0)
-        {
-            return new NotFoundObjectResult(new ApiResponse(ErrorCode.NotFound, "Not found any contributions"));
-        }
-        
         Curator curator = new Curator();
         
         var contributionsProcessed = curator.CleanData(contributions);

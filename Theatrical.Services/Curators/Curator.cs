@@ -23,37 +23,30 @@ public class Curator
         {
             case "Contribution":
                 List<Contribution> correctedContributions = CleanContributionData((data as List<Contribution>)!);
-                Console.WriteLine($"Corrected Contributions: {correctedContributions.Count}");
                 return (T)(object)correctedContributions;
             
             case "Event":
                 var correctedEvents = CleanEventData((data as List<Event>)!);
-                Console.WriteLine("Corrected Events");
                 return (T)(object)correctedEvents;
             
             case "Organizer":
                 var correctedOrganizers = CleanOrganizerData((data as List<Organizer>)!);
-                Console.WriteLine("Corrected Organizers");
                 return (T)(object)correctedOrganizers;
                 
             case "Production":
                 var correctedProductions = CleanProductionData((data as List<Production>)!);
-                Console.WriteLine("Corrected Productions");
                 return (T)(object)correctedProductions;
             
             case "Role":
                 var correctedRoles = CleanRoleData((data as List<Role>)!);
-                Console.WriteLine("Corrected Roles");
                 return (T)(object)correctedRoles;
             
             case "Person":
                 var correctedPeople = CleanPersonData((data as List<Person>)!);
-                Console.WriteLine("Corrected People");
                 return (T)(object)correctedPeople;
             
             case "Venue":
                 var correctedVenues = CleanVenueData((data as List<Venue>)!);
-                Console.WriteLine("Corrected Venues");
                 return (T)(object)correctedVenues;
             
             default:
@@ -66,7 +59,7 @@ public class Curator
     private List<Venue> CleanVenueData(List<Venue> venues)
     {
         List<Venue> venuesProcessed = new();
-        Console.WriteLine(venues.Count);
+        
         foreach (var venue in venues)
         {
             if (!string.IsNullOrEmpty(venue.Title))
@@ -108,6 +101,9 @@ public class Curator
                 }
             }
         }
+        
+        Console.WriteLine($"Processed venues: {venues.Count} and produced: {venuesProcessed.Count}");
+        
         return venuesProcessed;
     }
 
@@ -134,6 +130,8 @@ public class Curator
             }
         }
         
+        Console.WriteLine($"Processed roles: {roles.Count} and produced: {rolesProcessed.Count}");
+        
         return rolesProcessed;
     }
 
@@ -159,6 +157,7 @@ public class Curator
                 }
             }
         }
+        Console.WriteLine($"Processed people: {people.Count}, and produced: {peopleProcessed.Count}");
 
         return peopleProcessed;
     }
@@ -276,6 +275,8 @@ public class Curator
             }
         }
 
+        Console.WriteLine($"Processed productions: {productions.Count} and produced: {productionsProcessed.Count}");
+        
         return productionsProcessed;
     }
 
@@ -352,6 +353,8 @@ public class Curator
                 }
             }
         }
+        
+        Console.WriteLine($"Processed organizers: {organizers.Count} and produced: {organizersProcessed.Count}");
 
         return organizersProcessed;
     }
@@ -397,6 +400,8 @@ public class Curator
                 }
             }
         }
+        
+        Console.WriteLine($"Processed contributions: {contributions.Count} and produced: {contributionsProcessed.Count}");
 
         return contributionsProcessed;
     }
