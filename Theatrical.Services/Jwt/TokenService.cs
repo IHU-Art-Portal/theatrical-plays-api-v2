@@ -36,16 +36,18 @@ public class TokenService : ITokenService
         };
 
         var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
-
-        if (userIntRole == 1)
-            claims.Add(new Claim(ClaimTypes.Role, "admin"));
-        else if (userIntRole == 2)
-            claims.Add(new Claim(ClaimTypes.Role, "user"));
-        else if (userIntRole == 3)
-            claims.Add(new Claim(ClaimTypes.Role, "developer"));
-        else if (userIntRole == 4)
-            claims.Add(new Claim(ClaimTypes.Role, "claims manager"));
         
+        var userRole = userIntRole switch
+        {
+            1 => "admin",
+            2 => "user",
+            3 => "developer",
+            4 => "claims manager",
+            _ => "Invalid role"
+        };
+        
+        claims.Add(new Claim(ClaimTypes.Role, userRole));
+
         var securityKey = new SymmetricSecurityKey(key);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
