@@ -193,7 +193,8 @@ public class UserService : IUserService
             }).ToList(),
             FaceBook = user.FaceBook,
             Youtube = user.Youtube,
-            Instagram = user.Instagram
+            Instagram = user.Instagram,
+            Balance = user.UserTransactions.Sum(t => t.CreditAmount)
         };
 
         return userDto;

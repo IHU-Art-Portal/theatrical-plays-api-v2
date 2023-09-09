@@ -13,4 +13,5 @@ public class UserDto
     public string? FaceBook { get; set; }
     public string? Youtube { get; set; }
     public string? Instagram { get; set; }
+    public decimal? Balance { get; set; }
 }
