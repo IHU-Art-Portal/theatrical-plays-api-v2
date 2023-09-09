@@ -21,6 +21,9 @@ public interface IUserService
     Task DeactivateTwoFactorAuthentication(User user);
     ClaimsPrincipal? VerifyToken(string token);
     UserDto ToDto(User user);
+    Task UpdateFacebook(User user, string link);
+    Task UpdateInstagram(User user, string link);
+    Task UpdateYoutube(User user, string link);
 }
 
 public class UserService : IUserService
@@ -198,6 +201,21 @@ public class UserService : IUserService
         };
 
         return userDto;
+    }
+
+    public async Task UpdateFacebook(User user, string link)
+    {
+        await _repository.UpdateFacebook(user, link);
+    }
+    
+    public async Task UpdateYoutube(User user, string link)
+    {
+        await _repository.UpdateYoutube(user, link);
+    }
+    
+    public async Task UpdateInstagram(User user, string link)
+    {
+        await _repository.UpdateInstagram(user, link);
     }
 }
 

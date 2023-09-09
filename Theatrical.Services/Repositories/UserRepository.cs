@@ -18,6 +18,9 @@ public interface IUserRepository
     Task Activate2Fa(User user, string userSecret);
     Task Deactivate2Fa(User user);
     Task<User?> GetUserAuthoritiesAndTransactions(string email);
+    Task UpdateFacebook(User user, string link);
+    Task UpdateInstagram(User user, string link);
+    Task UpdateYoutube(User user, string link);
 }
 
 public class UserRepository : IUserRepository
@@ -54,6 +57,24 @@ public class UserRepository : IUserRepository
             .Include(u => u.UserAuthorities)
             .Include(u => u.UserTransactions)
             .FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task UpdateFacebook(User user, string link)
+    {
+        user.FaceBook = link;
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task UpdateInstagram(User user, string link)
+    {
+        user.Instagram = link;
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task UpdateYoutube(User user, string link)
+    {
+        user.Youtube = link;
+        await _context.SaveChangesAsync();
     }
 
 
