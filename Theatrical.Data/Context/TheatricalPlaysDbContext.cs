@@ -357,6 +357,10 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u._2FA_code).HasColumnName("2FA_code");
             
             entity.Property(u => u.UserSecret).HasColumnName("user_secret");
+
+            entity.Property(u => u.FaceBook).HasColumnName("facebook");
+            entity.Property(u => u.Youtube).HasColumnName("youtube");
+            entity.Property(u => u.Instagram).HasColumnName("instagram");
         });
         
         modelBuilder.Entity<Authority>(entity =>

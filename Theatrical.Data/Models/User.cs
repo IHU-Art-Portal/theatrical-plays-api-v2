@@ -16,4 +16,8 @@ public class User
     public bool _2FA_enabled { get; set; }
     public string? _2FA_code { get; set; }
     public string? UserSecret { get; set; }
+    
+    public string? FaceBook { get; set; }
+    public string? Youtube { get; set; }
+    public string? Instagram { get; set; }
 }

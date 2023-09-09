@@ -190,7 +190,10 @@ public class UserService : IUserService
                 AuthCode = t.AuthCode,
                 AccountNumber = t.AccountNumber,
                 AccountType = t.AccountType
-            }).ToList()
+            }).ToList(),
+            FaceBook = user.FaceBook,
+            Youtube = user.Youtube,
+            Instagram = user.Instagram
         };
 
         return userDto;
