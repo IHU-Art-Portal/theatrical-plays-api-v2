@@ -299,9 +299,21 @@ public class UserValidationService : IUserValidationService
     public ValidationReport ValidateSocialMediaLink(string link)
     {
         var report = new ValidationReport();
+
+        if (!Uri.IsWellFormedUriString(link, UriKind.Absolute))
+        {
+            //the Uri.IsWellFormedUriString() method is used to validate the link. If the link is not well-formed
+            //(i.e., it doesn't have a valid URI format), it will be considered invalid.
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
         
         if ( !(link.Contains("www.youtube.com/channel/") || link.Contains("www.facebook.com/") || link.Contains("www.instagram.com/")) )
         {
+            //Additionally, the code still
+            //checks if the link contains the required substrings for YouTube, Facebook, or Instagram profiles.
             report.Success = false;
             report.Message = "Invalid link";
             report.ErrorCode = ErrorCode.BadRequest;
