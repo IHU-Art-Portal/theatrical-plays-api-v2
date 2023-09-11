@@ -18,6 +18,7 @@ public interface IUserValidationService
     Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email);
     Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email);
     Task<(ValidationReport, User?)> ValidateUser(string email);
+    ValidationReport ValidateSocialMediaLink(string link);
 }
 
 public class UserValidationService : IUserValidationService
@@ -293,5 +294,21 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         report.Message = "User Found!";
         return (report, user);
+    }
+
+    public ValidationReport ValidateSocialMediaLink(string link)
+    {
+        var report = new ValidationReport();
+        
+        if ( !(link.Contains("www.youtube.com/channel/") || link.Contains("www.facebook.com/") || link.Contains("www.instagram.com/")) )
+        {
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+
+        report.Success = true;
+        return report;
     }
 }

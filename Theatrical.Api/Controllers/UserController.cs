@@ -391,6 +391,14 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
+            
+            var linkValidation = _validation.ValidateSocialMediaLink(link);
+
+            if (!linkValidation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)linkValidation.ErrorCode!, linkValidation.Message!);
+                return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
+            }
 
             await _service.UpdateFacebook(user!, link);
 
@@ -424,6 +432,14 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
+            var linkValidation = _validation.ValidateSocialMediaLink(link);
+
+            if (!linkValidation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)linkValidation.ErrorCode!, linkValidation.Message!);
+                return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
+            }
+
             await _service.UpdateYoutube(user!, link);
 
             var response = new ApiResponse("Successfully updated youtube link.");
@@ -454,6 +470,14 @@ public class UserController : ControllerBase
             {
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            var linkValidation = _validation.ValidateSocialMediaLink(link);
+
+            if (!linkValidation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)linkValidation.ErrorCode!, linkValidation.Message!);
+                return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
             }
 
             await _service.UpdateInstagram(user!, link);
