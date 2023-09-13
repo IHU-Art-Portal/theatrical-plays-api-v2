@@ -358,7 +358,7 @@ public class TheatricalPlaysDbContext : DbContext
             
             entity.Property(u => u.UserSecret).HasColumnName("user_secret");
 
-            entity.Property(u => u.FaceBook).HasColumnName("facebook");
+            entity.Property(u => u.Facebook).HasColumnName("facebook");
             entity.Property(u => u.Youtube).HasColumnName("youtube");
             entity.Property(u => u.Instagram).HasColumnName("instagram");
         });

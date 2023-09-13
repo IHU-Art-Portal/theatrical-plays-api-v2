@@ -61,7 +61,7 @@ public class UserRepository : IUserRepository
 
     public async Task UpdateFacebook(User user, string link)
     {
-        user.FaceBook = link;
+        user.Facebook = link;
         await _context.SaveChangesAsync();
     }
     

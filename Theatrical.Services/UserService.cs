@@ -194,7 +194,7 @@ public class UserService : IUserService
                 AccountNumber = t.AccountNumber,
                 AccountType = t.AccountType
             }).ToList(),
-            FaceBook = user.FaceBook,
+            Facebook = user.Facebook,
             Youtube = user.Youtube,
             Instagram = user.Instagram,
             Balance = user.UserTransactions.Sum(t => t.CreditAmount)
