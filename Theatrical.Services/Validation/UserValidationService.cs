@@ -18,7 +18,9 @@ public interface IUserValidationService
     Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email);
     Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email);
     Task<(ValidationReport, User?)> ValidateUser(string email);
-    ValidationReport ValidateSocialMediaLink(string link);
+    ValidationReport ValidateYoutubeLink(string link);
+    ValidationReport ValidateFacebookLink(string link);
+    ValidationReport ValidateInstagramLink(string link);
 }
 
 public class UserValidationService : IUserValidationService
@@ -296,7 +298,7 @@ public class UserValidationService : IUserValidationService
         return (report, user);
     }
 
-    public ValidationReport ValidateSocialMediaLink(string link)
+    public ValidationReport ValidateYoutubeLink(string link)
     {
         var report = new ValidationReport();
 
@@ -310,7 +312,7 @@ public class UserValidationService : IUserValidationService
             return report;
         }
         
-        if ( !(link.Contains("www.youtube.com/channel/") || link.Contains("www.facebook.com/") || link.Contains("www.instagram.com/")) )
+        if ( !link.Contains("www.youtube.com/channel/") )
         {
             //Additionally, the code still
             //checks if the link contains the required substrings for YouTube, Facebook, or Instagram profiles.
@@ -323,4 +325,61 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         return report;
     }
+    
+    public ValidationReport ValidateFacebookLink(string link)
+    {
+        var report = new ValidationReport();
+
+        if (!Uri.IsWellFormedUriString(link, UriKind.Absolute))
+        {
+            //the Uri.IsWellFormedUriString() method is used to validate the link. If the link is not well-formed
+            //(i.e., it doesn't have a valid URI format), it will be considered invalid.
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+        
+        if (!link.Contains("www.facebook.com/"))
+        {
+            //Additionally, the code still
+            //checks if the link contains the required substrings for YouTube, Facebook, or Instagram profiles.
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+
+        report.Success = true;
+        return report;
+    }
+    
+    public ValidationReport ValidateInstagramLink(string link)
+    {
+        var report = new ValidationReport();
+
+        if (!Uri.IsWellFormedUriString(link, UriKind.Absolute))
+        {
+            //the Uri.IsWellFormedUriString() method is used to validate the link. If the link is not well-formed
+            //(i.e., it doesn't have a valid URI format), it will be considered invalid.
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+        
+        if (!link.Contains("www.instagram.com/"))
+        {
+            //Additionally, the code still
+            //checks if the link contains the required substrings for YouTube, Facebook, or Instagram profiles.
+            report.Success = false;
+            report.Message = "Invalid link";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+
+        report.Success = true;
+        return report;
+    }
+    
 }

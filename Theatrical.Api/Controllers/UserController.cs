@@ -391,8 +391,8 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
-            
-            var linkValidation = _validation.ValidateSocialMediaLink(link);
+
+            var linkValidation = _validation.ValidateFacebookLink(link);
 
             if (!linkValidation.Success)
             {
@@ -432,7 +432,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
-            var linkValidation = _validation.ValidateSocialMediaLink(link);
+            var linkValidation = _validation.ValidateYoutubeLink(link);
 
             if (!linkValidation.Success)
             {
@@ -472,7 +472,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
             
-            var linkValidation = _validation.ValidateSocialMediaLink(link);
+            var linkValidation = _validation.ValidateInstagramLink(link);
 
             if (!linkValidation.Success)
             {
