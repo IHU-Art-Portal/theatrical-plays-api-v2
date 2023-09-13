@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators;
@@ -9,6 +10,7 @@ namespace Theatrical.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors("AllowOrigin")]
 public class CuratorController : ControllerBase
 {
     private readonly IContributionRepository _repo;
