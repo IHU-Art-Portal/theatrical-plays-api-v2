@@ -12,6 +12,7 @@ public interface IVenueRepository
     Task<Venue> Create(Venue venue);
     Task Delete(Venue venue);
     Task Update(Venue venue);
+    Task UpdateRange(List<Venue> venues);
 }
 
 public class VenueRepository : IVenueRepository
@@ -101,5 +102,11 @@ public class VenueRepository : IVenueRepository
             ("Title", venue.Title),
             ("Address", venue.Address)
         });
+    }
+
+    public async Task UpdateRange(List<Venue> venues)
+    {
+        _context.Venues.UpdateRange(venues);
+        await _context.SaveChangesAsync();
     }
 }

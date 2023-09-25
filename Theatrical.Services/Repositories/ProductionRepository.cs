@@ -10,6 +10,7 @@ public interface IProductionRepository
    Task<List<Production>>? Get();
    Task<Production?> GetProduction(int id);
    Task Delete(Production production);
+   Task UpdateRange(List<Production> productions);
 }
 
 public class ProductionRepository : IProductionRepository
@@ -42,6 +43,12 @@ public class ProductionRepository : IProductionRepository
     public async Task Delete(Production production)
     {
         _context.Productions.Remove(production);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateRange(List<Production> productions)
+    {
+        _context.Productions.UpdateRange(productions);
         await _context.SaveChangesAsync();
     }
 }

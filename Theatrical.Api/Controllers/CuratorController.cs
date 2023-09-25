@@ -13,17 +13,17 @@ namespace Theatrical.Api.Controllers;
 [EnableCors("AllowOrigin")]
 public class CuratorController : ControllerBase
 {
-    private readonly IContributionRepository _repo;
+    private readonly IContributionRepository _contributions;
     private readonly IOrganizerRepository _organizers;
     private readonly IPersonRepository _person;
     private readonly IProductionRepository _production;
     private readonly IRoleRepository _role;
     private readonly IVenueRepository _venues;
 
-    public CuratorController(IContributionRepository repo, IOrganizerRepository organizerRepository, IPersonRepository personRepository, IProductionRepository productionRepository,
+    public CuratorController(IContributionRepository contributions, IOrganizerRepository organizerRepository, IPersonRepository personRepository, IProductionRepository productionRepository,
         IRoleRepository roleRepository, IVenueRepository venueRepository)
     {
-        _repo = repo;
+        _contributions = contributions;
         _organizers = organizerRepository;
         _person = personRepository;
         _production = productionRepository;
@@ -31,12 +31,16 @@ public class CuratorController : ControllerBase
         _venues = venueRepository;
     }
 
-    [HttpGet("CurateAllNotSaving")]
+    /// <summary>
+    /// Removes special html symbols, redundant spaces and some useless symbols.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("CurateSimple")]
     public async Task<ActionResult<ApiResponse>> CurateAll()
     {
         try
         {
-            var contributions = await _repo.Get();
+            var contributions = await _contributions.Get();
             var organizers = await _organizers.Get();
             var people = await _person.Get();
             var productions = await _production.Get();
@@ -67,6 +71,13 @@ public class CuratorController : ControllerBase
                 VenuesCorrected = venuesProcessed.Count
             };
 
+            await _contributions.UpdateRange(contributionsProcessed);
+            await _organizers.UpdateRange(organizersProcessed);
+            await _person.UpdateRange(peopleProcessed);
+            await _production.UpdateRange(productionsProcessed);
+            await _role.UpdateRange(rolesProcessed);
+            await _venues.UpdateRange(venuesProcessed);
+
             var apiresponse = new ApiResponse<CurateResponseEverything>(curateResponse);
 
             return new OkObjectResult(apiresponse);
@@ -77,6 +88,13 @@ public class CuratorController : ControllerBase
         }
     }
 
+    [HttpGet("CurateHammingDistance")]
+    public async Task<ActionResult<ApiResponse>> CurateHammingDistance()
+    {
+        return Ok();
+    }
+
+    /*
     [HttpGet]
     [Route("curateContributionsNotSaving")]
     public async Task<ActionResult<ApiResponse>> CurateContributions()
@@ -179,6 +197,6 @@ public class CuratorController : ControllerBase
         var response = new ApiResponse<CurateResponseVenues<List<Venue>>>(curateResponseVenues);
 
         return new OkObjectResult(response);
-    }
+    }*/
     
 }

@@ -2,7 +2,6 @@
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.PersonDtos;
-using Theatrical.Services.PerformersService;
 
 namespace Theatrical.Services.Repositories;
 
@@ -17,6 +16,7 @@ public interface IPersonRepository
     Task<Person?> GetByName(string name);
     Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId);
     Task<List<Image>?> GetPersonsImages(int personId);
+    Task UpdateRange(List<Person> people);
 }
 
 public class PersonRepository : IPersonRepository
@@ -96,5 +96,11 @@ public class PersonRepository : IPersonRepository
         var person = await _context.Persons.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == personId);
 
         return person.Images;
+    }
+
+    public async Task UpdateRange(List<Person> people)
+    {
+        _context.Persons.UpdateRange(people);
+        await _context.SaveChangesAsync();
     }
 }

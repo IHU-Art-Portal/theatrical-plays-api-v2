@@ -15,6 +15,8 @@ public interface IContributionRepository
 
     Task<(bool productionExists, bool performerExists, bool roleExists)> CheckExists(int performerId, int productionId,
         int roleId);
+
+    Task UpdateRange(List<Contribution> contributions);
 }
 
 public class ContributionRepository : IContributionRepository
@@ -100,6 +102,12 @@ public class ContributionRepository : IContributionRepository
         bool roleExists = await _context.Roles.AnyAsync(r => r.Id == roleId);
 
         return (productionExists, performerExists, roleExists);
+    }
+
+    public async Task UpdateRange(List<Contribution> contributions)
+    {
+        _context.Contributions.UpdateRange(contributions);
+        await _context.SaveChangesAsync();
     }
 }
 

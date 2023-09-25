@@ -11,6 +11,7 @@ public interface IRoleRepository
     Task CreateRole(Role roles);
     Task DeleteRole(Role roles);
     Task<Role?> GetRoleByName(string searchRole);
+    Task UpdateRange(List<Role> roles);
 }
 
 public class RoleRepository : IRoleRepository
@@ -39,6 +40,12 @@ public class RoleRepository : IRoleRepository
     {
         var role = await _context.Roles.FirstOrDefaultAsync(r => r.Role1 == searchRole);
         return role;
+    }
+
+    public async Task UpdateRange(List<Role> roles)
+    {
+        _context.Roles.UpdateRange(roles);
+        await _context.SaveChangesAsync();
     }
 
     public async Task CreateRole(Role role)

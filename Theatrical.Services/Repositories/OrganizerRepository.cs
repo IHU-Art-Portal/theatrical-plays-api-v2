@@ -10,6 +10,7 @@ public interface IOrganizerRepository
     Task<List<Organizer?>> Get();
     Task Create(Organizer organizer);
     Task Delete(Organizer organizer);
+    Task UpdateRange(List<Organizer> organizers);
 }
 
 public class OrganizerRepository : IOrganizerRepository
@@ -42,6 +43,12 @@ public class OrganizerRepository : IOrganizerRepository
     public async Task Delete(Organizer organizer)
     {
         _context.Organizers.Remove(organizer);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateRange(List<Organizer> organizers)
+    {
+        _context.Organizers.UpdateRange(organizers);
         await _context.SaveChangesAsync();
     }
 }

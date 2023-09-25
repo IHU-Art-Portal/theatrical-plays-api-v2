@@ -67,6 +67,7 @@ public class Curator
                 if (venue.Title.Contains('\"'))
                 {
                     venue.Title = venue.Title.Replace("\"", "");
+                    venue.Title = venue.Title.Replace(@"\", "");
                     venuesProcessed.Add(venue);
                 }
 
