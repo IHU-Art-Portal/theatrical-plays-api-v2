@@ -10,6 +10,7 @@ public interface IEventValidationService
     Task<ValidationReport> ValidateForCreate(CreateEventDto createEventDto);
     Task<(ValidationReport report, List<Event>? events)> FetchAndValidate();
     Task<(ValidationReport, Event?)> ValidateForFetch(int eventId);
+    Task<(ValidationReport validation, List<Event>? events)> FetchEventsForPerson(int id);
 }
 
 public class EventValidationService : IEventValidationService
@@ -85,6 +86,25 @@ public class EventValidationService : IEventValidationService
         report.Message = "Event found";
 
         return (report, eventFromDb);
+    }
+
+    public async Task<(ValidationReport validation, List<Event>? events)> FetchEventsForPerson(int id)
+    {
+        var events = await _repository.GetEventsForPerson(id);
+        var report = new ValidationReport();
+
+        if (!events.Any())
+        {
+            report.Success = false;
+            report.Message = "Not Found events for this person";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "Found events";
+        
+        return (report, events);
     }
 }
 

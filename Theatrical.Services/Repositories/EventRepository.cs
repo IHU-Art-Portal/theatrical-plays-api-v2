@@ -13,6 +13,7 @@ public interface IEventRepository
     Task<Event> Create(Event newEvent);
     Task Delete(Event deletingEvent);
     Task UpdatePriceEvent(Event @event, UpdateEventDto eventDto);
+    Task<List<Event>> GetEventsForPerson(int personId);
 }
 
 public class EventRepository : IEventRepository
@@ -24,6 +25,22 @@ public class EventRepository : IEventRepository
     {
         _context = context;
         _logRepository = logRepository;
+    }
+    
+    public async Task<List<Event>> GetEventsForPerson(int personId)
+    {
+        var events = await _context.Persons
+            .Where(p => p.Id == personId)
+            .SelectMany(p => p.Contributions)
+            .Include(c => c.Production)
+            .ThenInclude(p => p.Events)
+            .ThenInclude(e => e.Venue)
+            .SelectMany(c => c.Production.Events)
+            .Include(e => e.Production)
+            .ToListAsync();
+            
+
+        return events;
     }
 
     public async Task<List<Event>?> Get()

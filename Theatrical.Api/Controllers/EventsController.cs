@@ -58,6 +58,40 @@ public class EventsController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+
+    [HttpGet]
+    [Route("person/{id:int}")]
+    public async Task<ActionResult<ApiResponse>> GetEventsForPerson([FromRoute] int id, int? page, int? size)
+    {
+        try
+        {
+            var (validation, ev) = await _validation.FetchEventsForPerson(id);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message! );
+                return new ObjectResult(errorResponse);
+            }
+
+            var eventsDto = _service.ToDto(ev);
+            
+            var paginationResult = _service.Paginate(page, size, eventsDto);
+
+            var response = new ApiResponse<PaginationResult<EventDto>>(paginationResult);
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+            return new ObjectResult(exceptionResponse);
+        }
+    }
+    
+    [HttpGet]
+    [Route("production/{id:int}")]
+    public async Task<ActionResult<ApiResponse>> GetEventsForProduction(int id, int? page, int? size)
+    {
+        return Ok(id);
+    }
     
     /// <summary>
     /// Endpoint to creating a new Event.
