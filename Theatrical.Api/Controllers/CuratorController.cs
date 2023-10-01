@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Net;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -91,7 +92,7 @@ public class CuratorController : ControllerBase
     [HttpGet("CurateHammingDistance")]
     public async Task<ActionResult<ApiResponse>> CurateHammingDistance()
     {
-        return Ok();
+        return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not yet implemented.");
     }
 
     /*
