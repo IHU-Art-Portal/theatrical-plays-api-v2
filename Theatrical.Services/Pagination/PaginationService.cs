@@ -22,7 +22,7 @@ public class PaginationService : IPaginationService
             {
                 Results = dtos,
                 CurrentPage = null,
-                PageSize = null
+                TotalPages = null
             };
 
             return response;
@@ -44,7 +44,7 @@ public class PaginationService : IPaginationService
         {
             Results = dtos,
             CurrentPage = page,
-            PageSize = pageCount
+            TotalPages = pageCount
         };
 
         return response1;
