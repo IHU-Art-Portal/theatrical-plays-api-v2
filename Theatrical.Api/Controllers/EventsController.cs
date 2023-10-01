@@ -69,7 +69,7 @@ public class EventsController : ControllerBase
             if (!validation.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message! );
-                return new ObjectResult(errorResponse);
+                return new ObjectResult(errorResponse){StatusCode = 404};
             }
 
             var eventsDto = _service.ToDto(ev);
@@ -88,9 +88,29 @@ public class EventsController : ControllerBase
     
     [HttpGet]
     [Route("production/{id:int}")]
-    public async Task<ActionResult<ApiResponse>> GetEventsForProduction(int id, int? page, int? size)
+    public async Task<ActionResult<ApiResponse>> GetEventsForProduction([FromRoute] int id, int? page, int? size)
     {
-        return Ok(id);
+        try
+        {
+            var (validation, ev) = await _validation.FetchEventsForProduction(id);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message! );
+                return new ObjectResult(errorResponse){StatusCode = 404};
+            }
+
+            var eventsDto = _service.ToDto(ev);
+            
+            var paginationResult = _service.Paginate(page, size, eventsDto);
+
+            var response = new ApiResponse<PaginationResult<EventDto>>(paginationResult);
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+            return new ObjectResult(exceptionResponse);
+        }
     }
     
     /// <summary>

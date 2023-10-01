@@ -14,6 +14,7 @@ public interface IEventRepository
     Task Delete(Event deletingEvent);
     Task UpdatePriceEvent(Event @event, UpdateEventDto eventDto);
     Task<List<Event>> GetEventsForPerson(int personId);
+    Task<List<Event>?> GetEventsForProduction(int productionId);
 }
 
 public class EventRepository : IEventRepository
@@ -39,6 +40,16 @@ public class EventRepository : IEventRepository
             .Include(e => e.Production)
             .ToListAsync();
             
+
+        return events;
+    }
+
+    public async Task<List<Event>?> GetEventsForProduction(int productionId)
+    {
+        var events = await _context.Productions
+            .Where(p => p.Id == productionId)
+            .SelectMany(p => p.Events)
+            .ToListAsync();
 
         return events;
     }
