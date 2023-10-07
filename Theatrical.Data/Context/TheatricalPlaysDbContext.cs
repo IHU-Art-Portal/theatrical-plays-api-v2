@@ -33,7 +33,7 @@ public class TheatricalPlaysDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseMySQL(_config.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseNpgsql(_config.GetConnectionString("DefaultConnection"));
         }
     }
 

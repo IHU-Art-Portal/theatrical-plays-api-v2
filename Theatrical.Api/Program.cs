@@ -58,7 +58,7 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 
 //dbconnection
 builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
-    opt.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")!));
 
 //services registering
 //persons services
