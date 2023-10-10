@@ -1,4 +1,5 @@
-﻿using Theatrical.Data.Models;
+﻿using System.Globalization;
+using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Services.Pagination;
@@ -38,8 +39,31 @@ public class PersonService : IPersonService
         {
             Fullname = createPersonDto.Fullname,
             Timestamp = DateTime.UtcNow,
-            SystemId = createPersonDto.System
+            SystemId = createPersonDto.System,
+            HairColor = createPersonDto.HairColor,
+            Height = createPersonDto.Height,
+            EyeColor = createPersonDto.EyeColor,
+            Weight = createPersonDto.Weight,
+            Languages = createPersonDto.Languages,
+            Description = createPersonDto.Description,
+            Bio = createPersonDto.Bio,
         };
+
+        if (createPersonDto.Birthdate is not null)
+        {
+            const string format = "dd-MM-yyyy";
+            try
+            {
+                DateTime parsedDate = DateTime.ParseExact(createPersonDto.Birthdate, format, CultureInfo.InvariantCulture);
+
+                // Explicitly set the DateTimeKind to UTC, to avoid errors.
+                person.Birthdate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
         if (createPersonDto.Images != null && createPersonDto.Images.Any())
         {
@@ -48,24 +72,17 @@ public class PersonService : IPersonService
             person.Images = images;
         }
         
-        
         var createdPerson = await _repository.Create(person);
         return createdPerson;
     }
 
+    //Retrieves all persons.
+    //Calls Pagination Method.
     public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size)
     {
         List<Person> persons = await _repository.Get();
 
-        var paginationResult = _pagination.GetPaginated(page, size, persons, items =>
-        {
-            return items.Select(personsDto => new PersonDto
-            {
-                Id = personsDto.Id,
-                Fullname = personsDto.Fullname,
-                SystemID = personsDto.SystemId
-            });
-        });
+        var paginationResult = PaginateAndProduceDtos(persons, page, size);
         
         return paginationResult;
     }
@@ -81,7 +98,15 @@ public class PersonService : IPersonService
         {
             Id = person.Id,
             Fullname = person.Fullname,
-            SystemID = person.SystemId
+            SystemID = person.SystemId,
+            Bio = person.Bio,
+            Birthdate = person.Birthdate != null ? person.Birthdate.ToString() : null, // Conditionally add Birthdate
+            Description = person.Description,
+            Languages = person.Languages,
+            Weight = person.Weight,
+            Height = person.Height,
+            EyeColor = person.Height,
+            HairColor = person.HairColor
         };
         return personDto;
     }
@@ -94,7 +119,15 @@ public class PersonService : IPersonService
             {
                 Id = personsDto.Id,
                 Fullname = personsDto.Fullname,
-                SystemID = personsDto.SystemId
+                SystemID = personsDto.SystemId,
+                Bio = personsDto.Bio,
+                Birthdate = personsDto.Birthdate != null ? personsDto.Birthdate.ToString() : null, // Conditionally add Birthdate
+                Description = personsDto.Description,
+                Languages = personsDto.Languages,
+                Weight = personsDto.Weight,
+                Height = personsDto.Height,
+                EyeColor = personsDto.Height,
+                HairColor = personsDto.HairColor
             });
         });
         

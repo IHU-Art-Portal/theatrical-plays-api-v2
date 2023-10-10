@@ -243,6 +243,15 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasForeignKey(d => d.SystemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("persons_ibfk_1");
+            
+            entity.Property(e => e.HairColor).HasColumnName("HairColor");
+            entity.Property(e => e.Height).HasColumnName("Height");
+            entity.Property(e => e.EyeColor).HasColumnName("EyeColor");
+            entity.Property(e => e.Weight).HasColumnName("Weight");
+            entity.Property(e => e.Languages).HasColumnName("Languages");
+            entity.Property(e => e.Description).HasColumnName("Description");
+            entity.Property(e => e.Bio).HasColumnName("Bio");
+            entity.Property(e => e.Birthdate).HasColumnName("Birthdate");
         });
 
         modelBuilder.Entity<Production>(entity =>
