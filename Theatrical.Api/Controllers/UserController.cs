@@ -375,6 +375,27 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpGet("refresh-token")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> RefreshToken()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var (validation, user) = await _validation.ValidateUser(email);
+        
+        if (!validation.Success)
+        {
+            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+            return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+        }
+        
+        var jwtDto = _service.GenerateToken(user!);
+
+        var response = new ApiResponse<JwtDto>(jwtDto, "Token refreshed!");
+
+        return new OkObjectResult(response);
+        
+    }
+
     [HttpPut]
     [Route("@/facebook")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
