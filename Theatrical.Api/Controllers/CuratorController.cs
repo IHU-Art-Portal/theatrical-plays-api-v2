@@ -112,7 +112,30 @@ public class CuratorController : ControllerBase
         
         return new OkObjectResult(apiresponse);
     }
-    
+
+    [HttpGet("DeleteContributionsForNonExistentProductions")]
+    public async Task<ActionResult<ApiResponse>> CorrectContrProd()
+    {
+        var contributions = await _contributions.Get();
+        var productions = await _production.Get();
+
+        var contributionsToDelete = contributions
+            .Where(contribution => productions.All(production => production.Id != contribution.ProductionId))
+            .ToList();
+        
+        var contrResp = new DeletedContributionsDto
+        {
+            DeletedCount = contributionsToDelete.Count,
+            TotalContributions = contributions.Count
+        };
+
+        await _contributions.RemoveRange(contributionsToDelete);
+        
+        var apiresponse = new ApiResponse<DeletedContributionsDto>(contrResp);
+        
+        return new OkObjectResult(apiresponse);
+    }
+
 
     [HttpGet("CurateHammingDistance")]
     public async Task<ActionResult<ApiResponse>> CurateHammingDistance()
