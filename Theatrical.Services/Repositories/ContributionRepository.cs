@@ -17,6 +17,7 @@ public interface IContributionRepository
         int roleId);
 
     Task UpdateRange(List<Contribution> contributions);
+    Task RemoveRange(List<Contribution> contributions);
 }
 
 public class ContributionRepository : IContributionRepository
@@ -107,6 +108,12 @@ public class ContributionRepository : IContributionRepository
     public async Task UpdateRange(List<Contribution> contributions)
     {
         _context.Contributions.UpdateRange(contributions);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveRange(List<Contribution> contributions)
+    {
+        _context.Contributions.RemoveRange(contributions);
         await _context.SaveChangesAsync();
     }
 }

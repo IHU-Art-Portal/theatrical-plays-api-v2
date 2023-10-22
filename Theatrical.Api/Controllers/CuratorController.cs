@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
+using Theatrical.Dto.ContributionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.Responses;
@@ -88,6 +89,30 @@ public class CuratorController : ControllerBase
             return new ObjectResult(e.Message);
         }
     }
+
+    [HttpGet("DeleteContributionsForNonExistentPeople")]
+    public async Task<ActionResult<ApiResponse>> CorrectContr()
+    {
+        var contributions = await _contributions.Get();
+        var persons = await _person.Get();
+
+        var contributionsToDelete = contributions
+            .Where(contribution => !persons.Any(person => person.Id == contribution.PeopleId))
+            .ToList();
+
+        var contrResp = new DeletedContributionsDto
+        {
+            DeletedCount = contributionsToDelete.Count,
+            TotalContributions = contributions.Count
+        };
+
+        await _contributions.RemoveRange(contributionsToDelete);
+        
+        var apiresponse = new ApiResponse<DeletedContributionsDto>(contrResp);
+        
+        return new OkObjectResult(apiresponse);
+    }
+    
 
     [HttpGet("CurateHammingDistance")]
     public async Task<ActionResult<ApiResponse>> CurateHammingDistance()
