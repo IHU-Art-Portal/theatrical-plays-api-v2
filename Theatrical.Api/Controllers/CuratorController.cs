@@ -7,6 +7,9 @@ using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.Responses;
 using Theatrical.Services.Repositories;
+using System.IO;
+using System.Text.Json;
+using Theatrical.Dto.RoleDtos;
 
 namespace Theatrical.Api.Controllers;
 
@@ -148,16 +151,54 @@ public class CuratorController : ControllerBase
     {
         List<Role> roles = await _role.GetRoles();
         
-        Dictionary<string, string> correctedRoleNames = GetCorrectedRoleDictionary();
+        //Similar roles list.
+        List<Role> similarRoleNames = FindSimilarRoleNames(roles);
+
+        if (similarRoleNames.Count == 0)
+        {
+            return new ObjectResult(new ApiResponse("The list of similar roles is empty. Thus there is no need for role correction."));
+        }
+
+        //Custom dictionary with mapped roles.
+        Dictionary<string, string> dictionary = GetCorrectedRoleDictionary();
+
+        List<Role> correctedRoles = MapWrongRolesToCorrect(similarRoleNames, dictionary);
         
-        List<string> similarRoleNames = FindSimilarRoleNames(roles);
-        Console.WriteLine(similarRoleNames.Count);
+        
+        var response = new CuratorRoleResponse
+        {
+            CorrectedRoles = correctedRoles.Count,
+            roles = correctedRoles,
+            TotalRoles = roles.Count
+        };
 
-        var apiresponse = new ApiResponse<List<string>>(similarRoleNames);
-
-        return new OkObjectResult(apiresponse);
+        return Ok(response);
     }
-    
+
+    private List<Role> MapWrongRolesToCorrect(List<Role> roles, Dictionary<string, string> dictionary)
+    {
+        var correctedRolesList = new List<Role>();
+
+        foreach (var role in roles)
+        {
+            string roleName = CleanName(role.Role1);
+
+            if (dictionary.ContainsKey(roleName))
+            {
+                Role correctedRole = new Role
+                {
+                    Id = role.Id,
+                    SystemId = role.SystemId,
+                    Timestamp = role.Timestamp,
+                    Role1 = dictionary[roleName]
+                };
+                correctedRolesList.Add(correctedRole);
+            }
+        }
+
+        return correctedRolesList;
+    }
+
     Dictionary<string, string> GetCorrectedRoleDictionary()
     {
         
@@ -634,9 +675,9 @@ public class CuratorController : ControllerBase
 
     }
     
-    List<string> FindSimilarRoleNames(List<Role> roles)
+    List<Role> FindSimilarRoleNames(List<Role> roles)
     {
-        List<string> similarRoleNames = new List<string>();
+        List<Role> similarRoles = new List<Role>();
 
         // Clean the role names for consistent comparison
         List<string> cleanedRoleNames = roles.Select(role => CleanName(role.Role1)).ToList();
@@ -649,12 +690,12 @@ public class CuratorController : ControllerBase
             Role role1 = roles[i];
             string roleName1 = cleanedRoleNames[i];
 
-            // Check if the role name has already been added to the list
-            bool isAdded = similarRoleNames.Contains(roleName1);
+            // Check if the role has already been added to the list
+            bool isAdded = similarRoles.Contains(role1);
 
             if (isAdded)
             {
-                // Skip this role name; it's already in the list
+                // Skip this role; it's already in the list
                 continue;
             }
 
@@ -668,16 +709,16 @@ public class CuratorController : ControllerBase
                 // If the similarity score is below the threshold, consider them similar
                 if (similarityScore <= similarityThreshold)
                 {
-                    if (!similarRoleNames.Contains(roleName1))
+                    if (!similarRoles.Contains(role1))
                     {
-                        similarRoleNames.Add(roleName1);
+                        similarRoles.Add(role1);
                     }
-                    similarRoleNames.Add(roleName2);
+                    similarRoles.Add(role2);
                 }
             }
         }
 
-        return similarRoleNames;
+        return similarRoles;
     }
     
     int CalculateLevenshteinDistance(string s1, string s2)
