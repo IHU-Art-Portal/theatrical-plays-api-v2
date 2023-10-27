@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.ContributionDtos;
@@ -7,8 +6,6 @@ using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.Responses;
 using Theatrical.Services.Repositories;
-using System.IO;
-using System.Text.Json;
 using Theatrical.Dto.RoleDtos;
 
 namespace Theatrical.Api.Controllers;
@@ -163,6 +160,9 @@ public class CuratorController : ControllerBase
         //Sends the list of roles for correction along with the dictionary.
         //This list will be used to update these entries in db.
         List<Role> correctedRoles = _roleSimplifierCurator.MapWrongRolesToCorrect(similarRoles, dictionary);
+
+        correctedRoles = correctedRoles.OrderBy(role => role.Id).ToList();
+        correctedRoles = correctedRoles.DistinctBy(role => role.Id).ToList();
         
         var response = new CuratorRoleResponse
         {

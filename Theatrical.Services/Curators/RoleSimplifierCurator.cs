@@ -15,9 +15,7 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
     public List<Role> FindSimilarRoles(List<Role> roles)
     {
         List<Role> similarRoles = new List<Role>();
-
-        // Clean the role names for consistent comparison
-        List<string> cleanedRoleNames = roles.Select(role => CleanName(role.Role1)).ToList();
+        HashSet<Role> addedRoles = new HashSet<Role>(); // To track added role names
 
         // Set a threshold for similarity (adjust this as needed)
         int similarityThreshold = 3;
@@ -25,12 +23,10 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
         for (int i = 0; i < roles.Count; i++)
         {
             Role role1 = roles[i];
-            string roleName1 = cleanedRoleNames[i];
+            string roleName1 = CleanName(role1.Role1);
 
             // Check if the role has already been added to the list
-            bool isAdded = similarRoles.Contains(role1);
-
-            if (isAdded)
+            if (addedRoles.Contains(role1))
             {
                 // Skip this role; it's already in the list
                 continue;
@@ -39,24 +35,29 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
             for (int j = i + 1; j < roles.Count; j++)
             {
                 Role role2 = roles[j];
-                string roleName2 = cleanedRoleNames[j];
+                string roleName2 = CleanName(role2.Role1);
 
                 int similarityScore = CalculateLevenshteinDistance(roleName1, roleName2);
 
                 // If the similarity score is below the threshold, consider them similar
                 if (similarityScore <= similarityThreshold)
                 {
-                    if (!similarRoles.Contains(role1))
+                    if (!addedRoles.Contains(role1))
                     {
                         similarRoles.Add(role1);
+                        addedRoles.Add(role1);
                     }
+
+                    addedRoles.Add(role2);
                     similarRoles.Add(role2);
+
                 }
             }
         }
 
         return similarRoles;
     }
+
     
     public List<Role> MapWrongRolesToCorrect(List<Role> roles, Dictionary<string, string> dictionary)
     {
@@ -90,7 +91,7 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
     
     private int CalculateLevenshteinDistance(string s1, string s2)
     {
-        int[,] distance = new int[s1.Length + 1, s2.Length + 1];
+        var distance = new int[s1.Length + 1, s2.Length + 1];
 
         for (int i = 0; i <= s1.Length; i++)
         {
