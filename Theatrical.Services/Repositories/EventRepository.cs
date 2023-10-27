@@ -30,7 +30,7 @@ public class EventRepository : IEventRepository
     
     public async Task<List<Event>> GetEventsForPerson(int personId)
     {
-        var events = await _context.Persons
+        /*var events = await _context.Persons
             .Where(p => p.Id == personId)
             .SelectMany(p => p.Contributions)
             .Include(c => c.Production)
@@ -38,6 +38,12 @@ public class EventRepository : IEventRepository
             .ThenInclude(e => e.Venue)
             .SelectMany(c => c.Production.Events)
             .Include(e => e.Production)
+            .ToListAsync();*/
+        
+        var events = await _context.Persons
+            .Where(p => p.Id == personId)
+            .SelectMany(p => p.Contributions)
+            .SelectMany(c => c.Production.Events)
             .ToListAsync();
             
 
