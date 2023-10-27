@@ -95,7 +95,8 @@ public class CuratorController : ControllerBase
         }
     }
 
-    [HttpGet("DeleteContributionsForNonExistentPeople")]
+    [HttpGet]
+    [Route("Contributions/Delete/ForNonExistent/People")]
     public async Task<ActionResult<ApiResponse>> CorrectContr()
     {
         var contributions = await _contributions.Get();
@@ -118,7 +119,8 @@ public class CuratorController : ControllerBase
         return new OkObjectResult(apiresponse);
     }
 
-    [HttpGet("DeleteContributionsForNonExistentProductions")]
+    [HttpGet]
+    [Route("Contributions/Delete/ForNonExistent/Productions")]
     public async Task<ActionResult<ApiResponse>> CorrectContrProd()
     {
         var contributions = await _contributions.Get();
@@ -141,14 +143,8 @@ public class CuratorController : ControllerBase
         return new OkObjectResult(apiresponse);
     }
 
-
-    [HttpGet("CurateHammingDistance")]
-    public async Task<ActionResult<ApiResponse>> CurateHammingDistance()
-    {
-        return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not yet implemented.");
-    }
-
-    [HttpGet("FindSimilarRoles")]
+    [HttpGet]
+    [Route("Roles/Simplify/LevenshteinDistance")]
     public async Task<ActionResult<ApiResponse>> FindSimilarRoles()
     {
         List<Role> roles = await _role.GetRoles();
