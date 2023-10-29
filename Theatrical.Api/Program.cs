@@ -129,6 +129,9 @@ builder.Services.AddScoped<UserAuthorizationFilter>();
 builder.Services.AddScoped<AnyRoleAuthorizationFilter>();
 builder.Services.AddScoped<ClaimsManagerAuthorizationFilter>();
 
+//Memory caching
+builder.Services.AddMemoryCache();
+
 //cors
 builder.Services.AddCors(options =>
 {
