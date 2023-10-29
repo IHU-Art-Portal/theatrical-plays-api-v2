@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
@@ -24,11 +25,13 @@ public class ContributionRepository : IContributionRepository
 {
     private readonly TheatricalPlaysDbContext _context;
     private readonly ILogRepository _logRepository;
+    private readonly ICaching _caching;
 
-    public ContributionRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
+    public ContributionRepository(TheatricalPlaysDbContext context, ILogRepository logRepository, ICaching caching)
     {
         _context = context;
         _logRepository = logRepository;
+        _caching = caching;
     }
 
     public async Task<Contribution> Create(Contribution contribution)
@@ -56,7 +59,12 @@ public class ContributionRepository : IContributionRepository
     
     public async Task<List<Contribution>> Get()
     {
-        var contributions = await _context.Contributions.ToListAsync();
+        var contributions = await _caching.GetOrSetAsync("allcontributions", async () =>
+        {
+            var contributions = await _context.Contributions.ToListAsync();
+            return contributions;
+        });
+
         return contributions;
     }
 
