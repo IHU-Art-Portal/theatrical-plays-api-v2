@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.PersonDtos;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
@@ -23,12 +24,12 @@ public interface IPersonRepository
 public class PersonRepository : IPersonRepository
 {
     private readonly TheatricalPlaysDbContext _context;
-    private readonly IMemoryCache _memoryCache;
+    private readonly ICaching _caching;
 
-    public PersonRepository(TheatricalPlaysDbContext context, IMemoryCache memoryCache)
+    public PersonRepository(TheatricalPlaysDbContext context, ICaching caching)
     {
         _context = context;
-        _memoryCache = memoryCache;
+        _caching = caching;
     }
 
     public async Task<Person> Create(Person person)
@@ -40,75 +41,47 @@ public class PersonRepository : IPersonRepository
     
     public async Task<List<Person>> Get()
     {
-        if (!_memoryCache.TryGetValue("allpeople", out List<Person> people))
-        {
-            people = await _context.Persons.ToListAsync();
-            _memoryCache.Set("allpeople", people);
-            return people;
-        }
+        var people = await _caching.GetOrSetAsync("allpeople", async () => await _context.Persons.ToListAsync());
 
         return people;
     }
     
     public async Task<Person?> Get(int id)
     {
-        if (!_memoryCache.TryGetValue($"person_{id}", out Person? person))
-        {
-            person = await _context.Persons.FindAsync(id);
+        var person = await _caching.GetOrSetAsync($"person_{id}", async () => await _context.Persons.FindAsync(id));
             
-            if (person != null)
-            {
-                _memoryCache.Set($"person_{id}", person, TimeSpan.FromMinutes(15)); //Cache for 15 minutes
-            }
-        }
-
         return person;
     }
 
     public async Task<List<Person>?> GetByRole(string role)
     {
-        if (!_memoryCache.TryGetValue($"persons_with_role_{role}", out List<Person> personsWithRole))
+        var people = await _caching.GetOrSetAsync($"persons_with_role_{role}", async () =>
         {
-            personsWithRole = await _context.Persons.Where(p => p.Contributions
-                    .Any(c => c.Role.Role1 == role))
+            return await _context.Persons
+                .Where(p => p.Contributions.Any(c => c.Role.Role1 == role))
                 .ToListAsync();
+        });
 
-            if (personsWithRole.Count > 0)
-            {
-                _memoryCache.Set($"persons_with_role_{role}", personsWithRole, TimeSpan.FromMinutes(15));
-            }
-        }
-        
-        return personsWithRole;
+        return people;
     }
 
     public async Task<List<Person>?> GetByLetter(string initials)
     {
-        if (!_memoryCache.TryGetValue($"persons_by_initials_{initials}", out List<Person> persons))
+        var people = await _caching.GetOrSetAsync($"persons_by_initials_{initials}", async () =>
         {
-            persons = await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
-
-            if (persons.Count > 0)
-            {
-                _memoryCache.Set($"persons_by_initials_{initials}", persons, TimeSpan.FromMinutes(15));
-            }
-        }
+            return await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
+        });
         
-
-        return persons;
+        
+        return people;
     }
 
     public async Task<Person?> GetByName(string name)
     {
-        if (!_memoryCache.TryGetValue($"person_by_name_{name}", out Person? person))
+        var person = await _caching.GetOrSetAsync($"person_by_name_{name}", async () =>
         {
-            person = await _context.Persons.FirstOrDefaultAsync(p => p.Fullname == name);
-
-            if (person != null)
-            {
-                _memoryCache.Set($"person_by_name_{name}", person, TimeSpan.FromMinutes(15));
-            }
-        }
+            return await _context.Persons.FirstOrDefaultAsync(p => p.Fullname == name);
+        });
 
         return person;
     }
@@ -121,9 +94,10 @@ public class PersonRepository : IPersonRepository
 
     public async Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId)
     {
-        if (!_memoryCache.TryGetValue($"productions_person_{personId}", out List<PersonProductionsRoleInfo> personProductions))
+        
+        return await _caching.GetOrSetAsync($"person_productions_{personId}", async () =>
         {
-            personProductions = await _context.Contributions
+            var personProductions = await _context.Contributions
                 .Where(c => c.PeopleId == personId)
                 .Include(c => c.Role)
                 .Select(c => new PersonProductionsRoleInfo
@@ -133,32 +107,22 @@ public class PersonRepository : IPersonRepository
                 })
                 .ToListAsync();
 
-            if (personProductions.Count > 0)
-            {
-                _memoryCache.Set($"productions_person_{personId}", personProductions, TimeSpan.FromMinutes(15));
-            }
-        }
+            return personProductions;
+        });
         
-        
-        return personProductions;
     }
 
     public async Task<List<Image>?> GetPersonsImages(int personId)
     {
-        if (!_memoryCache.TryGetValue($"persons_images_{personId}", out List<Image> images))
+        return await _caching.GetOrSetAsync($"person_images_{personId}", async () =>
         {
-            var person = await _context.Persons
+            var personImages = await _context.Persons
+                .Where(p => p.Id == personId)
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == personId);
-
-            if (person != null)
-            {
-                images = person.Images.ToList();
-                _memoryCache.Set($"persons_images_{personId}", images, TimeSpan.FromMinutes(15));
-            }
-        }
-
-        return images;
+                .SelectMany(p => p.Images)
+                .ToListAsync();
+            return personImages;
+        });
     }
 
     public async Task UpdateRange(List<Person> people)
