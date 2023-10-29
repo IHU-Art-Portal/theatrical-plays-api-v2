@@ -12,6 +12,7 @@ using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
+using Theatrical.Services.Caching;
 using Theatrical.Services.Curators;
 using Theatrical.Services.Email;
 using Theatrical.Services.Jwt;
@@ -129,8 +130,9 @@ builder.Services.AddScoped<UserAuthorizationFilter>();
 builder.Services.AddScoped<AnyRoleAuthorizationFilter>();
 builder.Services.AddScoped<ClaimsManagerAuthorizationFilter>();
 
-//Memory caching
+//Memory caching and ICaching service
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ICaching, Caching>();
 
 //cors
 builder.Services.AddCors(options =>
