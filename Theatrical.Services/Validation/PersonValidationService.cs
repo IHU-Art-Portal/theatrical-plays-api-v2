@@ -145,7 +145,7 @@ public class PersonValidationService : IPersonValidationService
         {
             report.Success = false;
             report.Message = "This person does not have any photos";
-            report.ErrorCode = ErrorCode.NotFound;
+            report.ErrorCode = ErrorCode.NoAvailablePhotos;
             return (report, null);
         }
 

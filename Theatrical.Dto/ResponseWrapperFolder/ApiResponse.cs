@@ -18,7 +18,8 @@ public enum ErrorCode
     _2FaEnabled,
     _2FaFailure,
     _2FaDisabled,
-    AlreadyLoggedIn
+    AlreadyLoggedIn,
+    NoAvailablePhotos
 }
 
 public class ApiResponse
