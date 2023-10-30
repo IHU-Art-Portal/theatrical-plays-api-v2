@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 
 namespace Theatrical.Services.Curators.DataCreationCurators;
 
@@ -25,11 +27,17 @@ public class CuratorIncomingData : ICuratorIncomingData
             // Remove extra spaces and commas and ensure the corrected name matches the pattern
             correctedName = Regex.Replace(correctedName, @"\s*,\s*", ", ");
 
-            correctedName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(correctedName.ToLower());
+            correctedName = ToTitleCase(correctedName);
 
             return correctedName;
         }
 
         return fullName;
+    }
+
+    private string ToTitleCase(string text)
+    {
+        var textInfo = CultureInfo.CurrentCulture.TextInfo;
+        return textInfo.ToTitleCase(text.ToLower());
     }
 }
