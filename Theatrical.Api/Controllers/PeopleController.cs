@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -281,17 +280,29 @@ public class PeopleController : ControllerBase
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DeletePerson(int id)
     {
-        var (validation, performer) = await _validation.ValidateForDelete(id);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-            return new ObjectResult(errorResponse){StatusCode = 404};
+            var (validation, performer) = await _validation.ValidateForDelete(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            await _service.Delete(performer!);
+            ApiResponse response = new ApiResponse(message: $"Person with ID: {id} has been deleted!");
+
+            return new OkObjectResult(response);
         }
-        
-        await _service.Delete(performer!);
-        ApiResponse response = new ApiResponse(message: $"Person with ID: {id} has been deleted!");
-        
-        return new OkObjectResult(response);
+        catch (Exception e)
+        {
+            if (e.HResult.Equals(-2146233088))
+            {
+                return new ObjectResult(new ApiResponse(ErrorCode.ServerError, "Object has already been deleted, but due to temporary caching you get this error. You may disregard this error message.")) { StatusCode = 500 };
+            }
+
+            return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
+        }
     }
 }
