@@ -7,6 +7,7 @@ namespace Theatrical.Services.Curators.DataCreationCurators;
 public interface ICuratorIncomingData
 {
     string CorrectFullName(string fullName);
+    List<string> CorrectRoles(List<string> roles);
 }
 
 public class CuratorIncomingData : ICuratorIncomingData
@@ -32,6 +33,39 @@ public class CuratorIncomingData : ICuratorIncomingData
 
         return fullName;
     }
+    
+    public List<string> CorrectRoles(List<string> roles)
+    {
+        var correctedRoles = new List<string>();
+        
+        foreach (var role in roles)
+        {
+            var correctRole = new string(role.Trim());
+            if (!FullNameRegex.IsMatch(role))
+            {
+                correctRole = Regex.Replace(correctRole, @"[^A-Za-zΑ-Ωα-ω\u0370-\u03ff\u1f00-\u1fff\s,]", "");
+                correctRole = Regex.Replace(correctRole,@"\s*,\s*", ", " );
+                correctRole = ToTitleCase(correctRole);
+                correctRole = RemoveExtraSpaces(correctRole);
+                correctedRoles.Add(correctRole);
+            }
+        }
+        
+        
+        return correctedRoles;
+    }
+    
+    public string RemoveExtraSpaces(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return input;
+        }
+
+        // Use regular expression to replace multiple spaces with a single space
+        return Regex.Replace(input, @"\s+", " ");
+    }
+
 
     private string ToTitleCase(string text)
     {

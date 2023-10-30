@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Mime;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
@@ -95,7 +94,7 @@ public class PeopleController : ControllerBase
     {
         try
         {
-            var (validation, correctedName) = await _validation.ValidateForCreate(createPersonDto.Fullname);
+            var (validation, correctedName, correctedRoles) = await _validation.ValidateForCreate(createPersonDto.Fullname, createPersonDto.Roles);
 
             if (!validation.Success)
             {
@@ -105,6 +104,7 @@ public class PeopleController : ControllerBase
             }
 
             createPersonDto.Fullname = correctedName;
+            createPersonDto.Roles = correctedRoles;
             var createdPerson = await _service.Create(createPersonDto);
             var createdPersonDto = _service.ToDto(createdPerson);
 
