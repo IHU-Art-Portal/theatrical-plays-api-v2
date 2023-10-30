@@ -48,6 +48,7 @@ public class PersonService : IPersonService
             Languages = createPersonDto.Languages,
             Description = createPersonDto.Description,
             Bio = createPersonDto.Bio,
+            Roles = createPersonDto.Roles
         };
 
         if (createPersonDto.Birthdate is not null)
@@ -107,7 +108,8 @@ public class PersonService : IPersonService
             Weight = person.Weight,
             Height = person.Height,
             EyeColor = person.Height,
-            HairColor = person.HairColor
+            HairColor = person.HairColor,
+            Roles = person.Roles
         };
         return personDto;
     }

@@ -20,4 +20,5 @@ public class Person
     public string? Description { get; set; }
     public string? Bio { get; set; }
     public DateTime? Birthdate { get; set; }
+    public List<string>? Roles { get; set; }
 }

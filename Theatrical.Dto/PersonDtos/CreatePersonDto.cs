@@ -8,10 +8,10 @@ public class CreatePersonDto
     public string? EyeColor { get; set; }
     public string? Weight { get; set; }
     public List<string>? Languages { get; set; }
-    public string? Role { get; set; }
     public string? Description { get; set; }
     public string? Bio { get; set; }
     public string? Birthdate { get; set; }
     public List<string>? Images { get; set; }
     public int System { get; set; }
+    public List<string>? Roles { get; set; }
 }
