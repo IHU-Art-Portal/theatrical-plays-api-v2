@@ -103,7 +103,7 @@ public class PeopleController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status400BadRequest};
             }
 
-            var createdPerson = await _service.Create(createPersonDto);
+            var createdPerson = await _service.Create(correctedCreatePersonDto!);
             var createdPersonDto = _service.ToDto(createdPerson);
 
             var response = new ApiResponse<PersonDto>(createdPersonDto,"Successfully Created Person");

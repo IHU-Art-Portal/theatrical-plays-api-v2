@@ -28,6 +28,8 @@ public class CuratorIncomingData : ICuratorIncomingData
 
             correctedName = ToTitleCase(correctedName);
 
+            correctedName = RemoveExtraSpaces(correctedName);
+
             return correctedName;
         }
 

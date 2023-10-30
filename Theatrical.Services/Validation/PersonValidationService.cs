@@ -157,12 +157,11 @@ public class PersonValidationService : IPersonValidationService
 
     public async Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto)
     {
-        
-        var correctedName = _curatorIncomingData.CorrectFullName(createPersonDto.Fullname);
+        createPersonDto.Fullname = _curatorIncomingData.CorrectFullName(createPersonDto.Fullname);
         
         var report = new ValidationReport();
 
-        var person = await _repository.GetByName(correctedName);
+        var person = await _repository.GetByName(createPersonDto.Fullname);
 
         if (person is not null)
         {
