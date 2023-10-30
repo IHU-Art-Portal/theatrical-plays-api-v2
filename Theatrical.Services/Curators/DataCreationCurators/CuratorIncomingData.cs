@@ -55,7 +55,7 @@ public class CuratorIncomingData : ICuratorIncomingData
         return correctedRoles;
     }
     
-    public string RemoveExtraSpaces(string input)
+    private string RemoveExtraSpaces(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
         {
