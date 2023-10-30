@@ -130,7 +130,8 @@ public class PersonService : IPersonService
                 Weight = personsDto.Weight,
                 Height = personsDto.Height,
                 EyeColor = personsDto.Height,
-                HairColor = personsDto.HairColor
+                HairColor = personsDto.HairColor,
+                Roles = personsDto.Roles
             });
         });
         
