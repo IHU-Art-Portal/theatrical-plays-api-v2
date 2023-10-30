@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
-using System.Net.Mime;
 using System.Text.RegularExpressions;
-using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 
 namespace Theatrical.Services.Curators.DataCreationCurators;
 
