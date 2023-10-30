@@ -19,6 +19,7 @@ public interface IPersonService
         List<PersonProductionsRoleInfo> personProductionsRole, int? page, int? size);
 
     List<ImageDto> ImagesToDto(List<Image> images);
+    Task<List<Image>?> GetImages();
 
 }
 
@@ -151,5 +152,11 @@ public class PersonService : IPersonService
     public List<ImageDto> ImagesToDto(List<Image> images)
     {
         return images.Select(image => new ImageDto { Id = image.Id, ImageUrl = image.ImageUrl, PersonId = image.PersonId }).ToList();
+    }
+
+    public async Task<List<Image>?> GetImages()
+    {
+        var images = await _repository.GetImages();
+        return images;
     }
 }

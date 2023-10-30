@@ -18,6 +18,7 @@ public interface IPersonRepository
     Task<List<PersonProductionsRoleInfo>?> GetProductionsOfPerson(int personId);
     Task<List<Image>?> GetPersonsImages(int personId);
     Task UpdateRange(List<Person> people);
+    Task<List<Image>?> GetImages();
 }
 
 public class PersonRepository : IPersonRepository
@@ -128,5 +129,15 @@ public class PersonRepository : IPersonRepository
     {
         _context.Persons.UpdateRange(people);
         await _context.SaveChangesAsync();
+    }
+    
+    public async Task<List<Image>?> GetImages()
+    {
+        return await _caching.GetOrSetAsync($"all_images", async () =>
+        {
+            var images = await _context.Images.ToListAsync();
+            
+            return images;
+        });
     }
 }

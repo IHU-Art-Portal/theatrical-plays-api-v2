@@ -1,6 +1,8 @@
 ﻿using System.Net;
+using System.Net.Mime;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -303,6 +305,24 @@ public class PeopleController : ControllerBase
                 return new ObjectResult(new ApiResponse(ErrorCode.ServerError, "Object has already been deleted, but due to temporary caching you get this error. You may disregard this error message.")) { StatusCode = 500 };
             }
 
+            return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
+        }
+    }
+
+    [HttpGet]
+    [Route("photos")]
+    public async Task<ActionResult<ApiResponse>> GetPhotos()
+    {
+        try
+        {
+            var images = await _service.GetImages();
+
+            var apiResponse = new ApiResponse<List<Image>>(images);
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
             return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
         }
     }
