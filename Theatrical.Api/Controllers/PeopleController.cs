@@ -93,7 +93,7 @@ public class PeopleController : ControllerBase
     {
         try
         {
-            var validation = await _validation.ValidateForCreate(createPersonDto.Fullname);
+            var (validation, correctedName) = await _validation.ValidateForCreate(createPersonDto.Fullname);
 
             if (!validation.Success)
             {
@@ -101,7 +101,8 @@ public class PeopleController : ControllerBase
                 
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status400BadRequest};
             }
-            
+
+            createPersonDto.Fullname = correctedName;
             var createdPerson = await _service.Create(createPersonDto);
             var createdPersonDto = _service.ToDto(createdPerson);
 

@@ -14,7 +14,7 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials);
     Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
-    Task<ValidationReport> ValidateForCreate(string fullName);
+    Task<(ValidationReport, string?)> ValidateForCreate(string fullName);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -155,31 +155,23 @@ public class PersonValidationService : IPersonValidationService
         return (report, images);
     }
 
-    public async Task<ValidationReport> ValidateForCreate(string fullName)
+    public async Task<(ValidationReport, string?)> ValidateForCreate(string fullName)
     {
-        bool isValid = _curatorIncomingData.ValidateFullName(fullName);
+        var correctedName = _curatorIncomingData.CorrectFullName(fullName);
         var report = new ValidationReport();
-        
-        if (!isValid)
-        {
-            report.Success = false;
-            report.Message = "Person's name must follow the template: {Name Surname}, {Name}, or {Surname}";
-            report.ErrorCode = ErrorCode.CurationFailure;
-            return report;
-        }
 
-        var person = await _repository.GetByName(fullName);
+        var person = await _repository.GetByName(correctedName);
 
         if (person is not null)
         {
             report.Success = false;
             report.Message = "Person with a similar name already exists.";
             report.ErrorCode = ErrorCode.AlreadyExists;
-            return report;
+            return (report, null);
         }
         
         report.Message = "Success";
         report.Success = true;
-        return report;
+        return (report, correctedName);
     }
 }
