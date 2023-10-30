@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Theatrical.Data.Context;
-using Theatrical.Data.Models;
+﻿using Theatrical.Data.Models;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
-using Theatrical.Services.Curators;
+using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -22,12 +20,12 @@ public interface IPersonValidationService
 public class PersonValidationService : IPersonValidationService
 {
     private readonly IPersonRepository _repository;
-    private readonly ITestCurator _testCurator;
+    private readonly ICuratorIncomingData _curatorIncomingData;
 
-    public PersonValidationService(IPersonRepository repository, ITestCurator testCurator)
+    public PersonValidationService(IPersonRepository repository, ICuratorIncomingData curatorIncomingData)
     {
         _repository = repository;
-        _testCurator = testCurator;
+        _curatorIncomingData = curatorIncomingData;
     }
 
     public async Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId)
@@ -159,7 +157,7 @@ public class PersonValidationService : IPersonValidationService
 
     public async Task<ValidationReport> ValidateForCreate(string fullName)
     {
-        bool isValid = _testCurator.ValidateFullName(fullName);
+        bool isValid = _curatorIncomingData.ValidateFullName(fullName);
         var report = new ValidationReport();
         
         if (!isValid)

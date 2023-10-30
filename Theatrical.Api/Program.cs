@@ -14,6 +14,7 @@ using Theatrical.Dto.LoginDtos;
 using Theatrical.Services;
 using Theatrical.Services.Caching;
 using Theatrical.Services.Curators;
+using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Email;
 using Theatrical.Services.Jwt;
 using Theatrical.Services.Pagination;
@@ -119,7 +120,7 @@ builder.Services.AddTransient<IPaginationService, PaginationService>();
 
 //Curator service
 builder.Services.AddTransient<IRoleSimplifierCurator, RoleSimplifierCurator>();
-builder.Services.AddTransient<ITestCurator, TestTestCurator>();
+builder.Services.AddTransient<ICuratorIncomingData, CuratorIncomingData>();
 
 //Email service
 builder.Services.AddTransient<IEmailService, EmailService>();
