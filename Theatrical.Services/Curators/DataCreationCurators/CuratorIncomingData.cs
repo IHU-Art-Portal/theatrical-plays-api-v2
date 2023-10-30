@@ -7,7 +7,7 @@ namespace Theatrical.Services.Curators.DataCreationCurators;
 public interface ICuratorIncomingData
 {
     string CorrectFullName(string fullName);
-    List<string> CorrectRoles(List<string> roles);
+    List<string> CorrectRolesOrLanguages(List<string> roles);
 }
 
 public class CuratorIncomingData : ICuratorIncomingData
@@ -34,7 +34,7 @@ public class CuratorIncomingData : ICuratorIncomingData
         return fullName;
     }
     
-    public List<string> CorrectRoles(List<string> roles)
+    public List<string> CorrectRolesOrLanguages(List<string> roles)
     {
         var correctedRoles = new List<string>();
         

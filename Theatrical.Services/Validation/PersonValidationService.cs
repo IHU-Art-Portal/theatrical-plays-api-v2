@@ -14,7 +14,7 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<Person>? person)> ValidateForInitials(string initials);
     Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
-    Task<(ValidationReport validationReport, string? correctedName, List<string>? correctedRoles)> ValidateForCreate(string fullName, List<string>? roles);
+    Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -155,15 +155,10 @@ public class PersonValidationService : IPersonValidationService
         return (report, images);
     }
 
-    public async Task<(ValidationReport validationReport, string? correctedName, List<string>? correctedRoles)> ValidateForCreate(string fullName, List<string>? roles)
+    public async Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto)
     {
-        var correctedName = _curatorIncomingData.CorrectFullName(fullName);
-        var correctedRoles = new List<string>();
-
-        if (roles.Count > 0)
-        {
-            correctedRoles = _curatorIncomingData.CorrectRoles(roles);
-        }
+        
+        var correctedName = _curatorIncomingData.CorrectFullName(createPersonDto.Fullname);
         
         var report = new ValidationReport();
 
@@ -174,11 +169,23 @@ public class PersonValidationService : IPersonValidationService
             report.Success = false;
             report.Message = "Person with a similar name already exists.";
             report.ErrorCode = ErrorCode.AlreadyExists;
-            return (report, null, null);
+            return (report, null);
         }
         
+        if (createPersonDto.Roles is not null && createPersonDto.Roles.Count > 0)
+        {
+            var correctedRoles = _curatorIncomingData.CorrectRolesOrLanguages(createPersonDto.Roles);
+            createPersonDto.Roles = correctedRoles;
+        }
+
+        if (createPersonDto.Languages is not null && createPersonDto.Languages.Count > 0)
+        {
+            var correctedLanguages = _curatorIncomingData.CorrectRolesOrLanguages(createPersonDto.Languages);
+            createPersonDto.Languages = correctedLanguages;
+        }
+
         report.Message = "Success";
         report.Success = true;
-        return (report, correctedName, correctedRoles);
+        return (report, createPersonDto);
     }
 }
