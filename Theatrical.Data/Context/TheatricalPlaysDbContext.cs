@@ -28,6 +28,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<User> Users { get; set; } = null!;
     public virtual DbSet<Venue> Venues { get; set; } = null!;
     public virtual DbSet<Transaction> Transactions { get; set; } = null!;
+    public virtual DbSet<AccountRequest> AccountRequests { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
