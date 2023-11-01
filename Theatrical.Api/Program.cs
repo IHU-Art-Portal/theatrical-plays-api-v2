@@ -125,11 +125,7 @@ builder.Services.AddTransient<ICuratorIncomingData, CuratorIncomingData>();
 //Email service
 builder.Services.AddTransient<IEmailService, EmailService>();
 
-//Authorization Filters
-builder.Services.AddTransient<AdminAuthorizationFilter>();
-builder.Services.AddTransient<UserAuthorizationFilter>();
-builder.Services.AddTransient<AnyRoleAuthorizationFilter>();
-builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
+//Removed authorization filters, they can be used directly without registering.
 
 //Memory caching and ICaching service
 builder.Services.AddMemoryCache();

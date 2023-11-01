@@ -24,13 +24,23 @@ public class AccountRequestsController : ControllerBase
     }
 
     [HttpGet]
+    [TypeFilter(typeof(ClaimsManagerAndAdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> ShowAll([FromQuery] ConfirmationStatus? status)
     {
-        var accountRequests = await _service.GetAll(status);
+        try
+        {
+            var accountRequests = await _service.GetAll(status);
 
-        var apiResponse = new ApiResponse<List<AccountRequestDto>>(accountRequests);
+            var apiResponse = new ApiResponse<List<AccountRequestDto>>(accountRequests);
 
-        return new OkObjectResult(apiResponse);
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }
     
     [HttpPost]
