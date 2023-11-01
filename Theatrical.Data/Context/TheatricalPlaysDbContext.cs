@@ -454,5 +454,36 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(t => t.NetworkTransactionId).HasColumnName("NetworkTransactionID");
         });
 
+        modelBuilder.Entity<AccountRequest>(entity =>
+        {
+            entity.ToTable("account_requests");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.Id).HasColumnName("id");
+
+            entity.Property(e => e.UserId).HasColumnName("UserId");
+
+            entity.Property(e => e.PersonId).HasColumnName("PersonId");
+            entity.Property(e => e.IdentificationDocument).HasColumnName("IdentificationDocument");
+            entity.Property(e => e.ConfirmationStatus).HasColumnName("ConfirmationStatus");
+            
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("CreatedAt")
+                .HasDefaultValueSql("now()");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Person)
+                .WithMany()
+                .HasForeignKey(e => e.PersonId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
     }
 }
