@@ -7,15 +7,20 @@ namespace Theatrical.Services;
 public interface IAccountRequestService
 {
     Task<List<AccountRequestDto>> GetAll(ConfirmationStatus? status);
+
+    Task<ResponseAccountRequestDto> CreateRequest(Person person, User user,
+        CreateAccountRequestDto createAccountRequestDto);
 }
 
 public class AccountRequestService : IAccountRequestService
 {
     private readonly IAccountRequestRepository _requestRepository;
+    private readonly IPersonRepository _personRepository;
 
-    public AccountRequestService(IAccountRequestRepository requestRepository)
+    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository)
     {
         _requestRepository = requestRepository;
+        _personRepository = personRepository;
     }
 
     /// <summary>
@@ -47,6 +52,30 @@ public class AccountRequestService : IAccountRequestService
             }).ToList();
         
         return filteredRequests;
+    }
+    
+    public async Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto)
+    {
+        var accountRequest = new AccountRequest
+        {
+            UserId = user.Id,
+            PersonId = person.Id,
+            ConfirmationStatus = ConfirmationStatus.Active,
+            IdentificationDocument = createAccountRequestDto.IdentificationDocument
+        };
+
+        await _personRepository.CreateRequest(person);                                //changes the claiming status to 1 (Unavailable)
+        var requestResponse = await _requestRepository.CreateRequest(accountRequest); //Creates an entry in account requests table
+
+        var accountRequestDto = new ResponseAccountRequestDto
+        {
+            Status = "Active",
+            Id = requestResponse.Id,
+            PersonId = requestResponse.PersonId,
+            UserId = requestResponse.UserId
+        };
+
+        return accountRequestDto;
     }
 }
 

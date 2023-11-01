@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Theatrical.Data.Models;
-using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Services.Pagination;
@@ -21,7 +20,6 @@ public interface IPersonService
 
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
-    Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto);
 
 }
 
@@ -200,27 +198,4 @@ public class PersonService : IPersonService
         return images;
     }
     
-    public async Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto)
-    {
-        var accountRequest = new AccountRequest
-        {
-            UserId = user.Id,
-            PersonId = person.Id,
-            ConfirmationStatus = ConfirmationStatus.Active,
-            IdentificationDocument = createAccountRequestDto.IdentificationDocument
-        };
-
-        await _repository.CreateRequest(person);                                             //changes the claiming status to 1 (Unavailable)
-        var requestResponse = await _accountRequestRepository.CreateRequest(accountRequest); //Creates an entry in account requests table
-
-        var accountRequestDto = new ResponseAccountRequestDto
-        {
-            Status = "Active",
-            Id = requestResponse.Id,
-            PersonId = requestResponse.PersonId,
-            UserId = requestResponse.UserId
-        };
-
-        return accountRequestDto;
-    }
 }
