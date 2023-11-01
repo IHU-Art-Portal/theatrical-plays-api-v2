@@ -21,4 +21,16 @@ public class Person
     public string? Bio { get; set; }
     public DateTime? Birthdate { get; set; }
     public List<string>? Roles { get; set; }
+    public bool IsClaimed { get; set; }
+    public ClaimingStatus ClaimingStatus { get; set; }
+    public string? ClaimedBy { get; set; }
+    public string? AuthorizedBy { get; set; }
+}
+
+public enum ClaimingStatus
+{
+    Available = 0,
+    InProgress = 1,
+    Approved = 2,
+    Rejected = 3,
 }

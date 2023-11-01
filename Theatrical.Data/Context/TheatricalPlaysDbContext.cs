@@ -244,6 +244,8 @@ public class TheatricalPlaysDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("persons_ibfk_1");
             
+            //Edit these values if a column name in database changes.
+            //So the mapping is correct.
             entity.Property(e => e.HairColor).HasColumnName("HairColor");
             entity.Property(e => e.Height).HasColumnName("Height");
             entity.Property(e => e.EyeColor).HasColumnName("EyeColor");
@@ -252,6 +254,12 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.Description).HasColumnName("Description");
             entity.Property(e => e.Bio).HasColumnName("Bio");
             entity.Property(e => e.Birthdate).HasColumnName("Birthdate");
+            entity.Property(e => e.Roles).HasColumnName("Roles");
+            entity.Property(e => e.Languages).HasColumnName("Languages");
+            entity.Property(e => e.IsClaimed).HasColumnName("IsClaimed");
+            entity.Property(e => e.ClaimingStatus).HasColumnName("ClaimingStatus");
+            entity.Property(e => e.ClaimedBy).HasColumnName("ClaimedBy");
+            entity.Property(e => e.AuthorizedBy).HasColumnName("AuthorizedBy");
         });
 
         modelBuilder.Entity<Production>(entity =>
