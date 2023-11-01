@@ -126,10 +126,10 @@ builder.Services.AddTransient<ICuratorIncomingData, CuratorIncomingData>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 //Authorization Filters
-builder.Services.AddScoped<AdminAuthorizationFilter>();
-builder.Services.AddScoped<UserAuthorizationFilter>();
-builder.Services.AddScoped<AnyRoleAuthorizationFilter>();
-builder.Services.AddScoped<ClaimsManagerAuthorizationFilter>();
+builder.Services.AddTransient<AdminAuthorizationFilter>();
+builder.Services.AddTransient<UserAuthorizationFilter>();
+builder.Services.AddTransient<AnyRoleAuthorizationFilter>();
+builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Memory caching and ICaching service
 builder.Services.AddMemoryCache();
