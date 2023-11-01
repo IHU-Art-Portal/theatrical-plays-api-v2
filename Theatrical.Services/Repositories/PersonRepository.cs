@@ -20,6 +20,7 @@ public interface IPersonRepository
     Task UpdateRange(List<Person> people);
     Task<List<Image>?> GetImages();
     Task<List<Person>> GetPeopleByClaimingStatus(ClaimingStatus claimingStatus);
+    Task CreateRequest(Person person);
 }
 
 public class PersonRepository : IPersonRepository
@@ -69,6 +70,16 @@ public class PersonRepository : IPersonRepository
         });
     }
 
+    /// <summary>
+    /// Changes the claiming status to 1.
+    /// </summary>
+    /// <param name="person"></param>
+    public async Task CreateRequest(Person person)
+    {
+        person.ClaimingStatus = ClaimingStatus.InProgress;
+        await _context.SaveChangesAsync();
+    }
+    
     public async Task<List<Person>?> GetByRole(string role)
     {
         var people = await _caching.GetOrSetAsync($"persons_with_role_{role}", async () =>

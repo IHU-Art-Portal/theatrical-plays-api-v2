@@ -133,7 +133,10 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Memory caching and ICaching service
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<ICaching, Caching>();
+builder.Services.AddTransient<ICaching, Caching>();
+
+//Account Requests Services
+builder.Services.AddTransient<IAccountRequestRepository, AccountRequestRepository>();
 
 //cors
 builder.Services.AddCors(options =>

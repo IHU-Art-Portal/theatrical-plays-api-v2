@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
+using System.Text;
 using Theatrical.Data.Models;
+using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Services.Pagination;
@@ -20,6 +22,7 @@ public interface IPersonService
 
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
+    Task<AccountRequestDto> CreateRequest(Person person, User user);
 
 }
 
@@ -27,11 +30,13 @@ public class PersonService : IPersonService
 {
     private readonly IPersonRepository _repository;
     private readonly IPaginationService _pagination;
+    private readonly IAccountRequestRepository _accountRequestRepository;
 
-    public PersonService(IPersonRepository repository, IPaginationService paginationService)
+    public PersonService(IPersonRepository repository, IPaginationService paginationService, IAccountRequestRepository accountRequestRepository)
     {
         _repository = repository;
         _pagination = paginationService;
+        _accountRequestRepository = accountRequestRepository;
     }
 
     public async Task<Person> Create(CreatePersonDto createPersonDto)
@@ -194,5 +199,33 @@ public class PersonService : IPersonService
     {
         var images = await _repository.GetImages();
         return images;
+    }
+
+    public async Task<AccountRequestDto> CreateRequest(Person person, User user)
+    {
+        byte[] sampleIdentificationDocument = Encoding.UTF8.GetBytes("This is a sample identification document.");
+        var accountRequest = new AccountRequest
+        {
+            UserId = user.Id,
+            PersonId = person.Id,
+            ConfirmationStatus = ConfirmationStatus.Active,
+            IdentificationDocument = sampleIdentificationDocument
+        };
+        
+        await _repository.CreateRequest(person);                       //changes the claiming status to 1
+        var requestReceipt = await _accountRequestRepository.CreateRequest(accountRequest); //Creates an entry in account requests table
+
+        var accountRequestDto = new AccountRequestDto
+        {
+            ConfirmationStatus = requestReceipt.ConfirmationStatus,
+            CreatedAt = requestReceipt.CreatedAt,
+            Id = requestReceipt.Id,
+            IdentificationDocument = requestReceipt.IdentificationDocument,
+            PersonId = requestReceipt.PersonId,
+            UserId = requestReceipt.UserId
+        };
+        
+        
+        return accountRequestDto;
     }
 }
