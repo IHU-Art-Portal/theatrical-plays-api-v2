@@ -10,7 +10,7 @@ namespace Theatrical.Services.PerformersService;
 public interface IPersonService
 {
     Task<Person> Create(CreatePersonDto createPersonDto);
-    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size);
+    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
     PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size);
@@ -78,12 +78,45 @@ public class PersonService : IPersonService
         return createdPerson;
     }
 
-    //Retrieves all persons.
-    //Calls Pagination Method.
-    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size)
+    /// <summary>
+    /// ShowAvailableAccounts is a parameter that changed the flow of code.
+    /// If left empty,
+    ///     the method retrieves all people,
+    ///     paginates the list and sends it back.
+    /// If true,
+    ///     returns all people that are available for claiming from a user,
+    ///     also paginates the result.
+    /// If false,
+    ///     returns already claimed accounts,
+    ///     also paginates the result.
+    /// Pagination works only if page and/or size is defined.
+    /// Pagination Behavior:
+    ///           only page: returns the specified page, with 10 results per page,
+    ///           only size: returns always the 1st page, with specified sized results.
+    /// </summary>
+    /// <param name="page"> integer (optional) </param>
+    /// <param name="size"> integer (optional) </param>
+    /// <param name="showAvailableAccounts"> boolean (optional)</param>
+    /// <returns></returns>
+    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts)
     {
-        List<Person> persons = await _repository.Get();
+        if (showAvailableAccounts is true)
+        {
+            var availableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Available);
+            var paginationResult1 = PaginateAndProduceDtos(availableAccounts, page, size);
+            return paginationResult1;
+        }
 
+        if (showAvailableAccounts is false)
+        {
+            var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Approved);
+            var paginationResult2 = PaginateAndProduceDtos(nonAvailableAccounts, page, size);
+            return paginationResult2;
+        }
+        
+        //Normal flow if `showAvailableAccounts` is empty/null;
+        List<Person> persons = await _repository.Get();
+        
         var paginationResult = PaginateAndProduceDtos(persons, page, size);
         
         return paginationResult;

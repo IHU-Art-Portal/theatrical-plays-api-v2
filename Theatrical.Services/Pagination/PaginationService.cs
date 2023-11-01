@@ -10,6 +10,18 @@ public interface IPaginationService
 
 public class PaginationService : IPaginationService
 {
+    /// <summary>
+    /// /// Pagination Behavior:
+    ///           only page: returns the specified page, with 10 results per page,
+    ///           only size: returns always the 1st page, with specified sized results.
+    /// </summary>
+    /// <param name="page">integer</param>
+    /// <param name="size">integer</param>
+    /// <param name="items">the list of X that you want to paginate</param>
+    /// <param name="mapper">map your items that you want to include</param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TDto"></typeparam>
+    /// <returns>A PaginationResult with the desired results.</returns>
     public PaginationResult<TDto> GetPaginated<T, TDto>(int? page, int? size, IEnumerable<T> items, Func<IEnumerable<T>, IEnumerable<TDto>> mapper)
     {
         List<TDto> dtos = new();
