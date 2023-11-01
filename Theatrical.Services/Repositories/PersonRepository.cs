@@ -76,7 +76,7 @@ public class PersonRepository : IPersonRepository
     /// <param name="person"></param>
     public async Task CreateRequest(Person person)
     {
-        person.ClaimingStatus = ClaimingStatus.InProgress;
+        person.ClaimingStatus = ClaimingStatus.Unavailable;
         await _context.SaveChangesAsync();
     }
     

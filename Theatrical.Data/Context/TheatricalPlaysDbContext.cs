@@ -260,7 +260,6 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.IsClaimed).HasColumnName("IsClaimed");
             entity.Property(e => e.ClaimingStatus).HasColumnName("ClaimingStatus");
             entity.Property(e => e.ClaimedBy).HasColumnName("ClaimedBy");
-            entity.Property(e => e.AuthorizedBy).HasColumnName("AuthorizedBy");
         });
 
         modelBuilder.Entity<Production>(entity =>
@@ -470,6 +469,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.PersonId).HasColumnName("PersonId");
             entity.Property(e => e.IdentificationDocument).HasColumnName("IdentificationDocument");
             entity.Property(e => e.ConfirmationStatus).HasColumnName("ConfirmationStatus");
+            entity.Property(e => e.AuthorizedBy).HasColumnName("AuthorizedBy");
+            
             
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("CreatedAt")

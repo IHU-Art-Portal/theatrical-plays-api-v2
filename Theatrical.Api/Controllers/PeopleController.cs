@@ -335,14 +335,14 @@ public class PeopleController : ControllerBase
         }
     }
 
-    [HttpGet]
-    [Route("RequestAccount/{personId}")]
+    [HttpPost]
+    [Route("RequestAccount")]
     [TypeFilter(typeof(UserAuthorizationFilter))]
-    public async Task<ActionResult<ApiResponse>> RequestAccount([FromRoute] int personId)
+    public async Task<ActionResult<ApiResponse>> RequestAccount([FromBody] CreateAccountRequestDto requestDto)
     {
         try
         {
-            var (validation, person) = await _validation.ValidateAndFetch(personId);
+            var (validation, person) = await _validation.ValidateAndFetch(requestDto.PersonId);
 
             if (!validation.Success)
             {
@@ -367,9 +367,9 @@ public class PeopleController : ControllerBase
             }
 
             //Normal flow of code
-            var accountRequest = await _service.CreateRequest(person, user);
+            var accountRequest = await _service.CreateRequest(person, user, requestDto);
 
-            ApiResponse response = new ApiResponse<AccountRequestDto>(accountRequest, "You have made an account request.");
+            ApiResponse response = new ApiResponse<ResponseAccountRequestDto>(accountRequest, "You have made an account request.");
 
             return new ObjectResult(response);
         }

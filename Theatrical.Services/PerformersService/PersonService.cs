@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Text;
 using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.Pagination;
@@ -22,7 +21,7 @@ public interface IPersonService
 
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
-    Task<AccountRequestDto> CreateRequest(Person person, User user);
+    Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto);
 
 }
 
@@ -114,7 +113,7 @@ public class PersonService : IPersonService
 
         if (showAvailableAccounts is false)
         {
-            var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Approved);
+            var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Unavailable);
             var paginationResult2 = PaginateAndProduceDtos(nonAvailableAccounts, page, size);
             return paginationResult2;
         }
@@ -200,32 +199,28 @@ public class PersonService : IPersonService
         var images = await _repository.GetImages();
         return images;
     }
-
-    public async Task<AccountRequestDto> CreateRequest(Person person, User user)
+    
+    public async Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto)
     {
-        byte[] sampleIdentificationDocument = Encoding.UTF8.GetBytes("This is a sample identification document.");
         var accountRequest = new AccountRequest
         {
             UserId = user.Id,
             PersonId = person.Id,
             ConfirmationStatus = ConfirmationStatus.Active,
-            IdentificationDocument = sampleIdentificationDocument
+            IdentificationDocument = createAccountRequestDto.IdentificationDocument
         };
-        
-        await _repository.CreateRequest(person);                       //changes the claiming status to 1
-        var requestReceipt = await _accountRequestRepository.CreateRequest(accountRequest); //Creates an entry in account requests table
 
-        var accountRequestDto = new AccountRequestDto
+        await _repository.CreateRequest(person);                                             //changes the claiming status to 1 (Unavailable)
+        var requestResponse = await _accountRequestRepository.CreateRequest(accountRequest); //Creates an entry in account requests table
+
+        var accountRequestDto = new ResponseAccountRequestDto
         {
-            ConfirmationStatus = requestReceipt.ConfirmationStatus,
-            CreatedAt = requestReceipt.CreatedAt,
-            Id = requestReceipt.Id,
-            IdentificationDocument = requestReceipt.IdentificationDocument,
-            PersonId = requestReceipt.PersonId,
-            UserId = requestReceipt.UserId
+            Status = "Active",
+            Id = requestResponse.Id,
+            PersonId = requestResponse.PersonId,
+            UserId = requestResponse.UserId
         };
-        
-        
+
         return accountRequestDto;
     }
 }
