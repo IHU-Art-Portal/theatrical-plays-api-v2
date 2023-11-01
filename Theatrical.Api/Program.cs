@@ -137,6 +137,7 @@ builder.Services.AddTransient<ICaching, Caching>();
 
 //Account Requests Services
 builder.Services.AddTransient<IAccountRequestRepository, AccountRequestRepository>();
+builder.Services.AddTransient<IAccountRequestService, AccountRequestService>();
 
 //cors
 builder.Services.AddCors(options =>
