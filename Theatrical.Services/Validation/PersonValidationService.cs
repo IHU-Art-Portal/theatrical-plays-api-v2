@@ -15,17 +15,20 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
     Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto);
+    Task<User?> ValidateWithEmail(string email);
 }
 
 public class PersonValidationService : IPersonValidationService
 {
     private readonly IPersonRepository _repository;
     private readonly ICuratorIncomingData _curatorIncomingData;
+    private readonly IUserRepository _userRepository;
 
-    public PersonValidationService(IPersonRepository repository, ICuratorIncomingData curatorIncomingData)
+    public PersonValidationService(IPersonRepository repository, ICuratorIncomingData curatorIncomingData, IUserRepository userRepository)
     {
         _repository = repository;
         _curatorIncomingData = curatorIncomingData;
+        _userRepository = userRepository;
     }
 
     public async Task<(ValidationReport report, Person? person)> ValidateAndFetch(int performerId)
@@ -186,5 +189,11 @@ public class PersonValidationService : IPersonValidationService
         report.Message = "Success";
         report.Success = true;
         return (report, createPersonDto);
+    }
+
+    public async Task<User?> ValidateWithEmail(string email)
+    {
+        var user = await _userRepository.Get(email);
+        return user;
     }
 }
