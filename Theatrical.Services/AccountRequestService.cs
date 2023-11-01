@@ -6,7 +6,7 @@ namespace Theatrical.Services;
 
 public interface IAccountRequestService
 {
-    Task<List<AccountRequestDto>> GetAll();
+    Task<List<AccountRequestDto>> GetAll(ConfirmationStatus? status);
 }
 
 public class AccountRequestService : IAccountRequestService
@@ -18,11 +18,18 @@ public class AccountRequestService : IAccountRequestService
         _requestRepository = requestRepository;
     }
 
-    public async Task<List<AccountRequestDto>> GetAll()
+    /// <summary>
+    /// Returns every request if status is null
+    /// </summary>
+    /// <param name="status"></param>
+    /// <returns></returns>
+    public async Task<List<AccountRequestDto>> GetAll(ConfirmationStatus? status)
     {
         var requests = await _requestRepository.GetAll();
         
-        var requestsDto = requests.Select(request => new AccountRequestDto
+        var filteredRequests = requests
+            .Where(request => status == null || request.ConfirmationStatus == status)
+            .Select(request => new AccountRequestDto
             {
                 Id = request.Id,
                 UserId = request.UserId,
@@ -38,8 +45,8 @@ public class AccountRequestService : IAccountRequestService
                     _ => "Invalid status"
                 }
             }).ToList();
-
-        return requestsDto;
+        
+        return filteredRequests;
     }
 }
 

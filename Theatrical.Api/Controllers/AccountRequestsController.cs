@@ -20,9 +20,9 @@ public class AccountRequestsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> ShowAll()
+    public async Task<ActionResult<ApiResponse>> ShowAll([FromQuery] ConfirmationStatus? status)
     {
-        var accountRequests = await _service.GetAll();
+        var accountRequests = await _service.GetAll(status);
 
         var apiResponse = new ApiResponse<List<AccountRequestDto>>(accountRequests);
 
