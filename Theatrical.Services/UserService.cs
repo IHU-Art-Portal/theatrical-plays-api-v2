@@ -5,7 +5,7 @@ using Theatrical.Services.Repositories;
 using OtpNet;
 using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.TransactionDtos;
-using Theatrical.Services.Jwt;
+using Theatrical.Services.Security.Jwt;
 
 namespace Theatrical.Services;
 

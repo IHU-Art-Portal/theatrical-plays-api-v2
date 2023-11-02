@@ -4,6 +4,7 @@ using Theatrical.Dto.ContributionDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;

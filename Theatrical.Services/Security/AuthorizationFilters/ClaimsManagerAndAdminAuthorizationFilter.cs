@@ -1,6 +1,6 @@
-﻿using Theatrical.Services.Jwt;
+﻿using Theatrical.Services.Security.Jwt;
 
-namespace Theatrical.Api;
+namespace Theatrical.Services.Security.AuthorizationFilters;
 
 public class ClaimsManagerAndAdminAuthorizationFilter : AuthorizationFilterBase
 {

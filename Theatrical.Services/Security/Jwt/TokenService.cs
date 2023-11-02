@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 
-namespace Theatrical.Services.Jwt;
+namespace Theatrical.Services.Security.Jwt;
 
 public interface ITokenService
 {

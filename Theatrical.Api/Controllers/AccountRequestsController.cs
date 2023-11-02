@@ -5,6 +5,7 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;

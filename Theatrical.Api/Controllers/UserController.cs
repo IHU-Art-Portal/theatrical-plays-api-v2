@@ -7,6 +7,7 @@ using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Email;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;

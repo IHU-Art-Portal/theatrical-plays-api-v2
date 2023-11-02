@@ -6,6 +6,7 @@ using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.PerformersService;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
