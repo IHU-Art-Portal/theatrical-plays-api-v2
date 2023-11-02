@@ -30,7 +30,7 @@ public class AccountRequestsController : ControllerBase
         _userValidation = userValidationService;
     }
 
-    [HttpGet]
+    [HttpGet("ClaimsManagers")]
     [TypeFilter(typeof(ClaimsManagerAndAdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> ShowAll([FromQuery] ConfirmationStatus? status)
     {
@@ -187,12 +187,77 @@ public class AccountRequestsController : ControllerBase
     
     [HttpGet]
     [Route("Reject/{requestId}")]
-    //[TypeFilter(typeof(ClaimsManagerAuthorizationFilter))]
+    [TypeFilter(typeof(ClaimsManagerAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> RejectRequest([FromRoute] int requestId)
     {
         try
         {
-            return Ok(requestId);
+            var (valReport, accountRequest) = await _accountRequestValidation.FetchAndValidate(requestId);
+            if (!valReport.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)valReport.ErrorCode!, valReport.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            if (accountRequest!.ConfirmationStatus != ConfirmationStatus.Active)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.Forbidden, "You can't take action against a completed request");
+                return new ObjectResult(errorResponse){StatusCode = (int) HttpStatusCode.Forbidden};
+            }
+
+            //Checks if the person still exists. Also returns the related person.
+            var (personReport, person) = await _personValidation.ValidateAndFetch(accountRequest!.PersonId);
+            if (!personReport.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)valReport.ErrorCode!, valReport.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            if (person!.IsClaimed)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.Forbidden, "This person is already claimed");
+                return new ObjectResult(errorResponse){StatusCode = (int) HttpStatusCode.Forbidden};
+            }
+
+            if (person.ClaimingStatus != ClaimingStatus.InProgress)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.Forbidden, "This person claiming status is not in progress");
+                return new ObjectResult(errorResponse){StatusCode = (int) HttpStatusCode.Forbidden};
+            }
+            
+            //Fetches the email from provided jwt and finds the manager user.
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var (managerReport, managerUser) = await _userValidation.ValidateUser(email);
+            
+            if (!managerReport.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)managerReport.ErrorCode!, managerReport.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var (claimantReport, claimantUser) = await _userValidation.ValidateUserById(accountRequest.UserId);
+            if (!claimantReport.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)claimantReport.ErrorCode!, claimantReport.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+
+            var requestActionDto = new RequestActionDto
+            {
+                ManagerUser = managerUser!, //Confirmed not null.
+                Claimant = claimantUser!,   //Confirmed not null;
+                Person = person!,           //Confirmed not null.
+                AccountRequest = accountRequest,
+                RequestManagerAction = RequestManagerAction.Reject
+            };
+
+            
+            await _service.RequestAction(requestActionDto);
+
+            var apiResponse = new ApiResponse("Successfully rejected the account request");
+
+            return new OkObjectResult(apiResponse);
         }
         catch (Exception e)
         {
