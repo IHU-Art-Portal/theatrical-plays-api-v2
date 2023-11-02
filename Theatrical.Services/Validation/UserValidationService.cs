@@ -18,6 +18,7 @@ public interface IUserValidationService
     Task<(ValidationReport, User?)> ValidateFor2FaDeactivation(string email);
     Task<(ValidationReport, User?)> ValidateFor2FaActivation(string email);
     Task<(ValidationReport, User?)> ValidateUser(string email);
+    Task<(ValidationReport, User?)> ValidateUserById(int userId);
     ValidationReport ValidateYoutubeLink(string link);
     ValidationReport ValidateFacebookLink(string link);
     ValidationReport ValidateInstagramLink(string link);
@@ -295,6 +296,25 @@ public class UserValidationService : IUserValidationService
 
         report.Success = true;
         report.Message = "User Found!";
+        return (report, user);
+    }
+
+    public async Task<(ValidationReport, User?)> ValidateUserById(int userId)
+    {
+        var user = await _repository.Get(userId);
+        var report = new ValidationReport();
+        
+        if (user is null)
+        {
+            report.Success = false;
+            report.Message = "This user has deleted their account.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        report.Message = "User Found!";
+
         return (report, user);
     }
 
