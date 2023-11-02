@@ -10,6 +10,8 @@ public interface IAccountRequestService
 
     Task<ResponseAccountRequestDto> CreateRequest(Person person, User user,
         CreateAccountRequestDto createAccountRequestDto);
+
+    Task RequestAction(RequestActionDto requestActionDto);
 }
 
 public class AccountRequestService : IAccountRequestService
@@ -77,5 +79,24 @@ public class AccountRequestService : IAccountRequestService
 
         return accountRequestDto;
     }
+
+    //Accept or Reject a user request for a Person (pre-made account).
+    //Run this after successfully passing validations.
+    public async Task RequestAction(RequestActionDto requestActionDto)
+    {
+        
+        if (requestActionDto.RequestManagerAction == RequestManagerAction.Approve)
+        {
+            
+            await _requestRepository.ApproveRequest(requestActionDto);
+            await _personRepository.ApproveRequest(requestActionDto);
+            return;
+        }
+    
+        await _requestRepository.RejectRequest(requestActionDto);
+        await _personRepository.RejectRequest(requestActionDto);
+    }
+
+    
 }
 

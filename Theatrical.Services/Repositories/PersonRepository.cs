@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Services.Caching;
 
@@ -21,6 +22,8 @@ public interface IPersonRepository
     Task<List<Image>?> GetImages();
     Task<List<Person>> GetPeopleByClaimingStatus(ClaimingStatus claimingStatus);
     Task CreateRequest(Person person);
+    Task ApproveRequest(RequestActionDto requestActionDto);
+    Task RejectRequest(RequestActionDto requestActionDto);
 }
 
 public class PersonRepository : IPersonRepository
@@ -76,10 +79,25 @@ public class PersonRepository : IPersonRepository
     /// <param name="person"></param>
     public async Task CreateRequest(Person person)
     {
-        person.ClaimingStatus = ClaimingStatus.Unavailable;
+        person.ClaimingStatus = ClaimingStatus.InProgress;
         await _context.SaveChangesAsync();
     }
-    
+
+    public async Task ApproveRequest(RequestActionDto requestActionDto)
+    {
+        requestActionDto.Person.IsClaimed = true;
+        requestActionDto.Person.ClaimedBy = requestActionDto.Claimant.Email;
+        requestActionDto.Person.ClaimingStatus = ClaimingStatus.Unavailable;
+        
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RejectRequest(RequestActionDto requestActionDto)
+    {
+        requestActionDto.Person.ClaimingStatus = ClaimingStatus.Available;
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<List<Person>?> GetByRole(string role)
     {
         var people = await _caching.GetOrSetAsync($"persons_with_role_{role}", async () =>
