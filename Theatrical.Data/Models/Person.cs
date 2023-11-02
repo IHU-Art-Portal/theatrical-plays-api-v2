@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Theatrical.Data.Models;
+﻿namespace Theatrical.Data.Models;
 
 public class Person
 {
@@ -29,5 +26,6 @@ public class Person
 public enum ClaimingStatus
 {
     Available = 0,
-    Unavailable = 1
+    Unavailable = 1,
+    InProgress = 2
 }
