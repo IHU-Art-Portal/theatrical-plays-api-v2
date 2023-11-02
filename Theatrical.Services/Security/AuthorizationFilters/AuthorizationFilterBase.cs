@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Theatrical.Dto.ResponseWrapperFolder;
-using Theatrical.Services.Jwt;
+using Theatrical.Services.Security.Jwt;
 
-namespace Theatrical.Api;
+namespace Theatrical.Services.Security.AuthorizationFilters;
 
 public abstract class AuthorizationFilterBase : IAuthorizationFilter
 {
