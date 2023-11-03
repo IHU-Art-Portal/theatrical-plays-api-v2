@@ -192,6 +192,8 @@ public class AccountRequestsController : ControllerBase
     {
         try
         {
+            //code does not pass this point if the role of the user who approves/reject a request is not claims manager.
+            
             var (valReport, accountRequest) = await _accountRequestValidation.FetchAndValidate(requestId);
             if (!valReport.Success)
             {
@@ -221,11 +223,12 @@ public class AccountRequestsController : ControllerBase
 
             if (person.ClaimingStatus != ClaimingStatus.InProgress)
             {
+                //Edge case that should never hit under the normal flow.
                 var errorResponse = new ApiResponse(ErrorCode.Forbidden, "This person claiming status is not in progress");
                 return new ObjectResult(errorResponse){StatusCode = (int) HttpStatusCode.Forbidden};
             }
             
-            //Fetches the email from provided jwt and finds the manager user.
+            //Gets the email from provided jwt and finds the manager user.
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var (managerReport, managerUser) = await _userValidation.ValidateUser(email);
             
@@ -247,7 +250,7 @@ public class AccountRequestsController : ControllerBase
             {
                 ManagerUser = managerUser!, //Confirmed not null.
                 Claimant = claimantUser!,   //Confirmed not null;
-                Person = person!,           //Confirmed not null.
+                Person = person,           
                 AccountRequest = accountRequest,
                 RequestManagerAction = RequestManagerAction.Reject
             };
