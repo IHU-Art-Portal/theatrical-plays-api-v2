@@ -101,7 +101,7 @@ public class TransactionService : ITransactionService
     {
         ApiOperationBase<ANetApiRequest, ANetApiResponse>.RunEnvironment = AuthorizeNet.Environment.SANDBOX;
         
-           // define the merchant information (authentication / transaction id)
+        // define the merchant information (authentication / transaction id)
         ApiOperationBase<ANetApiRequest, ANetApiResponse>.MerchantAuthentication = new merchantAuthenticationType()
         {
             name = "485cQaeSQ", //ApiLoginID

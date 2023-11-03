@@ -100,6 +100,10 @@ public class PeopleController : ControllerBase
 
             if (!validation.Success)
             {
+                if (validation.ErrorCode == ErrorCode.BadRequest)
+                {
+                    return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, validation.Message!));
+                }
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status400BadRequest};

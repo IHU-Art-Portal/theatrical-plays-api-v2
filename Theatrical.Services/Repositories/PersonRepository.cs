@@ -117,7 +117,6 @@ public class PersonRepository : IPersonRepository
             return await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
         });
         
-        
         return people;
     }
 
