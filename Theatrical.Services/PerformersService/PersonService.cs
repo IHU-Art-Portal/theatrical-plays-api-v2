@@ -142,7 +142,7 @@ public class PersonService : IPersonService
             Languages = person.Languages,
             Weight = person.Weight,
             Height = person.Height,
-            EyeColor = person.Height,
+            EyeColor = person.EyeColor,
             HairColor = person.HairColor,
             Roles = person.Roles
         };
