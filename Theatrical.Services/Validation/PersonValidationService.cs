@@ -160,20 +160,9 @@ public class PersonValidationService : IPersonValidationService
 
     public async Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto)
     {
-        if (string.IsNullOrEmpty(createPersonDto.Fullname))
-        {
-            return (new ValidationReport
-            {
-                ErrorCode = ErrorCode.BadRequest,
-                Message = "Fullname value must not be empty",
-                Success = false
-            }, null);
-        }
-        //createPersonDto = _curatorIncomingData.CorrectIncomingObject(createPersonDto);
-        createPersonDto.Fullname = _curatorIncomingData.CorrectFullName(createPersonDto.Fullname);
-        
         var report = new ValidationReport();
-
+        
+        _curatorIncomingData.CorrectString(createPersonDto.Fullname);      //Corrects the name before checking the db.
         var person = await _repository.GetByName(createPersonDto.Fullname);
 
         if (person is not null)
@@ -184,17 +173,7 @@ public class PersonValidationService : IPersonValidationService
             return (report, null);
         }
         
-        if (createPersonDto.Roles is not null && createPersonDto.Roles.Count > 0)
-        {
-            var correctedRoles = _curatorIncomingData.CorrectRolesOrLanguages(createPersonDto.Roles);
-            createPersonDto.Roles = correctedRoles;
-        }
-
-        if (createPersonDto.Languages is not null && createPersonDto.Languages.Count > 0)
-        {
-            var correctedLanguages = _curatorIncomingData.CorrectRolesOrLanguages(createPersonDto.Languages);
-            createPersonDto.Languages = correctedLanguages;
-        }
+        _curatorIncomingData.CorrectIncomingPerson(createPersonDto);    //Corrects other fields afterwards.
 
         report.Message = "Success";
         report.Success = true;

@@ -96,6 +96,11 @@ public class PeopleController : ControllerBase
     {
         try
         {
+            if (string.IsNullOrEmpty(createPersonDto.Fullname))
+            {
+                return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, "Fullname value must not be empty or null"));
+            }
+            
             var (validation, correctedCreatePersonDto) = await _validation.ValidateForCreate(createPersonDto);
 
             if (!validation.Success)
