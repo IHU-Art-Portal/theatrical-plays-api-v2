@@ -160,6 +160,16 @@ public class PersonValidationService : IPersonValidationService
 
     public async Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto)
     {
+        if (string.IsNullOrEmpty(createPersonDto.Fullname))
+        {
+            return (new ValidationReport
+            {
+                ErrorCode = ErrorCode.BadRequest,
+                Message = "Fullname value must not be empty",
+                Success = false
+            }, null);
+        }
+        //createPersonDto = _curatorIncomingData.CorrectIncomingObject(createPersonDto);
         createPersonDto.Fullname = _curatorIncomingData.CorrectFullName(createPersonDto.Fullname);
         
         var report = new ValidationReport();
