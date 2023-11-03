@@ -24,6 +24,7 @@ public interface IPersonRepository
     Task CreateRequest(Person person);
     Task ApproveRequest(RequestActionDto requestActionDto);
     Task RejectRequest(RequestActionDto requestActionDto);
+    Task DeleteTestData();
 }
 
 public class PersonRepository : IPersonRepository
@@ -80,6 +81,13 @@ public class PersonRepository : IPersonRepository
     public async Task CreateRequest(Person person)
     {
         person.ClaimingStatus = ClaimingStatus.InProgress;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteTestData()
+    {
+        var testPersons = await _context.Persons.Where(p => p.SystemId == 14).ToListAsync();
+        _context.Persons.RemoveRange(testPersons);
         await _context.SaveChangesAsync();
     }
 

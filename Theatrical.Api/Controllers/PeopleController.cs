@@ -342,5 +342,13 @@ public class PeopleController : ControllerBase
             return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
         }
     }
-    
+
+    [HttpDelete]
+    [Route("DeleteTestData")]
+    public async Task<ActionResult> DeleteTestData(string? Test_Data_Are_Considered_Data_Added_By_SystemID_14)
+    {
+        await _service.DeleteTestData();
+        return NoContent();
+    }
+
 }

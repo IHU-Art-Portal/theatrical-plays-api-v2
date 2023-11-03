@@ -20,7 +20,7 @@ public interface IPersonService
 
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
-
+    Task DeleteTestData();
 }
 
 public class PersonService : IPersonService
@@ -197,5 +197,9 @@ public class PersonService : IPersonService
         var images = await _repository.GetImages();
         return images;
     }
-    
+
+    public async Task DeleteTestData()
+    {
+        await _repository.DeleteTestData();
+    }
 }
