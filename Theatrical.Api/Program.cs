@@ -18,6 +18,7 @@ using Theatrical.Services.Email;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
 using Theatrical.Services.Repositories;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Security.Jwt;
 using Theatrical.Services.Validation;
 
@@ -134,6 +135,12 @@ builder.Services.AddTransient<ICaching, Caching>();
 builder.Services.AddTransient<IAccountRequestRepository, AccountRequestRepository>();
 builder.Services.AddTransient<IAccountRequestService, AccountRequestService>();
 builder.Services.AddTransient<IAccountRequestValidationService, AccountRequestRequestValidationService>();
+
+//Authorization Filters
+builder.Services.AddTransient<AdminAuthorizationFilter>();
+builder.Services.AddTransient<UserAuthorizationFilter>();
+builder.Services.AddTransient<AnyRoleAuthorizationFilter>();
+builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //cors
 builder.Services.AddCors(options =>
