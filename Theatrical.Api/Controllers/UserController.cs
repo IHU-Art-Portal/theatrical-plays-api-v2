@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.enums;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -397,6 +398,44 @@ public class UserController : ControllerBase
         
     }
 
+    [HttpDelete]
+    [Route("@/facebook")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> DeleteFacebook()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var mediaValidation = _validation.ValidateSocialMediaForDelete(user!, SocialMedia.Facebook);
+            if (!mediaValidation.Success)
+            {
+                var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
+                return new ObjectResult(mediaErrorResponse);
+            }
+
+            await _service.RemoveSocialMedia(user!, SocialMedia.Facebook);
+
+            var apiResponse = new ApiResponse($"Successfully removed your {SocialMedia.Facebook} account.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
+    
     [HttpPut]
     [Route("@/facebook")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
@@ -437,6 +476,44 @@ public class UserController : ControllerBase
         
     }
     
+    [HttpDelete]
+    [Route("@/youtube")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> DeleteYoutube()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var mediaValidation = _validation.ValidateSocialMediaForDelete(user!, SocialMedia.Youtube);
+            if (!mediaValidation.Success)
+            {
+                var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
+                return new ObjectResult(mediaErrorResponse);
+            }
+
+            await _service.RemoveSocialMedia(user!, SocialMedia.Youtube);
+
+            var apiResponse = new ApiResponse($"Successfully removed your {SocialMedia.Youtube} account.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
+    
     [HttpPut]
     [Route("@/youtube")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
@@ -475,6 +552,44 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
         
+    }
+    
+    [HttpDelete]
+    [Route("@/instagram")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> DeleteInstagram()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var mediaValidation = _validation.ValidateSocialMediaForDelete(user!, SocialMedia.Instagram);
+            if (!mediaValidation.Success)
+            {
+                var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
+                return new ObjectResult(mediaErrorResponse);
+            }
+
+            await _service.RemoveSocialMedia(user!, SocialMedia.Instagram);
+
+            var apiResponse = new ApiResponse($"Successfully removed your {SocialMedia.Instagram} account.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
     }
     
     [HttpPut]

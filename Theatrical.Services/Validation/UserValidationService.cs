@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using OtpNet;
+using Theatrical.Data.enums;
 using Theatrical.Data.Models;
 using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -22,6 +23,7 @@ public interface IUserValidationService
     ValidationReport ValidateYoutubeLink(string link);
     ValidationReport ValidateFacebookLink(string link);
     ValidationReport ValidateInstagramLink(string link);
+    ValidationReport ValidateSocialMediaForDelete(User user, SocialMedia socialMedia);
 }
 
 public class UserValidationService : IUserValidationService
@@ -401,5 +403,61 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         return report;
     }
-    
+
+    public ValidationReport ValidateSocialMediaForDelete(User user, SocialMedia socialMedia)
+    {
+        if (socialMedia == SocialMedia.Facebook)
+        {
+            if (string.IsNullOrEmpty(user.Facebook))
+            {
+                return new ValidationReport
+                {
+                    Success = false,
+                    ErrorCode = ErrorCode.NotFound,
+                    Message = "You don't have a facebook account registered."
+                };
+            }
+
+            return new ValidationReport
+            {
+                Success = true,
+                Message = "Facebook account found and can be deleted."
+            };
+        }
+
+        if (socialMedia == SocialMedia.Youtube)
+        {
+            if (string.IsNullOrEmpty(user.Youtube))
+            {
+                return new ValidationReport
+                {
+                    Success = false,
+                    ErrorCode = ErrorCode.NotFound,
+                    Message = "You don't have a youtube account registered."
+                };
+            }
+
+            return new ValidationReport
+            {
+                Success = true,
+                Message = "Youtube account found and can be deleted."
+            };
+        }
+
+        if (string.IsNullOrEmpty(user.Instagram))
+        {
+            return new ValidationReport
+            {
+                Success = false,
+                ErrorCode = ErrorCode.NotFound,
+                Message = "You don't have a instagram account registered."
+            };
+        }
+
+        return new ValidationReport
+        {
+            Success = true,
+            Message = "Instagram account found and can be deleted."
+        };
+    }
 }

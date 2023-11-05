@@ -21,6 +21,9 @@ public interface IUserRepository
     Task UpdateFacebook(User user, string link);
     Task UpdateInstagram(User user, string link);
     Task UpdateYoutube(User user, string link);
+    Task RemoveFacebook(User user);
+    Task RemoveYoutube(User user);
+    Task RemoveInstagram(User user);
 }
 
 public class UserRepository : IUserRepository
@@ -77,6 +80,23 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task RemoveFacebook(User user)
+    {
+        user.Facebook = null;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveYoutube(User user)
+    {
+        user.Youtube = null;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveInstagram(User user)
+    {
+        user.Instagram = null;
+        await _context.SaveChangesAsync();
+    }
 
     public async Task<User> Register(User user, int userRole)
     {
