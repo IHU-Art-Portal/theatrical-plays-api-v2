@@ -21,6 +21,7 @@ public interface IPersonService
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
     Task DeleteTestData();
+    Task CreateList(List<CreatePersonDto> addingPeople);
 }
 
 public class PersonService : IPersonService
@@ -201,5 +202,54 @@ public class PersonService : IPersonService
     public async Task DeleteTestData()
     {
         await _repository.DeleteTestData();
+    }
+
+    public async Task CreateList(List<CreatePersonDto> addingPeople)
+    {
+        var finalPeopleToAdd = new List<Person>();
+        foreach (var personDto in addingPeople)
+        {
+            var person = new Person
+            {
+                Fullname = personDto.Fullname,
+                Timestamp = DateTime.UtcNow,
+                SystemId = personDto.System,
+                HairColor = personDto.HairColor,
+                Height = personDto.Height,
+                EyeColor = personDto.EyeColor,
+                Weight = personDto.Weight,
+                Languages = personDto.Languages,
+                Description = personDto.Description,
+                Bio = personDto.Bio,
+                Roles = personDto.Roles
+            };
+
+            if (personDto.Birthdate is not null)
+            {
+                const string format = "dd-MM-yyyy";
+                try
+                {
+                    DateTime parsedDate = DateTime.ParseExact(personDto.Birthdate, format, CultureInfo.InvariantCulture);
+
+                    // Explicitly set the DateTimeKind to UTC, to avoid errors.
+                    person.Birthdate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            if (personDto.Images != null && personDto.Images.Any())
+            {
+                List<Image> images = personDto.Images.Select(imageUrl => new Image { ImageUrl = imageUrl }).ToList();
+
+                person.Images = images;
+            }
+        
+            finalPeopleToAdd.Add(person);
+        }
+
+        await _repository.CreateRange(finalPeopleToAdd);
     }
 }

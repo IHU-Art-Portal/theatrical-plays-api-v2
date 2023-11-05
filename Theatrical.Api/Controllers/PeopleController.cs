@@ -30,6 +30,7 @@ public class PeopleController : ControllerBase
     /// </summary>
     /// <param name="id">int</param>
     /// <returns>TheatricalResponse&lt;PerformerDto&gt; object containing performer data.</returns>
+    /// ToDo update person if they exist.
     [HttpGet]
     [Route("{id:int}")]
     public async Task<ActionResult<ApiResponse<PersonDto>>> GetPerson(int id)
@@ -127,6 +128,45 @@ public class PeopleController : ControllerBase
             var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
+    [HttpPost("Addrange")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> CreatePeople([FromBody] List<CreatePersonDto> createPersonDto)
+    {
+        try
+        {
+            var validPeople = new List<CreatePersonDto>();
+            var nullFullNamePeople = new List<CreatePersonDto>();
+            foreach (var person in createPersonDto)
+            {
+                if (string.IsNullOrEmpty(person.Fullname))
+                {
+                    nullFullNamePeople.Add(person);
+                }
+                validPeople.Add(person);
+            }
+
+            var (alreadyExistingPeople, addingPeople) = await _validation.ValidateForCreateList(validPeople);
+            
+            await _service.CreateList(addingPeople);
+
+            var statusReport = new CreatePeopleStatusReport
+            {
+                AddedPeople = addingPeople.Count,
+                AlreadyExistingPeople = alreadyExistingPeople?.Count ?? 0
+            };
+
+            var apiResponse = new ApiResponse<CreatePeopleStatusReport>(statusReport);
+
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse) { StatusCode = StatusCodes.Status500InternalServerError };
         }
     }
 

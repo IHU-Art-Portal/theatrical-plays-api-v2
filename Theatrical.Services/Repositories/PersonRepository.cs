@@ -25,6 +25,8 @@ public interface IPersonRepository
     Task ApproveRequest(RequestActionDto requestActionDto);
     Task RejectRequest(RequestActionDto requestActionDto);
     Task DeleteTestData();
+    Task<List<Person>?> GetByNameRange(List<CreatePersonDto> persons);
+    Task CreateRange(List<Person> finalPeopleToAdd);
 }
 
 public class PersonRepository : IPersonRepository
@@ -136,6 +138,21 @@ public class PersonRepository : IPersonRepository
         });
 
         return person;
+    }
+
+    public async Task<List<Person>?> GetByNameRange(List<CreatePersonDto> persons)
+    {
+        var namesToMatch = persons.Select(dto => dto.Fullname).ToList();
+
+        var matchingPersons = await _context.Persons.Where(p => namesToMatch.Contains(p.Fullname)).ToListAsync();
+
+        return matchingPersons;
+    }
+
+    public async Task CreateRange(List<Person> finalPeopleToAdd)
+    {
+        await _context.Persons.AddRangeAsync(finalPeopleToAdd);
+        await _context.SaveChangesAsync();
     }
 
     public async Task Delete(Person person)

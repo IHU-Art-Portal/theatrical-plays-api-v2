@@ -16,6 +16,7 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
     Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto);
     Task<User?> ValidateWithEmail(string email);
+    Task<(List<Person>?, List<CreatePersonDto>?)> ValidateForCreateList(List<CreatePersonDto> createPeopleDto);
 }
 
 public class PersonValidationService : IPersonValidationService
@@ -184,5 +185,38 @@ public class PersonValidationService : IPersonValidationService
     {
         var user = await _userRepository.Get(email);
         return user;
+    }
+    
+    public async Task<(List<Person>?, List<CreatePersonDto>?)> ValidateForCreateList(List<CreatePersonDto> createPeopleDto)
+    {
+
+        foreach (var personDto in createPeopleDto)
+        {
+            _curatorIncomingData.CorrectString(personDto.Fullname);
+        }
+
+        var peopleMatched = await _repository.GetByNameRange(createPeopleDto); //Should add handling/updating for people that already exist.
+        List<CreatePersonDto> peopleNotMatched;
+        
+        if (peopleMatched is not null && peopleMatched.Count > 0)
+        {
+            peopleNotMatched = createPeopleDto                          //Adding only the people that not exist in database.
+                .Where(dto => !peopleMatched.Any(p => p.Fullname == dto.Fullname))
+                .ToList();
+            
+            foreach (var personDto in peopleNotMatched)
+            {
+                _curatorIncomingData.CorrectIncomingPerson(personDto);
+            }
+        
+            return (peopleMatched, peopleNotMatched);
+        }
+
+        foreach (var personDto in createPeopleDto)
+        {
+            _curatorIncomingData.CorrectIncomingPerson(personDto);
+        }
+        
+        return (peopleMatched, createPeopleDto);
     }
 }
