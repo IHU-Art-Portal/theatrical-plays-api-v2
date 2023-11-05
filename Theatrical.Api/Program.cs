@@ -142,6 +142,9 @@ builder.Services.AddTransient<UserAuthorizationFilter>();
 builder.Services.AddTransient<AnyRoleAuthorizationFilter>();
 builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
+//Minio service
+builder.Services.AddTransient<IMinioService, MinioService>();
+
 //cors
 builder.Services.AddCors(options =>
 {

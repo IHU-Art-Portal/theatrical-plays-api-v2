@@ -2,12 +2,15 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Minio;
+using Minio.DataModel.Args;
 using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
+using Files = System.IO.File;
 
 namespace Theatrical.Api.Controllers;
 
@@ -50,6 +53,11 @@ public class AccountRequestsController : ControllerBase
         }
     }
     
+    /// <summary>
+    /// Send the Id of the person you want to claim, and your pdf in Base64 format.
+    /// </summary>
+    /// <param name="requestDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("RequestAccount")]
     [TypeFilter(typeof(UserAuthorizationFilter))]
@@ -267,6 +275,64 @@ public class AccountRequestsController : ControllerBase
             var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+    
+    /// <summary>
+    /// Get the download link of a user's documentation.pdf
+    /// </summary>
+    /// <param name="objectName"></param>
+    /// <returns></returns>
+    [HttpGet("GetDownloadLink")]
+    public async Task<ActionResult<ApiResponse>> GetObjectMinio(string objectName)
+    {
+        try
+        {
+            var minio = new MinioClient()
+                .WithSSL(false)
+                .WithEndpoint("127.0.0.1:9000")
+                .WithCredentials("toXclgHWaUaYgQhgG8gr", "E21eMXPu9vPWwcdybP4xQp51iNKuiG8lesBrPATa")
+                .Build();
+            
+            var bucketName = "dev"; //Change to correct bucketName
+            
+            //Downloads the file. Throws an exception if not exists.
+            await minio.GetObjectAsync(new GetObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithFile(objectName));
+            //Deletes the file after.
+            Files.Delete(objectName);
+            
+            var reqParams = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "response-content-type", "application/pdf" }
+            };
+
+            var presignedArgs = new PresignedGetObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithExpiry(1000)
+                .WithHeaders(reqParams);
+            
+            var url = await minio.PresignedGetObjectAsync(presignedArgs);
+            
+            
+            
+            var apiResponse = new ApiResponse<string>(url);
+            return Ok(apiResponse);
+        }
+        catch (Exception e)
+        {
+            //exception with this code triggers when a file was not found, when trying to Get object.
+            if (e.HResult == -2146233088)
+            {
+                var notFoundException = new ApiResponse(ErrorCode.NotFound, "File not found");
+                return new NotFoundObjectResult(notFoundException);
+            }
+            
+            var exceptionResponse = new ApiResponse<Exception>(e, ErrorCode.ServerError, "failed");
+            return new ObjectResult(exceptionResponse);
         }
     }
     

@@ -18,11 +18,13 @@ public class AccountRequestService : IAccountRequestService
 {
     private readonly IAccountRequestRepository _requestRepository;
     private readonly IPersonRepository _personRepository;
+    private readonly IMinioService _minioService;
 
-    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository)
+    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository, IMinioService minioService)
     {
         _requestRepository = requestRepository;
         _personRepository = personRepository;
+        _minioService = minioService;
     }
 
     /// <summary>
@@ -58,12 +60,14 @@ public class AccountRequestService : IAccountRequestService
     
     public async Task<ResponseAccountRequestDto> CreateRequest(Person person, User user, CreateAccountRequestDto createAccountRequestDto)
     {
+        var downloadUrl = await _minioService.PostPdf(createAccountRequestDto.IdentificationDocument, user.Id);
+        
         var accountRequest = new AccountRequest
         {
             UserId = user.Id,
             PersonId = person.Id,
             ConfirmationStatus = ConfirmationStatus.Active,
-            IdentificationDocument = createAccountRequestDto.IdentificationDocument
+            IdentificationDocument = downloadUrl
         };
 
         await _personRepository.CreateRequest(person);                                //changes the claiming status to 1 (Unavailable)

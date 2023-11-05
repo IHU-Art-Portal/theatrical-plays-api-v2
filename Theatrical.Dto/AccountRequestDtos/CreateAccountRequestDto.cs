@@ -3,5 +3,5 @@
 public class CreateAccountRequestDto
 {
     public int PersonId { get; set; }
-    public string IdentificationDocument { get; set; } //imageBase64
+    public byte[] IdentificationDocument { get; set; } //byte array of pdf.
 }
