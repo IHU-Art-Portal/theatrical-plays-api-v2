@@ -306,13 +306,23 @@ public class UserValidationService : IUserValidationService
     {
         var user = await _repository.GetByUsername(username);
         var report = new ValidationReport();
-
+        
+        if (user is not null && !(bool)user.Enabled!)
+        {
+            report.Success = false;
+            report.Message = "Verify your email in order to set your username.";
+            report.ErrorCode = ErrorCode.InvalidEmail;
+            return report;
+        }
+        
         if (user is null)
         {
             report.Success = true;
             report.Message = "No user found with this username. You may use this username.";
             return report;
         }
+        
+        
 
         report.Success = false;
         report.Message = "Username must be unique";

@@ -654,6 +654,12 @@ public class UserController : ControllerBase
 
             if (!uniqueValidation.Success)
             {
+                if (uniqueValidation.ErrorCode == ErrorCode.InvalidEmail)
+                {
+                    var notVerifiedResponse = new ApiResponse(ErrorCode.InvalidEmail, uniqueValidation.Message!);
+                    return new ObjectResult(notVerifiedResponse) { StatusCode = (int)HttpStatusCode.Conflict };
+                }
+                
                 var uniqueErrorResponse = new ApiResponse((ErrorCode)uniqueValidation.ErrorCode!, uniqueValidation.Message!);
                 return new ObjectResult(uniqueErrorResponse) { StatusCode = (int)HttpStatusCode.Conflict };
             }
