@@ -27,6 +27,7 @@ public interface IUserService
     Task UpdateYoutube(User user, string link);
     Task RemoveSocialMedia(User user, SocialMedia socialMedia);
     Task UpdateUsername(UpdateUsernameDto updateUsernameDto);
+    Task UpdatePassword(UpdatePasswordDto updatePasswordDto, User user);
 }
 
 public class UserService : IUserService
@@ -242,6 +243,12 @@ public class UserService : IUserService
     public async Task UpdateUsername(UpdateUsernameDto updateUsernameDto)
     {
         await _repository.UpdateUsername(updateUsernameDto.User, updateUsernameDto.Username);
+    }
+    
+    public async Task UpdatePassword(UpdatePasswordDto updatePasswordDto, User user)
+    {
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(updatePasswordDto.Password);
+        await _repository.UpdatePassword(user, hashedPassword);
     }
 }
 

@@ -681,4 +681,35 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+
+    [HttpPut]
+    [Route("Update/Password")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> UpdatePassword([FromBody] UpdatePasswordDto updatePasswordDto)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email);
+            
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            await _service.UpdatePassword(updatePasswordDto, user!);
+
+            var apiResponse = new ApiResponse("Successfully Updated Password!");
+
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

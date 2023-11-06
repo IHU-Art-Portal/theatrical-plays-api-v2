@@ -27,6 +27,7 @@ public interface IUserRepository
     Task RemoveInstagram(User user);
     Task OnRequestApproval(User user, Person person);
     Task UpdateUsername(User user, string username);
+    Task UpdatePassword(User user, string hashedPassword);
 }
 
 public class UserRepository : IUserRepository
@@ -115,6 +116,12 @@ public class UserRepository : IUserRepository
     public async Task UpdateUsername(User user, string username)
     {
         user.Username = username;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdatePassword(User user, string hashedPassword)
+    {
+        user.Password = hashedPassword;
         await _context.SaveChangesAsync();
     }
 
