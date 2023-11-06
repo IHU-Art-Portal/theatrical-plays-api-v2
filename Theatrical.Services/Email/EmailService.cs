@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using MailKit.Security;
+using MimeKit;
 using Theatrical.Data.Models;
 
 namespace Theatrical.Services.Email;
@@ -10,6 +12,7 @@ public interface IEmailService
     Task Send2FaVerificationCode(User user, string totpCode);
     Task SendConfirmationEmailTwoFactorActivated(string email);
     Task SendConfirmationEmailTwoFactorDeactivated(string email);
+    Task SendTemporaryPassword(string email, string temporaryPassword);
 }
 
 public class EmailService : IEmailService
@@ -78,6 +81,26 @@ public class EmailService : IEmailService
 
             await client.SendMailAsync(message);
         }
+    }
+    
+    public async Task SendTemporaryPassword(string email, string temporaryPassword)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("", _userEmail));
+        message.To.Add(new MailboxAddress("", email));
+        message.Subject = "Your Temporary Password";
+        message.Body = new TextPart("html")
+        {
+            Text =
+                $"<p><font color=\"black\">Use this temporary password to log in and change your password:</font></p>" +
+                $"<p><font color=\"red\">{temporaryPassword}</font></p>"
+        };
+        
+        using var client = new MailKit.Net.Smtp.SmtpClient();
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_userEmail, _emailPassword);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
     }
 
     /// <summary>

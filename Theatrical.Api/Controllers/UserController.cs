@@ -712,4 +712,32 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+
+    [HttpPost]
+    [Route("ForgotPassword")]
+    public async Task<ActionResult<ApiResponse>> ForgotPassword([FromQuery] string email)
+    {
+        try
+        {
+            var (validation, user) = await _validation.ValidateUser(email);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var temporaryPassword = await _service.SetTemporaryPassword(user!);
+            await _emailService.SendTemporaryPassword(email, temporaryPassword);
+
+            var apiResponse = new ApiResponse("Check your email for your temporary password.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

@@ -28,6 +28,7 @@ public interface IUserService
     Task RemoveSocialMedia(User user, SocialMedia socialMedia);
     Task UpdateUsername(UpdateUsernameDto updateUsernameDto);
     Task UpdatePassword(UpdatePasswordDto updatePasswordDto, User user);
+    Task<string> SetTemporaryPassword(User user);
 }
 
 public class UserService : IUserService
@@ -249,6 +250,14 @@ public class UserService : IUserService
     {
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(updatePasswordDto.Password);
         await _repository.UpdatePassword(user, hashedPassword);
+    }
+
+    public async Task<string> SetTemporaryPassword(User user)
+    {
+        var tempPassword = Guid.NewGuid().ToString();
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword); 
+        await _repository.UpdatePassword(user, hashedPassword);
+        return tempPassword;
     }
 }
 
