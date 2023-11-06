@@ -318,11 +318,12 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Provides the balance of a user.
-    /// Anyone can use this endpoint (22/08/2023).
+    /// Only admins can use this request.
     /// </summary>
     /// <param name="id">user's id</param>
     /// <returns>Available User Credits</returns>
     [HttpGet("{id}/balance")]
+    [ServiceFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> Balance([FromRoute]int id)
     {
         try
