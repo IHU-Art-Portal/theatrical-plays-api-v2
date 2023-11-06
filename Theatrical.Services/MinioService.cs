@@ -15,12 +15,9 @@ public class MinioService : IMinioService
     private string _bucketName = "api.testing";
     private readonly IMinioClient minioClient;
 
-    public MinioService()
+    public MinioService(IMinioClient minioClient)
     {
-        minioClient = new MinioClient()
-            .WithEndpoint("play.min.io")
-            .WithCredentials("HsIq0yLoY6AlqZdFMbZX", "0Jwvg6v4v6BxcTM9k2re5qV56RRjktCaodX7Dffa")
-            .Build();
+        this.minioClient = minioClient;
     }
 
     public async Task<string> PostPdf(byte[] pdfBytes, int userId)

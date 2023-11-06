@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Minio;
 using Newtonsoft.Json;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -144,6 +145,7 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Minio service
 builder.Services.AddTransient<IMinioService, MinioService>();
+builder.Services.AddMinio("HsIq0yLoY6AlqZdFMbZX", "0Jwvg6v4v6BxcTM9k2re5qV56RRjktCaodX7Dffa");
 
 //cors
 builder.Services.AddCors(options =>

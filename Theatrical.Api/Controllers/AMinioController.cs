@@ -13,12 +13,9 @@ public class AMinioController : ControllerBase
 {
     private readonly IMinioClient _minio;
 
-    public AMinioController()
+    public AMinioController(IMinioClient minioClient)
     {
-        _minio = new MinioClient()
-            .WithEndpoint("play.min.io")
-            .WithCredentials("HsIq0yLoY6AlqZdFMbZX", "0Jwvg6v4v6BxcTM9k2re5qV56RRjktCaodX7Dffa")
-            .Build();
+        _minio = minioClient;
     }
     
     
