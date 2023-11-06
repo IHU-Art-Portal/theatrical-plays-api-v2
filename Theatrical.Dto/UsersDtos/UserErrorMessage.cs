@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.ResponseWrapperFolder;
 
-namespace Theatrical.Dto.LoginDtos;
+namespace Theatrical.Dto.UsersDtos;
 
 public class UserErrorMessage
 {

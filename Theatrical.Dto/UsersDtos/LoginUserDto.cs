@@ -1,4 +1,4 @@
-﻿namespace Theatrical.Dto.LoginDtos;
+﻿namespace Theatrical.Dto.UsersDtos;
 
 public class LoginUserDto
 {

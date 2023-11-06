@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.UsersDtos;
 
 namespace Theatrical.Services.Security.Jwt;
 

@@ -2,8 +2,8 @@
 using OtpNet;
 using Theatrical.Data.enums;
 using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Dto.UsersDtos;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -24,6 +24,7 @@ public interface IUserValidationService
     ValidationReport ValidateFacebookLink(string link);
     ValidationReport ValidateInstagramLink(string link);
     ValidationReport ValidateSocialMediaForDelete(User user, SocialMedia socialMedia);
+    Task<ValidationReport> ValidateUniqueUsername(string username);
 }
 
 public class UserValidationService : IUserValidationService
@@ -299,6 +300,24 @@ public class UserValidationService : IUserValidationService
         report.Success = true;
         report.Message = "User Found!";
         return (report, user);
+    }
+
+    public async Task<ValidationReport> ValidateUniqueUsername(string username)
+    {
+        var user = await _repository.GetByUsername(username);
+        var report = new ValidationReport();
+
+        if (user is null)
+        {
+            report.Success = true;
+            report.Message = "No user found with this username. You may use this username.";
+            return report;
+        }
+
+        report.Success = false;
+        report.Message = "Username must be unique";
+        report.ErrorCode = ErrorCode.AlreadyExists;
+        return report;
     }
 
     public async Task<(ValidationReport, User?)> ValidateUserById(int userId)

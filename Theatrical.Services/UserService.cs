@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using Theatrical.Data.Models;
-using Theatrical.Dto.LoginDtos;
 using Theatrical.Services.Repositories;
 using OtpNet;
 using Theatrical.Data.enums;
-using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.TransactionDtos;
+using Theatrical.Dto.UsersDtos;
+using Theatrical.Dto.UsersDtos.ResponseDto;
 using Theatrical.Services.Security.Jwt;
 
 namespace Theatrical.Services;
@@ -26,6 +26,7 @@ public interface IUserService
     Task UpdateInstagram(User user, string link);
     Task UpdateYoutube(User user, string link);
     Task RemoveSocialMedia(User user, SocialMedia socialMedia);
+    Task UpdateUsername(UpdateUsernameDto updateUsernameDto);
 }
 
 public class UserService : IUserService
@@ -236,6 +237,11 @@ public class UserService : IUserService
         }
 
         await _repository.RemoveInstagram(user);
+    }
+
+    public async Task UpdateUsername(UpdateUsernameDto updateUsernameDto)
+    {
+        await _repository.UpdateUsername(updateUsernameDto.User, updateUsernameDto.Username);
     }
 }
 

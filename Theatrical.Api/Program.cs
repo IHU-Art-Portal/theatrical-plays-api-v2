@@ -9,7 +9,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
-using Theatrical.Dto.LoginDtos;
+using Theatrical.Dto.UsersDtos;
 using Theatrical.Services;
 using Theatrical.Services.Caching;
 using Theatrical.Services.Curators;

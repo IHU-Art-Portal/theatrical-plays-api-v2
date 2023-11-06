@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Theatrical.Dto.LoginDtos;
+namespace Theatrical.Dto.UsersDtos;
 
 public class RegisterUserDto
 {

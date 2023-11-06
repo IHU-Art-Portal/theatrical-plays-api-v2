@@ -8,6 +8,7 @@ public interface IUserRepository
 {
     Task<User?> Get(string email);
     Task<User?> Get(int id);
+    Task<User?> GetByUsername(string username);
     Task<User> Register(User user, int userRole);
     Task<User?> GetUserIncludingAuthorities(string email);
     Task<decimal> GetUserBalance(int id);
@@ -25,6 +26,7 @@ public interface IUserRepository
     Task RemoveYoutube(User user);
     Task RemoveInstagram(User user);
     Task OnRequestApproval(User user, Person person);
+    Task UpdateUsername(User user, string username);
 }
 
 public class UserRepository : IUserRepository
@@ -38,6 +40,11 @@ public class UserRepository : IUserRepository
         _logRepository = logRepository;
     }
 
+    public async Task<User?> GetByUsername(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+    }
+    
     public async Task<User?> Get(string email)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -102,6 +109,12 @@ public class UserRepository : IUserRepository
     public async Task OnRequestApproval(User user, Person person)
     {
         user.Username = person.Fullname;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateUsername(User user, string username)
+    {
+        user.Username = username;
         await _context.SaveChangesAsync();
     }
 

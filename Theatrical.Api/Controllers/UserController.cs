@@ -3,9 +3,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.enums;
-using Theatrical.Dto.LoginDtos;
-using Theatrical.Dto.LoginDtos.ResponseDto;
 using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Dto.UsersDtos;
+using Theatrical.Dto.UsersDtos.ResponseDto;
 using Theatrical.Services;
 using Theatrical.Services.Email;
 using Theatrical.Services.Security.AuthorizationFilters;
@@ -633,4 +633,46 @@ public class UserController : ControllerBase
         
     }
 
+    [HttpPut]
+    [Route("Update/Username/{username}")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> UpdateUsername([FromRoute] string username)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email);
+            
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var uniqueValidation = await _validation.ValidateUniqueUsername(username);
+
+            if (!uniqueValidation.Success)
+            {
+                var uniqueErrorResponse = new ApiResponse((ErrorCode)uniqueValidation.ErrorCode!, uniqueValidation.Message!);
+                return new ObjectResult(uniqueErrorResponse) { StatusCode = (int)HttpStatusCode.Conflict };
+            }
+
+            await _service.UpdateUsername(new UpdateUsernameDto
+            {
+                User = user!,      //valid user.
+                Username = username
+            });
+
+            var apiResponse = new ApiResponse("Successfully Updated Username");
+
+            return new ObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

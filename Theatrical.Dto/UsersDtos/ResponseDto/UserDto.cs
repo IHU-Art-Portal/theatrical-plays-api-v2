@@ -1,6 +1,6 @@
 ﻿using Theatrical.Dto.TransactionDtos;
 
-namespace Theatrical.Dto.LoginDtos.ResponseDto;
+namespace Theatrical.Dto.UsersDtos.ResponseDto;
 
 public class UserDto
 {
