@@ -16,57 +16,9 @@ public class AMinioController : ControllerBase
     public AMinioController()
     {
         _minio = new MinioClient()
-            .WithEndpoint("127.0.0.1:9000")
-            .WithCredentials("toXclgHWaUaYgQhgG8gr", "E21eMXPu9vPWwcdybP4xQp51iNKuiG8lesBrPATa")
+            .WithEndpoint("play.min.io")
+            .WithCredentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
             .Build();
-    }
-
-    [HttpGet("Test-Minio")]
-    public async Task<ActionResult<ApiResponse>> TestMinio()
-    {
-        try
-        {
-            var bucketName = "test.net.core";
-
-            //Find if a bucket exists.
-            var existArg = new BucketExistsArgs().WithBucket(bucketName);
-            var found = await _minio.BucketExistsAsync(existArg);
-            //Create the bucket if it does not exist.
-            if (!found)
-            {
-                await _minio.MakeBucketAsync(
-                    new MakeBucketArgs()
-                        .WithBucket(bucketName)
-                    )
-                    .ConfigureAwait(false);
-            }
-
-            //Creates a test.text file and uploads it to the bucket.
-            var filePath = "sample.pdf";
-            var objectName = "sample.pdf"; //Change to have the name of the user.
-            ReadOnlyMemory<byte> bs = await System.IO.File.ReadAllBytesAsync(filePath);
-            using var filestream = bs.AsStream();
-
-            var putArgs = new PutObjectArgs()
-                .WithBucket(bucketName)
-                .WithObject(objectName)
-                .WithStreamData(filestream)
-                .WithObjectSize(filestream.Length)
-                .WithContentType("application/pdf");
-
-            await _minio.PutObjectAsync(putArgs);
-
-            Console.WriteLine($"Uploaded object {objectName} to bucket {bucketName}");
-
-            //
-
-            return Ok(bucketName);
-        }
-        catch (Exception e)
-        {
-            var exceptionResponse = new ApiResponse<Exception>(e, ErrorCode.ServerError, "failed");
-            return new ObjectResult(exceptionResponse);
-        }
     }
     
     
@@ -76,7 +28,7 @@ public class AMinioController : ControllerBase
         //Remove a file from a bucket
         try
         {
-            var bucketName = "dev";
+            var bucketName = "api.testing";
             var objectName = name;
             
 

@@ -12,14 +12,14 @@ public interface IMinioService
 
 public class MinioService : IMinioService
 {
-    private string _bucketName = "dev";
+    private string _bucketName = "api.testing";
     private readonly IMinioClient minioClient;
 
     public MinioService()
     {
         minioClient = new MinioClient()
-            .WithEndpoint("127.0.0.1:9000")
-            .WithCredentials("toXclgHWaUaYgQhgG8gr", "E21eMXPu9vPWwcdybP4xQp51iNKuiG8lesBrPATa")
+            .WithEndpoint("play.min.io")
+            .WithCredentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
             .Build();
     }
 
