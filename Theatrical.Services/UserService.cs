@@ -181,6 +181,7 @@ public class UserService : IUserService
         var userDto = new UserDto
         {
             Id = user.Id,
+            Username = user.Username,
             Email = user.Email,
             EmailVerified = user.Enabled,
             _2FA_enabled = user._2FA_enabled,
