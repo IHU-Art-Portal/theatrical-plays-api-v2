@@ -367,6 +367,12 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("password");
 
+            entity.HasIndex(e => e.Username, "username")
+                .IsUnique();
+            entity.Property(e => e.Username)
+                .HasMaxLength(60)
+                .HasColumnName("username");
+
             entity.Property(e => e.VerificationCode).HasColumnName("verification_code");
 
             entity.Property(u => u._2FA_enabled).HasColumnName("2FA_enabled");

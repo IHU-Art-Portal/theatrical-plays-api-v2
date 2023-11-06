@@ -24,6 +24,7 @@ public interface IUserRepository
     Task RemoveFacebook(User user);
     Task RemoveYoutube(User user);
     Task RemoveInstagram(User user);
+    Task OnRequestApproval(User user, Person person);
 }
 
 public class UserRepository : IUserRepository
@@ -95,6 +96,12 @@ public class UserRepository : IUserRepository
     public async Task RemoveInstagram(User user)
     {
         user.Instagram = null;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task OnRequestApproval(User user, Person person)
+    {
+        user.Username = person.Fullname;
         await _context.SaveChangesAsync();
     }
 

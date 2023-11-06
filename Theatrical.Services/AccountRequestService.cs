@@ -19,12 +19,14 @@ public class AccountRequestService : IAccountRequestService
     private readonly IAccountRequestRepository _requestRepository;
     private readonly IPersonRepository _personRepository;
     private readonly IMinioService _minioService;
+    private readonly IUserRepository _userRepository;
 
-    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository, IMinioService minioService)
+    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository, IMinioService minioService, IUserRepository userRepository)
     {
         _requestRepository = requestRepository;
         _personRepository = personRepository;
         _minioService = minioService;
+        _userRepository = userRepository;
     }
 
     /// <summary>
@@ -91,9 +93,9 @@ public class AccountRequestService : IAccountRequestService
         
         if (requestActionDto.RequestManagerAction == RequestManagerAction.Approve)
         {
-            
             await _requestRepository.ApproveRequest(requestActionDto);
             await _personRepository.ApproveRequest(requestActionDto);
+            await _userRepository.OnRequestApproval(requestActionDto.Claimant, requestActionDto.Person);
             return;
         }
     

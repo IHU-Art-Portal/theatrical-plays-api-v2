@@ -98,7 +98,7 @@ public class PersonRepository : IPersonRepository
         requestActionDto.Person.IsClaimed = true;
         requestActionDto.Person.ClaimedBy = requestActionDto.Claimant.Email;
         requestActionDto.Person.ClaimingStatus = ClaimingStatus.Unavailable;
-        
+
         await _context.SaveChangesAsync();
     }
 
