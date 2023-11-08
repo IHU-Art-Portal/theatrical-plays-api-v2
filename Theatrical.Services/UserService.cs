@@ -29,6 +29,7 @@ public interface IUserService
     Task UpdateUsername(UpdateUsernameDto updateUsernameDto);
     Task UpdatePassword(UpdatePasswordDto updatePasswordDto, User user);
     Task<string> SetTemporaryPassword(User user);
+    Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
 }
 
 public class UserService : IUserService
@@ -258,6 +259,11 @@ public class UserService : IUserService
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(tempPassword); 
         await _repository.UpdatePassword(user, hashedPassword);
         return tempPassword;
+    }
+
+    public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
+    {
+        await _repository.UploadPhoto(user, updateUserPhotoDto);
     }
 }
 

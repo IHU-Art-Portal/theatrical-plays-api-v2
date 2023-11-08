@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Dto.UsersDtos;
 
 namespace Theatrical.Services.Repositories;
 
@@ -28,6 +29,7 @@ public interface IUserRepository
     Task OnRequestApproval(User user, Person person);
     Task UpdateUsername(User user, string username);
     Task UpdatePassword(User user, string hashedPassword);
+    Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
 }
 
 public class UserRepository : IUserRepository
@@ -122,6 +124,15 @@ public class UserRepository : IUserRepository
     public async Task UpdatePassword(User user, string hashedPassword)
     {
         user.Password = hashedPassword;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
+    {
+        user.Photos ??= new List<string>();
+        
+        user.Photos.Add(updateUserPhotoDto.Photo);
+        
         await _context.SaveChangesAsync();
     }
 
