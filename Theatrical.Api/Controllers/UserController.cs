@@ -56,7 +56,7 @@ public class UserController : ControllerBase
             var verificationToken = Guid.NewGuid().ToString();
 
             //URI to verification endpoint.
-            var verificationUrl = $"{Request.Scheme}://{Request.Host}/api/user/verify?token={verificationToken}";
+            var verificationUrl = $"{Request.Scheme}://{Request.Host}/api/user/verify-email?token={verificationToken}";
 
             //Send confirmation email to the registered user.
             await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationUrl);
@@ -80,7 +80,7 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="token">verification code</param>
     /// <returns></returns>
-    [HttpGet("verify")]
+    [HttpGet("verify-email")]
     public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token)
     {
         try
