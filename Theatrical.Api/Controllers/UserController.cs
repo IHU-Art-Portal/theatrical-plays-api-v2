@@ -750,7 +750,7 @@ public class UserController : ControllerBase
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            var (validation, user) = await _validation.ValidateUser(email);
+            var (validation, user) = await _validation.ValidateUser(email!);
             
             if (!validation.Success)
             {
@@ -758,9 +758,9 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
-            await _service.UploadPhoto(user, updateUserPhotoDto);
+            await _service.UploadPhoto(user!, updateUserPhotoDto);
 
-            var apiResponse = new ApiResponse();
+            var apiResponse = new ApiResponse("Successfully Added Photo Link to your Profile.");
             
             return new OkObjectResult(apiResponse);
         }
@@ -771,4 +771,44 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+
+    [HttpPost]
+    [Route("AddRole")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> AddRole([FromQuery] string role)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+            
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var roleValid = await _validation.ValidateUserRole(user!, role);
+            if (!roleValid.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)roleValid.ErrorCode!, roleValid.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.Conflict };
+            }
+
+            await _service.AddRole(user!, role);
+            
+            var apiResponse = new ApiResponse("Successfully Added Role to your Profile.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
+    
+    
 }

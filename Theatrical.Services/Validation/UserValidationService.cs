@@ -25,6 +25,7 @@ public interface IUserValidationService
     ValidationReport ValidateInstagramLink(string link);
     ValidationReport ValidateSocialMediaForDelete(User user, SocialMedia socialMedia);
     Task<ValidationReport> ValidateUniqueUsername(string username);
+    Task<ValidationReport> ValidateUserRole(User user, string role);
 }
 
 public class UserValidationService : IUserValidationService
@@ -327,6 +328,39 @@ public class UserValidationService : IUserValidationService
         report.Success = false;
         report.Message = "Username must be unique";
         report.ErrorCode = ErrorCode.AlreadyExists;
+        return report;
+    }
+
+    public async Task<ValidationReport> ValidateUserRole(User user, string role)
+    {
+        var report = new ValidationReport();
+        
+        //Check for special characters. Roles can only include letters english/greek and spaces.
+        if (!Regex.Match(role, @"^[a-zA-ZΑ-Ωα-ω\u0370-\u03ff\u1f00-\u1fff\s]+$").Success)
+        {
+            report.Message = "Role cannot contain special characters or numbers.";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.InvalidCharacters;
+            return report;
+        }
+        
+        if (user.Roles == null)
+        {
+            report.Message = "No user roles yet. This role can be added.";
+            report.Success = true;
+            return report;
+        }
+
+        if (user.Roles.Contains(role))
+        {
+            report.Message = "This role already exists.";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.AlreadyExists;
+            return report;
+        }
+
+        report.Success = true;
+        report.Message = "Role can be added.";
         return report;
     }
 

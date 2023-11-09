@@ -30,6 +30,7 @@ public interface IUserService
     Task UpdatePassword(UpdatePasswordDto updatePasswordDto, User user);
     Task<string> SetTemporaryPassword(User user);
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
+    Task AddRole(User user, string role);
 }
 
 public class UserService : IUserService
@@ -264,6 +265,11 @@ public class UserService : IUserService
     public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
     {
         await _repository.UploadPhoto(user, updateUserPhotoDto);
+    }
+
+    public async Task AddRole(User user, string role)
+    {
+        await _repository.AddRole(user, role);
     }
 }
 

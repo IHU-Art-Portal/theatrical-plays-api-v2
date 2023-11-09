@@ -30,6 +30,7 @@ public interface IUserRepository
     Task UpdateUsername(User user, string username);
     Task UpdatePassword(User user, string hashedPassword);
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
+    Task AddRole(User user, string role);
 }
 
 public class UserRepository : IUserRepository
@@ -133,6 +134,13 @@ public class UserRepository : IUserRepository
         
         user.Photos.Add(updateUserPhotoDto.Photo);
         
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddRole(User user, string role)
+    {
+        user.Roles ??= new List<string>();                //same as if (user.Roles == null) user.Roles = new List<string>();
+        user.Roles.Add(role);
         await _context.SaveChangesAsync();
     }
 

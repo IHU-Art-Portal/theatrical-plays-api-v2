@@ -20,6 +20,7 @@ public enum ErrorCode
     _2FaDisabled,
     AlreadyLoggedIn,
     NoAvailablePhotos,
+    InvalidCharacters
 }
 
 public class ApiResponse
