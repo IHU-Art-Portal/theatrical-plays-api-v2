@@ -385,7 +385,7 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u.Youtube).HasColumnName("youtube");
             entity.Property(u => u.Instagram).HasColumnName("instagram");
             entity.Property(u => u.Photos).HasColumnName("photos");
-            entity.Property(u => u.Roles).HasColumnName("roles");
+            entity.Property(u => u.PerformerRoles).HasColumnName("artistRoles");
         });
         
         modelBuilder.Entity<Authority>(entity =>

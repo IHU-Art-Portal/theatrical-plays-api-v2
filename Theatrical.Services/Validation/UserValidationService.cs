@@ -344,14 +344,14 @@ public class UserValidationService : IUserValidationService
             return report;
         }
         
-        if (user.Roles == null)
+        if (user.PerformerRoles == null)
         {
             report.Message = "No user roles yet. This role can be added.";
             report.Success = true;
             return report;
         }
 
-        if (user.Roles.Contains(role))
+        if (user.PerformerRoles.Contains(role))
         {
             report.Message = "This role already exists.";
             report.Success = false;

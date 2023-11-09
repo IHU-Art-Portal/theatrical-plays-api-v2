@@ -139,8 +139,8 @@ public class UserRepository : IUserRepository
 
     public async Task AddRole(User user, string role)
     {
-        user.Roles ??= new List<string>();                //same as if (user.Roles == null) user.Roles = new List<string>();
-        user.Roles.Add(role);
+        user.PerformerRoles ??= new List<string>();                //same as if (user.Roles == null) user.Roles = new List<string>();
+        user.PerformerRoles.Add(role);
         await _context.SaveChangesAsync();
     }
 

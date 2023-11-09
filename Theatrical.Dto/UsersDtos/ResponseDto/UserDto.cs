@@ -15,4 +15,6 @@ public class UserDto
     public string? Youtube { get; set; }
     public string? Instagram { get; set; }
     public decimal? Balance { get; set; }
+    public List<string>? PerformerRoles { get; set; }
+    public List<string>? Photos { get; set; }
 }

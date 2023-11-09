@@ -205,7 +205,9 @@ public class UserService : IUserService
             Facebook = user.Facebook,
             Youtube = user.Youtube,
             Instagram = user.Instagram,
-            Balance = user.UserTransactions.Sum(t => t.CreditAmount)
+            Balance = user.UserTransactions.Sum(t => t.CreditAmount),
+            Photos = user.Photos,
+            PerformerRoles = user.PerformerRoles
         };
 
         return userDto;
