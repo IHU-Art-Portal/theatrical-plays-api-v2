@@ -809,6 +809,46 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
-    
-    
+
+    [HttpPost]
+    [Route("RemoveRole")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> RemoveRole([FromQuery] string role)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var roleValidation = await _validation.ValidateForRemoveRole(user!, role);
+            if (!roleValidation.Success)
+            {
+                if (roleValidation.ErrorCode == ErrorCode.BadRequest)
+                {
+                    return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, roleValidation.Message!));
+                }
+
+                return new ObjectResult(new ApiResponse(ErrorCode.RoleNotFound, roleValidation.Message!)){StatusCode = (int)HttpStatusCode.Conflict};
+            }
+
+            await _service.RemoveRole(user!, role);
+
+            var apiResponse = new ApiResponse("Successfully Removed the Role from your Profile.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

@@ -26,6 +26,7 @@ public interface IUserValidationService
     ValidationReport ValidateSocialMediaForDelete(User user, SocialMedia socialMedia);
     Task<ValidationReport> ValidateUniqueUsername(string username);
     Task<ValidationReport> ValidateUserRole(User user, string role);
+    Task<ValidationReport> ValidateForRemoveRole(User user, string role);
 }
 
 public class UserValidationService : IUserValidationService
@@ -361,6 +362,31 @@ public class UserValidationService : IUserValidationService
 
         report.Success = true;
         report.Message = "Role can be added.";
+        return report;
+    }
+
+    public async Task<ValidationReport> ValidateForRemoveRole(User user, string role)
+    {
+        var report = new ValidationReport();
+
+        if (user.PerformerRoles is null)
+        {
+            report.Success = false;
+            report.Message = "You don't have any roles.";
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+        
+        if (!user.PerformerRoles.Contains(role))
+        {
+            report.Success = false;
+            report.Message = $"You don't have a role with the name: {role}";
+            report.ErrorCode = ErrorCode.RoleNotFound;
+            return report;
+        }
+
+        report.Success = true;
+        report.Message = "Role can be removed.";
         return report;
     }
 

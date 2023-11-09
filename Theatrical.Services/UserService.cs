@@ -31,6 +31,7 @@ public interface IUserService
     Task<string> SetTemporaryPassword(User user);
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
     Task AddRole(User user, string role);
+    Task RemoveRole(User user, string role);
 }
 
 public class UserService : IUserService
@@ -272,6 +273,11 @@ public class UserService : IUserService
     public async Task AddRole(User user, string role)
     {
         await _repository.AddRole(user, role);
+    }
+
+    public async Task RemoveRole(User user, string role)
+    {
+        await _repository.RemoveRole(user, role);
     }
 }
 

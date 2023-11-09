@@ -31,6 +31,7 @@ public interface IUserRepository
     Task UpdatePassword(User user, string hashedPassword);
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
     Task AddRole(User user, string role);
+    Task RemoveRole(User user, string role);
 }
 
 public class UserRepository : IUserRepository
@@ -141,6 +142,15 @@ public class UserRepository : IUserRepository
     {
         user.PerformerRoles ??= new List<string>();                //same as if (user.Roles == null) user.Roles = new List<string>();
         user.PerformerRoles.Add(role);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveRole(User user, string role)
+    {
+        user.PerformerRoles!.Remove(role);
+        
+        if (user.PerformerRoles.Count == 0) user.PerformerRoles = null; //Set the artistRoles to null if the list is empty after the removal.
+        
         await _context.SaveChangesAsync();
     }
 
