@@ -145,7 +145,8 @@ public class PersonService : IPersonService
             Height = person.Height,
             EyeColor = person.EyeColor,
             HairColor = person.HairColor,
-            Roles = person.Roles
+            Roles = person.Roles,
+            Images = person.Images
         };
         return personDto;
     }
