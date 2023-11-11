@@ -155,7 +155,8 @@ public class PeopleController : ControllerBase
             var statusReport = new CreatePeopleStatusReport
             {
                 AddedPeople = addingPeople.Count,
-                AlreadyExistingPeople = alreadyExistingPeople?.Count ?? 0
+                AlreadyExistingPeople = alreadyExistingPeople?.Count ?? 0,
+                NullNameNotAddedPeople = nullFullNamePeople.Count
             };
 
             var apiResponse = new ApiResponse<CreatePeopleStatusReport>(statusReport);
