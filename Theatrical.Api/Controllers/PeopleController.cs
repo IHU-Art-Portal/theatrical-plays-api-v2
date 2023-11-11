@@ -305,13 +305,6 @@ public class PeopleController : ControllerBase
 
             if (!validation.Success)
             {
-                if (validation.ErrorCode.Equals(ErrorCode.NoAvailablePhotos))
-                {
-                    var emptyArray = new List<Person>();
-                    //returns 200 if the person exists but has no photos.
-                    var errorNotFoundPhotos = new ApiResponse<List<Person>>(emptyArray, (ErrorCode) validation.ErrorCode, validation.Message!);
-                    return new OkObjectResult(errorNotFoundPhotos);
-                }
                 var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }

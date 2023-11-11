@@ -145,14 +145,6 @@ public class PersonValidationService : IPersonValidationService
 
         var images = await _repository.GetPersonsImages(personId);
 
-        if (!images.Any())
-        {
-            report.Success = false;
-            report.Message = "This person does not have any photos";
-            report.ErrorCode = ErrorCode.NoAvailablePhotos;
-            return (report, null);
-        }
-
         report.Success = true;
         report.Message = "Successful";
 
