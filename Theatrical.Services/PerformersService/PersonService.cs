@@ -136,7 +136,7 @@ public class PersonService : IPersonService
         {
             Id = person.Id,
             Fullname = person.Fullname,
-            SystemID = person.SystemId,
+            //SystemID = person.SystemId,
             Bio = person.Bio,
             Birthdate = person.Birthdate != null ? person.Birthdate.ToString() : null, // Conditionally add Birthdate
             Description = person.Description,
