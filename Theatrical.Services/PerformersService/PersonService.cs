@@ -158,7 +158,7 @@ public class PersonService : IPersonService
             {
                 Id = personsDto.Id,
                 Fullname = personsDto.Fullname,
-                SystemID = personsDto.SystemId,
+                //SystemID = personsDto.SystemId,
                 Bio = personsDto.Bio,
                 Birthdate = personsDto.Birthdate != null ? personsDto.Birthdate.ToString() : null, // Conditionally add Birthdate
                 Description = personsDto.Description,
@@ -167,7 +167,8 @@ public class PersonService : IPersonService
                 Height = personsDto.Height,
                 EyeColor = personsDto.Height,
                 HairColor = personsDto.HairColor,
-                Roles = personsDto.Roles
+                Roles = personsDto.Roles,
+                Images = personsDto.Images
             });
         });
         

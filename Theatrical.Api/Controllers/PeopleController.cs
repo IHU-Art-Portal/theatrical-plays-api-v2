@@ -308,8 +308,8 @@ public class PeopleController : ControllerBase
                 var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
-
-            var imagesDto = _service.ImagesToDto(images!);
+            
+            var imagesDto = _service.ImagesToDto(images);
             
             var response = new ApiResponse<List<ImageDto>>(imagesDto);
             

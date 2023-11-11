@@ -49,8 +49,12 @@ public class PersonRepository : IPersonRepository
     
     public async Task<List<Person>> Get()
     {
-        var people = await _caching.GetOrSetAsync("allpeople", async () => await _context.Persons.ToListAsync());
-
+        var people = await _caching.GetOrSetAsync("allpeople", 
+            async () => await _context.Persons
+                .AsNoTracking()
+                .Include(p => p.Images)
+                .ToListAsync());
+        
         return people;
     }
     
@@ -69,10 +73,9 @@ public class PersonRepository : IPersonRepository
     /// <returns>A list of people</returns>
     public async Task<List<Person>> GetPeopleByClaimingStatus(ClaimingStatus claimingStatus)
     {
-        
         return await _caching.GetOrSetAsync($"people_by_claim_status_{claimingStatus}", async () =>
         {
-            return await _context.Persons.Where(person => person.ClaimingStatus == claimingStatus).ToListAsync();
+            return await _context.Persons.Where(person => person.ClaimingStatus == claimingStatus).Include(p => p.Images).ToListAsync();
         });
     }
 

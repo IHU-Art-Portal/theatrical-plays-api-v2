@@ -1,4 +1,6 @@
-﻿namespace Theatrical.Dto.PersonDtos;
+﻿using Theatrical.Data.Models;
+
+namespace Theatrical.Dto.PersonDtos;
 
 public class PersonDto
 {
@@ -14,4 +16,5 @@ public class PersonDto
     public string? EyeColor { get; set; }
     public string? HairColor { get; set; }
     public List<string>? Roles { get; set; }
+    public List<Image>? Images { get; set; }
 }
