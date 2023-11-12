@@ -17,4 +17,5 @@ public class PersonDto
     public string? HairColor { get; set; }
     public List<string>? Roles { get; set; }
     public List<Image>? Images { get; set; }
+    public bool IsClaimed { get; set; }
 }

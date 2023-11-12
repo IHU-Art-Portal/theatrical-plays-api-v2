@@ -146,7 +146,8 @@ public class PersonService : IPersonService
             EyeColor = person.EyeColor,
             HairColor = person.HairColor,
             Roles = person.Roles,
-            Images = person.Images
+            Images = person.Images,
+            IsClaimed = person.IsClaimed
         };
         return personDto;
     }
@@ -169,7 +170,8 @@ public class PersonService : IPersonService
                 EyeColor = personsDto.Height,
                 HairColor = personsDto.HairColor,
                 Roles = personsDto.Roles,
-                Images = personsDto.Images
+                Images = personsDto.Images,
+                IsClaimed = personsDto.IsClaimed
             });
         });
         
