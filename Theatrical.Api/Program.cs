@@ -145,7 +145,7 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Minio service
 builder.Services.AddTransient<IMinioService, MinioService>();
-builder.Services.AddMinio("HsIq0yLoY6AlqZdFMbZX", "0Jwvg6v4v6BxcTM9k2re5qV56RRjktCaodX7Dffa");
+builder.Services.AddMinio("TPLBhn60BoCIWuiyblFN", "uVKnOUdQoXfRvwbXUOyqMJrMBqwS6FrMa8fU5ORX");
 
 //cors
 builder.Services.AddCors(options =>

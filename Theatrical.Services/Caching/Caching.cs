@@ -26,7 +26,6 @@ public class Caching : ICaching
             if (cacheValue is not null)
             {
                 MemoryCacheEntryOptions cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromSeconds(30))
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
 
                 _memoryCache.Set(key, cacheValue, cacheOptions);
