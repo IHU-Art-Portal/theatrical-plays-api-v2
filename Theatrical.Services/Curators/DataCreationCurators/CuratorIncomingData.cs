@@ -127,8 +127,8 @@ public class CuratorIncomingData : ICuratorIncomingData
                 correctRole = Regex.Replace(correctRole,@"\s*,\s*", ", " );
                 correctRole = ToTitleCase(correctRole);
                 correctRole = RemoveExtraSpaces(correctRole);
-                correctedRoles.Add(correctRole);
             }
+            correctedRoles.Add(correctRole);
         }
         
         return correctedRoles;
