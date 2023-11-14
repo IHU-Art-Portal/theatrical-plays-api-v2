@@ -187,12 +187,13 @@ public class PersonValidationService : IPersonValidationService
             _curatorIncomingData.CorrectString(personDto.Fullname);
         }
 
-        var peopleMatched = await _repository.GetByNameRange(createPeopleDto); //Should add handling/updating for people that already exist.
-        List<CreatePersonDto> peopleNotMatched;
-        
+        //people that were found in database, and should be updated.
+        var peopleMatched = await _repository.GetByNameRange(createPeopleDto);
+
         if (peopleMatched is not null && peopleMatched.Count > 0)
         {
-            peopleNotMatched = createPeopleDto                          //Adding only the people that not exist in database.
+            //people that were not found in database, and should be added.
+            List<CreatePersonDto> peopleNotMatched = createPeopleDto                          
                 .Where(dto => !peopleMatched.Any(p => p.Fullname == dto.Fullname))
                 .ToList();
             

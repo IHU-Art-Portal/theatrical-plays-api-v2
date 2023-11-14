@@ -27,6 +27,7 @@ public interface IPersonRepository
     Task DeleteTestData();
     Task<List<Person>?> GetByNameRange(List<CreatePersonDto> persons);
     Task CreateRange(List<Person> finalPeopleToAdd);
+    Task SaveListChanges();
 }
 
 public class PersonRepository : IPersonRepository
@@ -155,6 +156,11 @@ public class PersonRepository : IPersonRepository
     public async Task CreateRange(List<Person> finalPeopleToAdd)
     {
         await _context.Persons.AddRangeAsync(finalPeopleToAdd);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task SaveListChanges()
+    {
         await _context.SaveChangesAsync();
     }
 

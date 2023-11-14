@@ -2,6 +2,7 @@
 using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.PersonDtos;
+using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
@@ -22,19 +23,21 @@ public interface IPersonService
     Task<List<Image>?> GetImages();
     Task DeleteTestData();
     Task CreateList(List<CreatePersonDto> addingPeople);
+    Task UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto);
 }
 
 public class PersonService : IPersonService
 {
     private readonly IPersonRepository _repository;
     private readonly IPaginationService _pagination;
-    private readonly IAccountRequestRepository _accountRequestRepository;
+    private readonly ICuratorIncomingData _curatorIncomingData;
 
-    public PersonService(IPersonRepository repository, IPaginationService paginationService, IAccountRequestRepository accountRequestRepository)
+    public PersonService(IPersonRepository repository, IPaginationService paginationService,
+        ICuratorIncomingData curatorIncomingData)
     {
         _repository = repository;
         _pagination = paginationService;
-        _accountRequestRepository = accountRequestRepository;
+        _curatorIncomingData = curatorIncomingData;
     }
 
     public async Task<Person> Create(CreatePersonDto createPersonDto)
@@ -213,47 +216,97 @@ public class PersonService : IPersonService
         var finalPeopleToAdd = new List<Person>();
         foreach (var personDto in addingPeople)
         {
-            var person = new Person
+            if (!string.IsNullOrEmpty(personDto.Fullname))
             {
-                Fullname = personDto.Fullname,
-                Timestamp = DateTime.UtcNow,
-                SystemId = personDto.System,
-                HairColor = personDto.HairColor,
-                Height = personDto.Height,
-                EyeColor = personDto.EyeColor,
-                Weight = personDto.Weight,
-                Languages = personDto.Languages,
-                Description = personDto.Description,
-                Bio = personDto.Bio,
-                Roles = personDto.Roles
-            };
-
-            if (personDto.Birthdate is not null)
-            {
-                const string format = "dd-MM-yyyy";
-                try
+                var person = new Person
                 {
-                    DateTime parsedDate = DateTime.ParseExact(personDto.Birthdate, format, CultureInfo.InvariantCulture);
+                    Fullname = personDto.Fullname,
+                    Timestamp = DateTime.UtcNow,
+                    SystemId = personDto.System,
+                    HairColor = personDto.HairColor,
+                    Height = personDto.Height,
+                    EyeColor = personDto.EyeColor,
+                    Weight = personDto.Weight,
+                    Languages = personDto.Languages,
+                    Description = personDto.Description,
+                    Bio = personDto.Bio,
+                    Roles = personDto.Roles
+                };
 
-                    // Explicitly set the DateTimeKind to UTC, to avoid errors.
-                    person.Birthdate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
-                }
-                catch (Exception e)
+                if (personDto.Birthdate is not null)
                 {
-                    Console.WriteLine(e.Message);
+                    const string format = "dd-MM-yyyy";
+                    try
+                    {
+                        DateTime parsedDate =
+                            DateTime.ParseExact(personDto.Birthdate, format, CultureInfo.InvariantCulture);
+
+                        // Explicitly set the DateTimeKind to UTC, to avoid errors.
+                        person.Birthdate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
-            }
 
-            if (personDto.Images != null && personDto.Images.Any())
-            {
-                List<Image> images = personDto.Images.Select(imageUrl => new Image { ImageUrl = imageUrl }).ToList();
+                if (personDto.Images != null && personDto.Images.Any())
+                {
+                    List<Image> images = personDto.Images.Select(imageUrl => new Image { ImageUrl = imageUrl })
+                        .ToList();
 
-                person.Images = images;
+                    person.Images = images;
+                }
+
+                finalPeopleToAdd.Add(person);
             }
-        
-            finalPeopleToAdd.Add(person);
         }
 
         await _repository.CreateRange(finalPeopleToAdd);
+    }
+
+    public async Task UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto)
+    {
+        foreach (var existingPerson in alreadyExistingPeople)
+        {
+            foreach (var createDto in createPersonDto)
+            {
+                if (!string.IsNullOrEmpty(createDto.Fullname) && existingPerson.Fullname == createDto.Fullname)
+                {
+                    _curatorIncomingData.CorrectIncomingPerson(createDto);
+                    
+                    existingPerson.Fullname = createDto.Fullname;
+                    existingPerson.HairColor = createDto.HairColor;
+                    existingPerson.Height = createDto.Height;
+                    existingPerson.EyeColor = createDto.EyeColor;
+                    existingPerson.Weight = createDto.Weight;
+                    existingPerson.Languages = createDto.Languages;
+                    existingPerson.Description = createDto.Description;
+                    existingPerson.Bio = createDto.Bio;
+                    
+                    if (createDto.Images != null)
+                    {
+                        existingPerson.Images = createDto.Images.Select(imageUrl => new Image { ImageUrl = imageUrl })
+                            .ToList();
+                    }
+                    existingPerson.SystemId = createDto.System;
+                    existingPerson.Roles = createDto.Roles;
+                    
+                    const string format = "dd-MM-yyyy";
+
+                    if (createDto.Birthdate != null)
+                    {
+                        DateTime parsedDate = DateTime.ParseExact(createDto.Birthdate, format, CultureInfo.InvariantCulture);
+
+                        // Explicitly set the DateTimeKind to UTC, to avoid errors.
+                        existingPerson.Birthdate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                    }
+                    
+                    break;
+                }
+            }
+        }
+
+        await _repository.SaveListChanges();
     }
 }
