@@ -32,6 +32,7 @@ public interface IUserRepository
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
+    Task SetProfilePhoto(User user, string photo);
 }
 
 public class UserRepository : IUserRepository
@@ -151,6 +152,12 @@ public class UserRepository : IUserRepository
         
         if (user.PerformerRoles.Count == 0) user.PerformerRoles = null; //Set the artistRoles to null if the list is empty after the removal.
         
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task SetProfilePhoto(User user, string photo)
+    {
+        user.PhotoProfile = photo;
         await _context.SaveChangesAsync();
     }
 

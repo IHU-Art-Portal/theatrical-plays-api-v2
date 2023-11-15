@@ -32,6 +32,7 @@ public interface IUserService
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
+    Task SetProfilePhoto(User user, SetProfilePhotoDto photo);
 }
 
 public class UserService : IUserService
@@ -208,6 +209,7 @@ public class UserService : IUserService
             Instagram = user.Instagram,
             Balance = user.UserTransactions.Sum(t => t.CreditAmount),
             Photos = user.Photos,
+            ProfilePhoto = user.PhotoProfile,
             PerformerRoles = user.PerformerRoles
         };
 
@@ -278,6 +280,11 @@ public class UserService : IUserService
     public async Task RemoveRole(User user, string role)
     {
         await _repository.RemoveRole(user, role);
+    }
+
+    public async Task SetProfilePhoto(User user, SetProfilePhotoDto setProfilePhotoDto)
+    {
+        await _repository.SetProfilePhoto(user, setProfilePhotoDto.Photo);
     }
 }
 

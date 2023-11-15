@@ -851,4 +851,36 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+    
+    [HttpPost]
+    [Route("SetPhotoProfile")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> SetProfilePhoto([FromBody] SetProfilePhotoDto setProfilePhotoDto)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            await _service.SetProfilePhoto(user, setProfilePhotoDto);
+            
+            
+            var apiResponse = new ApiResponse("Successfully Set Profile Photo.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }
