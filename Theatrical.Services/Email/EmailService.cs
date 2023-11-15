@@ -149,7 +149,7 @@ public class EmailService : IEmailService
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress("", _userEmail));
         message.To.Add(new MailboxAddress("", email));
-        message.Subject = "You have request an account";
+        message.Subject = "You have requested an account";
         message.Body = new TextPart("html")
         {
             Text =
