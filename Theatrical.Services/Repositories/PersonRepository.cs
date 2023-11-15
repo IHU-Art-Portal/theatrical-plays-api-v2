@@ -100,7 +100,6 @@ public class PersonRepository : IPersonRepository
     public async Task ApproveRequest(RequestActionDto requestActionDto)
     {
         requestActionDto.Person.IsClaimed = true;
-        requestActionDto.Person.ClaimedBy = requestActionDto.Claimant.Email;
         requestActionDto.Person.ClaimingStatus = ClaimingStatus.Unavailable;
 
         await _context.SaveChangesAsync();

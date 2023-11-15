@@ -20,7 +20,6 @@ public class Person
     public List<string>? Roles { get; set; }
     public bool IsClaimed { get; set; }
     public ClaimingStatus ClaimingStatus { get; set; }
-    public string? ClaimedBy { get; set; }
 }
 
 public enum ClaimingStatus

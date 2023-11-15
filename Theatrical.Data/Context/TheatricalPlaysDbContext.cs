@@ -260,7 +260,6 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.Languages).HasColumnName("Languages");
             entity.Property(e => e.IsClaimed).HasColumnName("IsClaimed");
             entity.Property(e => e.ClaimingStatus).HasColumnName("ClaimingStatus");
-            entity.Property(e => e.ClaimedBy).HasColumnName("ClaimedBy");
         });
 
         modelBuilder.Entity<Production>(entity =>
