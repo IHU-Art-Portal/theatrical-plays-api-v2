@@ -15,6 +15,7 @@ public interface IEmailService
     Task SendTemporaryPassword(string email, string temporaryPassword);
     Task SendApprovalEmail(string email, string personFullname);
     Task SendDisApprovalEmail(string email, string personFullname);
+    Task SendRequestConfirmationEmail(string email, string personFullname);
 }
 
 public class EmailService : IEmailService
@@ -114,7 +115,7 @@ public class EmailService : IEmailService
         message.Body = new TextPart("html")
         {
             Text =
-                $"<p><font color=\"black\">Your Account request for {personFullname} has been <font color=\"green\">approved!</font></font></p>"
+                $"<p><font color=\"black\">Your Account request for \"{personFullname}\" has been <font color=\"green\">approved!</font></font></p>"
         };
         
         using var client = new MailKit.Net.Smtp.SmtpClient();
@@ -133,7 +134,26 @@ public class EmailService : IEmailService
         message.Body = new TextPart("html")
         {
             Text =
-                $"<p><font color=\"black\">Your Account request for {personFullname} has been <font color=\"red\">rejected!</font></font></p>"
+                $"<p><font color=\"black\">Your Account request for \"{personFullname}\" has been <font color=\"red\">rejected!</font></font></p>"
+        };
+        
+        using var client = new MailKit.Net.Smtp.SmtpClient();
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_userEmail, _emailPassword);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+    }
+
+    public async Task SendRequestConfirmationEmail(string email, string personFullname)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("", _userEmail));
+        message.To.Add(new MailboxAddress("", email));
+        message.Subject = "You have request an account";
+        message.Body = new TextPart("html")
+        {
+            Text =
+                $"<p><font color=\"black\">Your Account Request for \"{personFullname}\" has been created and is being reviewed by our managers!</font></p>"
         };
         
         using var client = new MailKit.Net.Smtp.SmtpClient();

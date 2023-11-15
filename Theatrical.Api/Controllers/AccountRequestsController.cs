@@ -102,6 +102,8 @@ public class AccountRequestsController : ControllerBase
             //Normal flow of code
             var accountRequest = await _service.CreateRequest(person, user, requestDto);
 
+            await _emailService.SendRequestConfirmationEmail(user.Email, person.Fullname);
+
             ApiResponse response = new ApiResponse<ResponseAccountRequestDto>(accountRequest, "You have made an account request.");
 
             return new ObjectResult(response);
