@@ -13,7 +13,9 @@ using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
 
-
+/// <summary>
+/// This controller contains the basic operations for user related functions.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [EnableCors("AllowOrigin")]
@@ -773,9 +775,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Route("AddRole")]
+    [Route("Add-Artist-Role")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
-    public async Task<ActionResult<ApiResponse>> AddRole([FromQuery] string role)
+    public async Task<ActionResult<ApiResponse>> AddArtistRole([FromQuery] string role)
     {
         try
         {
@@ -811,9 +813,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Route("RemoveRole")]
+    [Route("Remove-Artist-Role")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
-    public async Task<ActionResult<ApiResponse>> RemoveRole([FromQuery] string role)
+    public async Task<ActionResult<ApiResponse>> RemoveArtistRole([FromQuery] string role)
     {
         try
         {
