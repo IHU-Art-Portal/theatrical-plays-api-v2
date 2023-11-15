@@ -70,13 +70,21 @@ public class AccountRequestsController : ControllerBase
         try
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var user = await _personValidation.ValidateWithEmail(email!);
+            var user = await _userValidation.ValidateWithEmail(email!);
 
             //Edge case that checks if the connected user is deleted/not existent during the request.
             if (user is null)
             {
                 var userError = new ApiResponse(ErrorCode.NotFound, "There was an error finding your user account");
                 return new ObjectResult(userError) { StatusCode = 404 };
+            }
+            
+            //Checks if the user already have a claimed person.
+            var uniquenessValidation = await _userValidation.ValidateUserPersonUniqueness(user.Id);
+            if (!uniquenessValidation.Success)
+            {
+                var uniqueErrorResponse = new ApiResponse(ErrorCode.AlreadyExists, uniquenessValidation.Message!);
+                return new ObjectResult(uniqueErrorResponse) { StatusCode = (int)HttpStatusCode.Conflict };
             }
 
             if (user.Enabled == false)
@@ -98,7 +106,7 @@ public class AccountRequestsController : ControllerBase
                 var claimingError = new ApiResponse(ErrorCode.Forbidden, "The account you tried to request is unavailable.");
                 return new ObjectResult(claimingError) { StatusCode = 403 };
             }
-
+            
             //Normal flow of code
             var accountRequest = await _service.CreateRequest(person, user, requestDto);
 

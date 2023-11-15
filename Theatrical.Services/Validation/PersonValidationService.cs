@@ -15,7 +15,6 @@ public interface IPersonValidationService
     Task<(ValidationReport report, List<PersonProductionsRoleInfo>? productions)> ValidatePersonsProductions(int personId);
     Task<(ValidationReport report, List<Image>? images)> ValidatePersonsPhotos(int personId);
     Task<(ValidationReport, CreatePersonDto?)> ValidateForCreate(CreatePersonDto createPersonDto);
-    Task<User?> ValidateWithEmail(string email);
     Task<(List<Person>?, List<CreatePersonDto>?)> ValidateForCreateList(List<CreatePersonDto> createPeopleDto);
 }
 
@@ -173,12 +172,6 @@ public class PersonValidationService : IPersonValidationService
         return (report, createPersonDto);
     }
 
-    public async Task<User?> ValidateWithEmail(string email)
-    {
-        var user = await _userRepository.Get(email);
-        return user;
-    }
-    
     public async Task<(List<Person>?, List<CreatePersonDto>?)> ValidateForCreateList(List<CreatePersonDto> createPeopleDto)
     {
 

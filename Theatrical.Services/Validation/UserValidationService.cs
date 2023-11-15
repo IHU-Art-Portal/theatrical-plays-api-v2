@@ -27,17 +27,45 @@ public interface IUserValidationService
     Task<ValidationReport> ValidateUniqueUsername(string username);
     Task<ValidationReport> ValidateUserRole(User user, string role);
     Task<ValidationReport> ValidateForRemoveRole(User user, string role);
+    Task<User?> ValidateWithEmail(string email);
+    Task<ValidationReport> ValidateUserPersonUniqueness(int userId);
 }
 
 public class UserValidationService : IUserValidationService
 {
     private readonly IUserRepository _repository;
     private readonly IUserService _userService;
+    private readonly IAssignedUserRepository _assignedUsersRepository;
 
-    public UserValidationService(IUserRepository repository, IUserService userService)
+    public UserValidationService(IUserRepository repository, IUserService userService, IAssignedUserRepository assignedUserRepository)
     {
         _repository = repository;
         _userService = userService;
+        _assignedUsersRepository = assignedUserRepository;
+    }
+    
+    public async Task<User?> ValidateWithEmail(string email)
+    {
+        var user = await _repository.Get(email);
+        return user;
+    }
+
+    public async Task<ValidationReport> ValidateUserPersonUniqueness(int userId)
+    {
+        var assignedUser = await _assignedUsersRepository.GetByUserId(userId);
+        var report = new ValidationReport();
+
+        if (assignedUser is not null)
+        {
+            report.Message = "You already have an approved request. You can't make more person account requests.";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.AlreadyExists;
+            return report;
+        }
+
+        report.Success = true;
+        report.Message = "User does not have an approved request and may create additional requests.";
+        return report;
     }
 
     public async Task<ValidationReport> ValidateForRegister(RegisterUserDto userdto)

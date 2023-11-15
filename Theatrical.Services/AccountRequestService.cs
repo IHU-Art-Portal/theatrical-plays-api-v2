@@ -96,8 +96,8 @@ public class AccountRequestService : IAccountRequestService
         
         if (requestActionDto.RequestManagerAction == RequestManagerAction.Approve)
         {
-            await _requestRepository.ApproveRequest(requestActionDto);
             await _personRepository.ApproveRequest(requestActionDto);
+            await _requestRepository.ApproveRequest(requestActionDto);
             await _userRepository.OnRequestApproval(requestActionDto.Claimant, requestActionDto.Person);
             var assignedUser = new AssignedUser
             {
