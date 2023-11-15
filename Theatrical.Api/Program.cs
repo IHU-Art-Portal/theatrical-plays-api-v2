@@ -53,7 +53,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swagger =>
 {
     swagger.SwaggerDoc("v2", new OpenApiInfo { Title = "Theatrical.Api", Version = "v2" });
-                    
+    swagger.SchemaFilter<EnumSchemaFilter>();
 });
 
 //Swagger UI authorization support
