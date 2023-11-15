@@ -153,7 +153,7 @@ public class PeopleController : ControllerBase
 
             if (alreadyExistingPeople is not null && alreadyExistingPeople.Count > 0)
             {
-                await _service.UpdateList(alreadyExistingPeople, createPersonDto);
+                await _service.UpdateList(alreadyExistingPeople, validPeople);
             }
             
             await _service.CreateList(addingPeople!);
