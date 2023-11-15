@@ -150,7 +150,8 @@ public class PersonService : IPersonService
             HairColor = person.HairColor,
             Roles = person.Roles,
             Images = person.Images,
-            IsClaimed = person.IsClaimed
+            IsClaimed = person.IsClaimed,
+            ClaimingStatus = person.ClaimingStatus.ToString()
         };
         return personDto;
     }

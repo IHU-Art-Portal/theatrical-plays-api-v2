@@ -18,4 +18,5 @@ public class PersonDto
     public List<string>? Roles { get; set; }
     public List<Image>? Images { get; set; }
     public bool IsClaimed { get; set; }
+    public string ClaimingStatus { get; set; }
 }
