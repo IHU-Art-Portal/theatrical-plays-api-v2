@@ -8,6 +8,7 @@ using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
+using Theatrical.Services.Email;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 using Files = System.IO.File;
@@ -23,14 +24,17 @@ public class AccountRequestsController : ControllerBase
     private readonly IPersonValidationService _personValidation;
     private readonly IAccountRequestValidationService _accountRequestValidation;
     private readonly IUserValidationService _userValidation;
+    private readonly IEmailService _emailService;
 
     public AccountRequestsController(IAccountRequestService service, IPersonValidationService personValidationService,
-        IAccountRequestValidationService accountRequestValidationService, IUserValidationService userValidationService)
+        IAccountRequestValidationService accountRequestValidationService, IUserValidationService userValidationService,
+        IEmailService emailService)
     {
         _service = service;
         _personValidation = personValidationService;
         _accountRequestValidation = accountRequestValidationService;
         _userValidation = userValidationService;
+        _emailService = emailService;
     }
 
     [HttpGet("ClaimsManagers")]
@@ -181,6 +185,8 @@ public class AccountRequestsController : ControllerBase
             
             await _service.RequestAction(requestActionDto);
 
+            await _emailService.SendApprovalEmail(claimantUser!.Email, person.Fullname);
+
             var apiResponse = new ApiResponse("Successfully assigned the account to the user");
 
             return new OkObjectResult(apiResponse);
@@ -265,6 +271,8 @@ public class AccountRequestsController : ControllerBase
 
             
             await _service.RequestAction(requestActionDto);
+            
+            await _emailService.SendDisApprovalEmail(claimantUser!.Email, person.Fullname);
 
             var apiResponse = new ApiResponse("Successfully rejected the account request");
 

@@ -13,6 +13,8 @@ public interface IEmailService
     Task SendConfirmationEmailTwoFactorActivated(string email);
     Task SendConfirmationEmailTwoFactorDeactivated(string email);
     Task SendTemporaryPassword(string email, string temporaryPassword);
+    Task SendApprovalEmail(string email, string personFullname);
+    Task SendDisApprovalEmail(string email, string personFullname);
 }
 
 public class EmailService : IEmailService
@@ -94,6 +96,44 @@ public class EmailService : IEmailService
             Text =
                 $"<p><font color=\"black\">Use this temporary password to log in and change your password:</font></p>" +
                 $"<p><font color=\"red\">{temporaryPassword}</font></p>"
+        };
+        
+        using var client = new MailKit.Net.Smtp.SmtpClient();
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_userEmail, _emailPassword);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+    }
+
+    public async Task SendApprovalEmail(string email, string personFullname)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("", _userEmail));
+        message.To.Add(new MailboxAddress("", email));
+        message.Subject = "Your Account Request has been approved!";
+        message.Body = new TextPart("html")
+        {
+            Text =
+                $"<p><font color=\"black\">Your Account request for {personFullname} has been <font color=\"green\">approved!</font></font></p>"
+        };
+        
+        using var client = new MailKit.Net.Smtp.SmtpClient();
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_userEmail, _emailPassword);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+    }
+
+    public async Task SendDisApprovalEmail(string email, string personFullname)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("", _userEmail));
+        message.To.Add(new MailboxAddress("", email));
+        message.Subject = "Your Account Request has been rejected.";
+        message.Body = new TextPart("html")
+        {
+            Text =
+                $"<p><font color=\"black\">Your Account request for {personFullname} has been <font color=\"red\">rejected!</font></font></p>"
         };
         
         using var client = new MailKit.Net.Smtp.SmtpClient();
