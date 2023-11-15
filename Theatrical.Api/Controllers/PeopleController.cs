@@ -144,6 +144,7 @@ public class PeopleController : ControllerBase
                 if (string.IsNullOrEmpty(person.Fullname))
                 {
                     nullFullNamePeople.Add(person);
+                    continue;
                 }
                 validPeople.Add(person);
             }
