@@ -147,6 +147,9 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 builder.Services.AddTransient<IMinioService, MinioService>();
 builder.Services.AddMinio("TPLBhn60BoCIWuiyblFN", "uVKnOUdQoXfRvwbXUOyqMJrMBqwS6FrMa8fU5ORX");
 
+//Assigned Users Services
+builder.Services.AddTransient<IAssignedUserRepository, AssignedUserRepository>();
+
 //cors
 builder.Services.AddCors(options =>
 {

@@ -29,6 +29,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<Venue> Venues { get; set; } = null!;
     public virtual DbSet<Transaction> Transactions { get; set; } = null!;
     public virtual DbSet<AccountRequest> AccountRequests { get; set; } = null!;
+    public virtual DbSet<AssignedUser> AssignedUsers { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -494,6 +495,35 @@ public class TheatricalPlaysDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.PersonId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AssignedUser>(entity =>
+        {
+            entity.ToTable("assigned_users");
+            
+            entity.HasKey(up => up.Id);
+            entity.Property(up => up.Id).ValueGeneratedOnAdd();
+            entity.Property(up => up.Id).HasColumnName("id");
+
+            entity.Property(up => up.PersonId).HasColumnName("personid");
+
+            entity.Property(up => up.UserId).HasColumnName("userid");
+
+            entity.Property(up => up.RequestId).HasColumnName("requestid");
+
+            entity.Property(up => up.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+
+            entity.HasOne(up => up.User)
+                .WithMany()
+                .HasForeignKey(up => up.UserId);
+
+            entity.HasOne(up => up.Person)
+                .WithMany()
+                .HasForeignKey(up => up.PersonId);
+
+            entity.HasOne(up => up.AccountRequest)
+                .WithMany()
+                .HasForeignKey(up => up.RequestId);
         });
 
     }

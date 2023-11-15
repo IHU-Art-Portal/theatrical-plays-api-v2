@@ -20,13 +20,16 @@ public class AccountRequestService : IAccountRequestService
     private readonly IPersonRepository _personRepository;
     private readonly IMinioService _minioService;
     private readonly IUserRepository _userRepository;
+    private readonly IAssignedUserRepository _assignedUserRepository;
 
-    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository, IMinioService minioService, IUserRepository userRepository)
+    public AccountRequestService(IAccountRequestRepository requestRepository, IPersonRepository personRepository, IMinioService minioService, IUserRepository userRepository,
+        IAssignedUserRepository assignedUserRepository)
     {
         _requestRepository = requestRepository;
         _personRepository = personRepository;
         _minioService = minioService;
         _userRepository = userRepository;
+        _assignedUserRepository = assignedUserRepository;
     }
 
     /// <summary>
@@ -96,6 +99,13 @@ public class AccountRequestService : IAccountRequestService
             await _requestRepository.ApproveRequest(requestActionDto);
             await _personRepository.ApproveRequest(requestActionDto);
             await _userRepository.OnRequestApproval(requestActionDto.Claimant, requestActionDto.Person);
+            var assignedUser = new AssignedUser
+            {
+                UserId = requestActionDto.Claimant.Id,
+                PersonId = requestActionDto.Person.Id,
+                RequestId = requestActionDto.AccountRequest.Id
+            };
+            await _assignedUserRepository.AddAssignedPerson(assignedUser);
             return;
         }
     
