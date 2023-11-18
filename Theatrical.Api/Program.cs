@@ -145,7 +145,7 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Minio service
 builder.Services.AddTransient<IMinioService, MinioService>();
-builder.Services.AddMinio("TPLBhn60BoCIWuiyblFN", "uVKnOUdQoXfRvwbXUOyqMJrMBqwS6FrMa8fU5ORX");
+builder.Services.AddMinio("8VTIrCBShDrGdKGLkSoJ", "tg6i4X6JOLmkUunLVj554YYZnDEdDpBI9edJh3p2");
 
 //Assigned Users Services
 builder.Services.AddTransient<IAssignedUserRepository, AssignedUserRepository>();
