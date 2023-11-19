@@ -31,6 +31,8 @@ public class ContributionsController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<ContributionDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetContributions(int? page, int? size)
     {
         try
@@ -66,6 +68,8 @@ public class ContributionsController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
     {
         try

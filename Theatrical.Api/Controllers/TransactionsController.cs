@@ -92,6 +92,7 @@ public class TransactionsController : ControllerBase
     /// <param name="id">transaction id</param>
     /// <returns>TransactionDtoFetch</returns>
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(TransactionDtoFetch), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetTransaction([FromRoute] int id)
     {
         try
@@ -122,6 +123,8 @@ public class TransactionsController : ControllerBase
     /// <param name="id">user's id</param>
     /// <returns>List&lt;TransactionsDtoFetch&gt;</returns>
     [HttpGet("user/{id}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(TransactionDtoFetch), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
     {
         try

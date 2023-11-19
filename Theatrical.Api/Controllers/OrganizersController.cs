@@ -56,6 +56,8 @@ public class OrganizersController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<OrganizerDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetOrganizers(int? page, int? size)
     {
         try

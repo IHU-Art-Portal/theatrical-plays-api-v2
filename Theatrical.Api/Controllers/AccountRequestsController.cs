@@ -2,8 +2,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Minio;
-using Minio.DataModel.Args;
 using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -39,6 +37,7 @@ public class AccountRequestsController : ControllerBase
 
     [HttpGet("ClaimsManagers")]
     [TypeFilter(typeof(ClaimsManagerAndAdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(AccountRequestDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> ShowAll([FromQuery] ConfirmationStatus? status)
     {
         try
@@ -65,6 +64,8 @@ public class AccountRequestsController : ControllerBase
     [HttpPost]
     [Route("RequestAccount")]
     [TypeFilter(typeof(UserAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse>> RequestAccount([FromBody] CreateAccountRequestDto requestDto)
     {
         try
@@ -127,6 +128,9 @@ public class AccountRequestsController : ControllerBase
     [HttpGet]
     [Route("Approve/{requestId}")]
     [TypeFilter(typeof(ClaimsManagerAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> ApproveRequest([FromRoute] int requestId)
     {
         try
@@ -167,7 +171,7 @@ public class AccountRequestsController : ControllerBase
             
             //Fetches the email from provided jwt and finds the manager user.
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var (managerReport, managerUser) = await _userValidation.ValidateUser(email);
+            var (managerReport, managerUser) = await _userValidation.ValidateUser(email!);
             
             if (!managerReport.Success)
             {
@@ -212,6 +216,9 @@ public class AccountRequestsController : ControllerBase
     [HttpGet]
     [Route("Reject/{requestId}")]
     [TypeFilter(typeof(ClaimsManagerAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> RejectRequest([FromRoute] int requestId)
     {
         try
@@ -232,7 +239,7 @@ public class AccountRequestsController : ControllerBase
             }
 
             //Checks if the person still exists. Also returns the related person.
-            var (personReport, person) = await _personValidation.ValidateAndFetch(accountRequest!.PersonId);
+            var (personReport, person) = await _personValidation.ValidateAndFetch(accountRequest.PersonId);
             if (!personReport.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)valReport.ErrorCode!, valReport.Message!);
@@ -254,7 +261,7 @@ public class AccountRequestsController : ControllerBase
             
             //Gets the email from provided jwt and finds the manager user.
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var (managerReport, managerUser) = await _userValidation.ValidateUser(email);
+            var (managerReport, managerUser) = await _userValidation.ValidateUser(email!);
             
             if (!managerReport.Success)
             {

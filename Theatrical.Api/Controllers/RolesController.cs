@@ -67,6 +67,8 @@ public class RolesController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<RoleDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetRoles(int? page,  int? size)
     {
         try
@@ -85,7 +87,7 @@ public class RolesController : ControllerBase
             
             var response = new ApiResponse<PaginationResult<RoleDto>>(paginationResult);
 
-            return new ObjectResult(response);
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {

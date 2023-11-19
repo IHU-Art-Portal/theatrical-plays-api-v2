@@ -33,6 +33,8 @@ public class PeopleController : ControllerBase
     /// ToDo update person if they exist.
     [HttpGet]
     [Route("{id:int}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PersonDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<PersonDto>>> GetPerson(int id)
     {
         try
@@ -49,7 +51,7 @@ public class PeopleController : ControllerBase
 
             ApiResponse response = new ApiResponse<PersonDto>(performerDto);
 
-            return new ObjectResult(response);
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
@@ -67,6 +69,7 @@ public class PeopleController : ControllerBase
     /// <param name="showAvailableAccounts"></param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
+    [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, bool? showAvailableAccounts)
     {
         try
@@ -94,6 +97,8 @@ public class PeopleController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(PersonDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreatePerson([FromBody] CreatePersonDto createPersonDto)
     {
         try
@@ -133,6 +138,7 @@ public class PeopleController : ControllerBase
 
     [HttpPost("Addrange")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(CreatePeopleStatusReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreatePeople([FromBody] List<CreatePersonDto> createPersonDto)
     {
         try
@@ -201,6 +207,8 @@ public class PeopleController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("role/{role}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPeopleByRole(string role, int? page, int? size)
     {
         try
@@ -235,6 +243,8 @@ public class PeopleController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("initials/{letters}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPeopleByInitialLetter(string letters, int? page, int? size)
     {
         try
@@ -271,6 +281,8 @@ public class PeopleController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{id}/productions")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<PersonProductionsRoleInfo>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPersonProductions(int id, int? page, int? size)
     {
         try
@@ -304,6 +316,8 @@ public class PeopleController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{id}/photos")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ImageDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPersonsPhotos(int id)
     {
         try
@@ -338,6 +352,7 @@ public class PeopleController : ControllerBase
     [HttpDelete]
     [Route("{id}")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> DeletePerson(int id)
     {
         try
@@ -368,6 +383,7 @@ public class PeopleController : ControllerBase
 
     [HttpGet]
     [Route("photos")]
+    [ProducesResponseType(typeof(Image), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPhotos()
     {
         try
@@ -386,7 +402,8 @@ public class PeopleController : ControllerBase
 
     [HttpDelete]
     [Route("DeleteTestData")]
-    public async Task<ActionResult> DeleteTestData(string? Test_Data_Are_Considered_Data_Added_By_SystemID_14)
+    [ProducesResponseType(typeof(NoContentResult), StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> DeleteTestData(string? Test_Data_Are_Considered_Data_Added_Or_Modified_By_SystemID_14)
     {
         await _service.DeleteTestData();
         return NoContent();

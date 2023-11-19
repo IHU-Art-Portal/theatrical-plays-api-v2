@@ -42,6 +42,8 @@ public class UserController : ControllerBase
     /// <param name="registerUserDto"></param>
     /// <returns></returns>
     [HttpPost("register")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(UserDtoRole), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterUserDto registerUserDto)
     {
         try
@@ -83,6 +85,8 @@ public class UserController : ControllerBase
     /// <param name="token">verification code</param>
     /// <returns></returns>
     [HttpGet("verify-email")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token)
     {
         try
@@ -125,6 +129,9 @@ public class UserController : ControllerBase
     /// <param name="loginUserDto"></param>
     /// <returns></returns>
     [HttpPost("login")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(JwtDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> Login([FromBody]LoginUserDto loginUserDto)
     {
         try
@@ -190,13 +197,16 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost("enable2fa")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> EnableTwoFactorAuth()
     {
         try
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            var (validation, user) = await _validation.ValidateFor2FaActivation(email);
+            var (validation, user) = await _validation.ValidateFor2FaActivation(email!);
 
             if (!validation.Success)
             {
@@ -242,13 +252,15 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost("disable2fa")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse>> DisableTwoFactorAuth()
     {
         try
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             
-            var (validation, user) = await _validation.ValidateFor2FaDeactivation(email);
+            var (validation, user) = await _validation.ValidateFor2FaDeactivation(email!);
 
             //Executes when something fails. Or if two factor authentication is already disabled.
             if (!validation.Success)
@@ -292,6 +304,7 @@ public class UserController : ControllerBase
     /// <param name="code"></param>
     /// <returns></returns>
     [HttpPost("login/2fa/{code}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> Login2Fa([FromRoute]int code)
     {
         try
@@ -301,7 +314,7 @@ public class UserController : ControllerBase
             if (!validation.Success)
             {
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.Unauthorized };
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.BadRequest };
             }
 
             var jwtDto = _service.GenerateToken(user!);
@@ -326,6 +339,7 @@ public class UserController : ControllerBase
     /// <returns>Available User Credits</returns>
     [HttpGet("{id}/balance")]
     [ServiceFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> Balance([FromRoute]int id)
     {
         try
@@ -352,13 +366,14 @@ public class UserController : ControllerBase
 
     [HttpGet("info")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetConnectedUserInfo()
     {
         try
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            var (validation, user) = await _validation.ValidateUser(email);
+            var (validation, user) = await _validation.ValidateUser(email!);
 
             if (!validation.Success)
             {
@@ -382,28 +397,38 @@ public class UserController : ControllerBase
 
     [HttpGet("refresh-token")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(JwtDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> RefreshToken()
     {
-        var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-        var (validation, user) = await _validation.ValidateUser(email);
-        
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
-            return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var jwtDto = _service.GenerateToken(user!);
+
+            var response = new ApiResponse<JwtDto>(jwtDto, "Token refreshed!");
+
+            return new OkObjectResult(response);
         }
-        
-        var jwtDto = _service.GenerateToken(user!);
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
 
-        var response = new ApiResponse<JwtDto>(jwtDto, "Token refreshed!");
-
-        return new OkObjectResult(response);
-        
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
     }
 
     [HttpDelete]
     [Route("@/facebook")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> DeleteFacebook()
     {
         try
@@ -422,7 +447,7 @@ public class UserController : ControllerBase
             if (!mediaValidation.Success)
             {
                 var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
-                return new ObjectResult(mediaErrorResponse);
+                return new ObjectResult(mediaErrorResponse){StatusCode = 404};
             }
 
             await _service.RemoveSocialMedia(user!, SocialMedia.Facebook);
@@ -442,13 +467,14 @@ public class UserController : ControllerBase
     [HttpPut]
     [Route("@/facebook")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> UpdateFacebook([FromQuery] string link)
     {
         try
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            var (validation, user) = await _validation.ValidateUser(email);
+            var (validation, user) = await _validation.ValidateUser(email!);
 
             if (!validation.Success)
             {
@@ -482,6 +508,7 @@ public class UserController : ControllerBase
     [HttpDelete]
     [Route("@/youtube")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> DeleteYoutube()
     {
         try
@@ -500,7 +527,7 @@ public class UserController : ControllerBase
             if (!mediaValidation.Success)
             {
                 var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
-                return new ObjectResult(mediaErrorResponse);
+                return new ObjectResult(mediaErrorResponse){StatusCode = 404};
             }
 
             await _service.RemoveSocialMedia(user!, SocialMedia.Youtube);
@@ -560,6 +587,7 @@ public class UserController : ControllerBase
     [HttpDelete]
     [Route("@/instagram")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> DeleteInstagram()
     {
         try
@@ -578,7 +606,7 @@ public class UserController : ControllerBase
             if (!mediaValidation.Success)
             {
                 var mediaErrorResponse = new ApiResponse((ErrorCode)mediaValidation.ErrorCode!, mediaValidation.Message!);
-                return new ObjectResult(mediaErrorResponse);
+                return new ObjectResult(mediaErrorResponse){StatusCode = 404};
             }
 
             await _service.RemoveSocialMedia(user!, SocialMedia.Instagram);
@@ -638,6 +666,7 @@ public class UserController : ControllerBase
     [HttpPut]
     [Route("Update/Username/{username}")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse>> UpdateUsername([FromRoute] string username)
     {
         try
@@ -687,6 +716,7 @@ public class UserController : ControllerBase
     [HttpPut]
     [Route("Update/Password")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse>> UpdatePassword([FromBody] UpdatePasswordDto updatePasswordDto)
     {
         try
@@ -777,6 +807,7 @@ public class UserController : ControllerBase
     [HttpPost]
     [Route("Add-Artist-Role")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse>> AddArtistRole([FromQuery] string role)
     {
         try
@@ -815,6 +846,8 @@ public class UserController : ControllerBase
     [HttpPost]
     [Route("Remove-Artist-Role")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse>> RemoveArtistRole([FromQuery] string role)
     {
         try
@@ -871,7 +904,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
-            await _service.SetProfilePhoto(user, setProfilePhotoDto);
+            await _service.SetProfilePhoto(user!, setProfilePhotoDto);
             
             
             var apiResponse = new ApiResponse("Successfully Set Profile Photo.");

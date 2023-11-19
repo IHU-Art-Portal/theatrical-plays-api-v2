@@ -33,6 +33,8 @@ public class EventsController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<EventDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetEvents(int? page, int? size)
     {
         try

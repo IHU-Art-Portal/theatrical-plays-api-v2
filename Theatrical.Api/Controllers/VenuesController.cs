@@ -31,6 +31,7 @@ public class VenuesController : ControllerBase
     /// <param name="size">size capacity for a page</param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(PaginationResult<VenueDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size)
     {
         try
@@ -49,7 +50,7 @@ public class VenuesController : ControllerBase
 
             var response = new ApiResponse<PaginationResult<VenueDto>>(paginationResult);
 
-            return new ObjectResult(response);
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
@@ -67,6 +68,8 @@ public class VenuesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetVenue(int id)
     {
         try
@@ -98,6 +101,7 @@ public class VenuesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateVenue([FromBody] VenueCreateDto venueCreateDto)
     {
         try

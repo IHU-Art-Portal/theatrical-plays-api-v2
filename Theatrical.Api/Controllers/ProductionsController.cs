@@ -30,6 +30,8 @@ public class ProductionsController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProductionDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<ApiResponse>> CreateProduction([FromBody] CreateProductionDto createProductionDto)
     {
         try
@@ -64,6 +66,8 @@ public class ProductionsController : ControllerBase
     /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<ProductionDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetProductions(int? page, int? size)
     {
         try
