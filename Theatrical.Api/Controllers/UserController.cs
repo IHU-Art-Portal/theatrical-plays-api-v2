@@ -888,7 +888,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    [Route("SetPhotoProfile")]
+    [Route("Set/Profile-Photo")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> SetProfilePhoto([FromBody] SetProfilePhotoDto setProfilePhotoDto)
     {
