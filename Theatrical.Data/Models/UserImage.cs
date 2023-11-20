@@ -7,4 +7,5 @@ public class UserImage
     public virtual User User { get; set; }
     public string ImageLocation { get; set; }
     public string? Label { get; set; }
+    public bool? IsProfile { get; set; }
 }

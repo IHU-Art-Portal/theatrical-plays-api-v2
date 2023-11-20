@@ -409,6 +409,7 @@ public class TheatricalPlaysDbContext : DbContext
 
             entity.Property(e => e.ImageLocation).HasColumnName("imagelocation");
             entity.Property(e => e.Label).HasColumnName("label");
+            entity.Property(e => e.IsProfile).HasColumnName("isProfile").HasDefaultValue(false);
         });
         
         modelBuilder.Entity<Authority>(entity =>

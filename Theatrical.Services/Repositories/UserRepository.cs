@@ -35,6 +35,8 @@ public interface IUserRepository
     Task<List<UserImage>?> GetUserImages(int userId);
     Task RemoveUserImage(UserImage userImage);
     Task<UserImage?> GetUserImage(int imageId);
+    Task<UserImage?> GetFirstProfileImage(int userId);
+    Task UnsetProfileImage(UserImage userImage);
 }
 
 public class UserRepository : IUserRepository
@@ -175,6 +177,21 @@ public class UserRepository : IUserRepository
     {
         var userImage = await _context.UserImages.FirstOrDefaultAsync(ui => ui.Id == imageId);
         return userImage;
+    }
+
+    public async Task<UserImage?> GetFirstProfileImage(int userId)
+    {
+        var userImage = await _context.UserImages
+            .Where(ui => ui.UserId == userId && ui.IsProfile == true)
+            .FirstOrDefaultAsync();
+
+        return userImage;
+    }
+
+    public async Task UnsetProfileImage(UserImage userImage)
+    {
+        userImage.IsProfile = false;
+        await _context.SaveChangesAsync();
     }
 
     public async Task RemoveUserImage(UserImage userImage)

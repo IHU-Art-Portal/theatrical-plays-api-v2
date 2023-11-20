@@ -286,11 +286,21 @@ public class UserService : IUserService
 
     public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
     {
+        if (updateUserPhotoDto.IsProfile)
+        {
+            var userImageProfile = await _repository.GetFirstProfileImage(user.Id);
+            if (userImageProfile is not null)
+            {
+                await _repository.UnsetProfileImage(userImageProfile);
+            }
+        }
+        
         var userImage = new UserImage
         {
             ImageLocation = updateUserPhotoDto.Photo,
             Label = updateUserPhotoDto.Label,
-            UserId = user.Id
+            UserId = user.Id,
+            IsProfile = updateUserPhotoDto.IsProfile
         };
         
         await _repository.UploadPhoto(userImage);
