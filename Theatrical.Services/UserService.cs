@@ -34,6 +34,7 @@ public interface IUserService
     Task RemoveRole(User user, string role);
     Task SetProfilePhoto(User user, UserImage userImage, SetProfilePhotoDto setProfilePhotoDto);
     Task RemoveUserImage(UserImage userImage);
+    Task UnsetProfilePhoto(UserImage userImage);
 }
 
 public class UserService : IUserService
@@ -343,6 +344,11 @@ public class UserService : IUserService
     public async Task RemoveUserImage(UserImage userImage)
     {
         await _repository.RemoveUserImage(userImage);
+    }
+
+    public async Task UnsetProfilePhoto(UserImage userImage)
+    {
+        await _repository.UnsetProfilePhoto(userImage);
     }
 }
 
