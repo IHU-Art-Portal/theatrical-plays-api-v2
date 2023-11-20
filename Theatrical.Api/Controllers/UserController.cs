@@ -918,4 +918,43 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+
+    [HttpDelete]
+    [Route("Remove/Image/{imageId}")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> RemoveUserImage([FromRoute] int imageId)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var (imageReport, userImage) = await _validation.ValidateUserImageExistence(imageId);
+
+            if (!imageReport.Success)
+            {
+                var errorImageResponse = new ApiResponse((ErrorCode)imageReport.ErrorCode!, imageReport.Message!);
+                return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            await _service.RemoveUserImage(userImage!);
+            
+            var apiResponse = new ApiResponse("Successfully Removed Your Image.");
+            
+            return new OkObjectResult(apiResponse);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

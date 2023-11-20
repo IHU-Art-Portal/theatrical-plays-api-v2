@@ -33,6 +33,7 @@ public interface IUserService
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
     Task SetProfilePhoto(User user, SetProfilePhotoDto photo);
+    Task RemoveUserImage(UserImage userImage);
 }
 
 public class UserService : IUserService
@@ -308,6 +309,11 @@ public class UserService : IUserService
     public async Task SetProfilePhoto(User user, SetProfilePhotoDto setProfilePhotoDto)
     {
         await _repository.SetProfilePhoto(user, setProfilePhotoDto.Photo);
+    }
+
+    public async Task RemoveUserImage(UserImage userImage)
+    {
+        await _repository.RemoveUserImage(userImage);
     }
 }
 

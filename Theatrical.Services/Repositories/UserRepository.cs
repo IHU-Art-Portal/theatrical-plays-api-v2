@@ -33,6 +33,8 @@ public interface IUserRepository
     Task RemoveRole(User user, string role);
     Task SetProfilePhoto(User user, string photo);
     Task<List<UserImage>?> GetUserImages(int userId);
+    Task RemoveUserImage(UserImage userImage);
+    Task<UserImage?> GetUserImage(int imageId);
 }
 
 public class UserRepository : IUserRepository
@@ -167,6 +169,18 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         return user?.UserImages?.ToList();
+    }
+
+    public async Task<UserImage?> GetUserImage(int imageId)
+    {
+        var userImage = await _context.UserImages.FirstOrDefaultAsync(ui => ui.Id == imageId);
+        return userImage;
+    }
+
+    public async Task RemoveUserImage(UserImage userImage)
+    {
+        _context.UserImages.Remove(userImage);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<User> Register(User user, int userRole)

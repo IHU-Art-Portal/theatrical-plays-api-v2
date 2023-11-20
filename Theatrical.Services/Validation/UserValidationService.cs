@@ -28,7 +28,8 @@ public interface IUserValidationService
     Task<ValidationReport> ValidateUserRole(User user, string role);
     Task<ValidationReport> ValidateForRemoveRole(User user, string role);
     Task<User?> ValidateWithEmail(string email);
-    Task<ValidationReport> ValidateUserPersonUniqueness(int userId);
+    Task<ValidationReport> ValidateUserPersonUniqueness(int userId);            //Validates User-Person relation uniqueness.
+    Task<(ValidationReport, UserImage?)> ValidateUserImageExistence(int imageId);
 }
 
 public class UserValidationService : IUserValidationService
@@ -576,5 +577,22 @@ public class UserValidationService : IUserValidationService
             Success = true,
             Message = "Instagram account found and can be deleted."
         };
+    }
+
+    public async Task<(ValidationReport, UserImage?)> ValidateUserImageExistence(int imageId)
+    {
+        var userImage = await _repository.GetUserImage(imageId);
+        var report = new ValidationReport();
+
+        if (userImage is null)
+        {
+            report.Success = false;
+            report.Message = "Image not found.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        return (report, userImage);
     }
 }
