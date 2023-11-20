@@ -996,7 +996,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
             
-            //await _service.RemoveUserImage(userImage!, user);
+            await _service.RemoveUserImage(userImage!);
             
             var apiResponse = new ApiResponse("Successfully Removed Your Image.");
             
