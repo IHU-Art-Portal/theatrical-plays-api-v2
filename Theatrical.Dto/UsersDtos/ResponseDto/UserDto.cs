@@ -17,5 +17,5 @@ public class UserDto
     public decimal? Balance { get; set; }
     public List<string>? PerformerRoles { get; set; }
     public List<UserImagesDto>? UserImages { get; set; }
-    public string? ProfilePhoto { get; set; }
+    public UserProfilePictureResponseDto? ProfilePhoto { get; set; }
 }

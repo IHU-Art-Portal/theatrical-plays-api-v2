@@ -903,8 +903,16 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
+            
+            var (imageReport, userImage) = await _validation.ValidateUserImageExistence(setProfilePhotoDto.ImageId);
 
-            await _service.SetProfilePhoto(user!, setProfilePhotoDto);
+            if (!imageReport.Success)
+            {
+                var errorImageResponse = new ApiResponse((ErrorCode)imageReport.ErrorCode!, imageReport.Message!);
+                return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            await _service.SetProfilePhoto(user!, userImage!, setProfilePhotoDto);
             
             
             var apiResponse = new ApiResponse("Successfully Set Profile Photo.");
@@ -944,7 +952,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
             
-            await _service.RemoveUserImage(userImage!);
+            //await _service.RemoveUserImage(userImage!, user);
             
             var apiResponse = new ApiResponse("Successfully Removed Your Image.");
             

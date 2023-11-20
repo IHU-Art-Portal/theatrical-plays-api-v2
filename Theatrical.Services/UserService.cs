@@ -32,7 +32,7 @@ public interface IUserService
     Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
-    Task SetProfilePhoto(User user, SetProfilePhotoDto photo);
+    Task SetProfilePhoto(User user, UserImage userImage, SetProfilePhotoDto setProfilePhotoDto);
     Task RemoveUserImage(UserImage userImage);
 }
 
@@ -178,6 +178,15 @@ public class UserService : IUserService
         var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
         var userImages = await _repository.GetUserImages(user.Id);
         var userImagesDto = new List<UserImagesDto>();
+        var userProfilePhoto = await _repository.GetFirstProfileImage(user.Id);
+        var userProfilePictureResponseDto = new UserProfilePictureResponseDto();
+
+        if (userProfilePhoto is not null)
+        {
+            userProfilePictureResponseDto.Id = userProfilePhoto.Id;
+            userProfilePictureResponseDto.ImageLocation = userProfilePhoto.ImageLocation;
+            userProfilePictureResponseDto.Label = userProfilePhoto.Label;
+        }
         
         if (userImages is not null)
         {
@@ -226,7 +235,7 @@ public class UserService : IUserService
             Instagram = user.Instagram,
             Balance = user.UserTransactions.Sum(t => t.CreditAmount),
             UserImages = userImagesDto,
-            ProfilePhoto = user.PhotoProfile,
+            ProfilePhoto = userProfilePictureResponseDto,
             PerformerRoles = user.PerformerRoles
         };
 
@@ -291,7 +300,7 @@ public class UserService : IUserService
             var userImageProfile = await _repository.GetFirstProfileImage(user.Id);
             if (userImageProfile is not null)
             {
-                await _repository.UnsetProfileImage(userImageProfile);
+                await _repository.UnsetProfilePhoto(userImageProfile);
             }
         }
         
@@ -316,9 +325,19 @@ public class UserService : IUserService
         await _repository.RemoveRole(user, role);
     }
 
-    public async Task SetProfilePhoto(User user, SetProfilePhotoDto setProfilePhotoDto)
+    public async Task SetProfilePhoto(User user, UserImage userImage, SetProfilePhotoDto setProfilePhotoDto)
     {
-        await _repository.SetProfilePhoto(user, setProfilePhotoDto.Photo);
+        var userImageProfile = await _repository.GetFirstProfileImage(user.Id);
+        
+        if (userImageProfile is not null)
+        {
+            //unsets the current profile picture if found.
+            await _repository.UnsetProfilePhoto(userImageProfile);
+        }
+
+        userImage.Label = setProfilePhotoDto.Label;
+
+        await _repository.SetProfilePhoto(userImage);
     }
 
     public async Task RemoveUserImage(UserImage userImage)

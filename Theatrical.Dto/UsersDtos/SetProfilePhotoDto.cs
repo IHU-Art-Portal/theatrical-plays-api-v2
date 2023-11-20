@@ -2,5 +2,6 @@
 
 public class SetProfilePhotoDto
 {
-    public string Photo { get; set; }
+    public int ImageId { get; set; }
+    public string? Label { get; set; }
 }

@@ -31,12 +31,12 @@ public interface IUserRepository
     Task UploadPhoto(UserImage userImage);
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
-    Task SetProfilePhoto(User user, string photo);
     Task<List<UserImage>?> GetUserImages(int userId);
     Task RemoveUserImage(UserImage userImage);
     Task<UserImage?> GetUserImage(int imageId);
     Task<UserImage?> GetFirstProfileImage(int userId);
-    Task UnsetProfileImage(UserImage userImage);
+    Task UnsetProfilePhoto(UserImage userImage);
+    Task SetProfilePhoto(UserImage userImage);
 }
 
 public class UserRepository : IUserRepository
@@ -157,12 +157,6 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task SetProfilePhoto(User user, string photo)
-    {
-        user.PhotoProfile = photo;
-        await _context.SaveChangesAsync();
-    }
-
     //Should be used after user confirmation.
     public async Task<List<UserImage>?> GetUserImages(int userId)
     {
@@ -188,9 +182,15 @@ public class UserRepository : IUserRepository
         return userImage;
     }
 
-    public async Task UnsetProfileImage(UserImage userImage)
+    public async Task UnsetProfilePhoto(UserImage userImage)
     {
         userImage.IsProfile = false;
+        await _context.SaveChangesAsync();
+    }
+    
+    public async Task SetProfilePhoto(UserImage userImage)
+    {
+        userImage.IsProfile = true;
         await _context.SaveChangesAsync();
     }
 
