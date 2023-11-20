@@ -30,6 +30,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<Transaction> Transactions { get; set; } = null!;
     public virtual DbSet<AccountRequest> AccountRequests { get; set; } = null!;
     public virtual DbSet<AssignedUser> AssignedUsers { get; set; } = null!;
+    public virtual DbSet<UserImage> UserImages { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -384,9 +385,30 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u.Facebook).HasColumnName("facebook");
             entity.Property(u => u.Youtube).HasColumnName("youtube");
             entity.Property(u => u.Instagram).HasColumnName("instagram");
-            entity.Property(u => u.Photos).HasColumnName("photos");
             entity.Property(u => u.PhotoProfile).HasColumnName("profile_photo");
             entity.Property(u => u.PerformerRoles).HasColumnName("artistRoles");
+            
+            entity.HasMany(u => u.UserImages)
+                .WithOne(ui => ui.User)
+                .HasForeignKey(ui => ui.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserImage>(entity =>
+        {
+            entity.ToTable("user_images");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            
+            entity.Property(e => e.UserId).HasColumnName("userid");
+            
+            entity.HasOne(ui => ui.User)
+                .WithMany(u => u.UserImages)
+                .HasForeignKey(ui => ui.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.Property(e => e.ImageLocation).HasColumnName("imagelocation");
+            entity.Property(e => e.Label).HasColumnName("label");
         });
         
         modelBuilder.Entity<Authority>(entity =>

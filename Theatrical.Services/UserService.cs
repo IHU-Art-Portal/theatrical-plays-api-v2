@@ -21,7 +21,7 @@ public interface IUserService
     Task ActivateTwoFactorAuthentication(User user);
     Task DeactivateTwoFactorAuthentication(User user);
     ClaimsPrincipal? VerifyToken(string token);
-    UserDto ToDto(User user);
+    Task<UserDto> ToDto(User user);
     Task UpdateFacebook(User user, string link);
     Task UpdateInstagram(User user, string link);
     Task UpdateYoutube(User user, string link);
@@ -171,10 +171,26 @@ public class UserService : IUserService
         return _tokenService.VerifyToken(token);
     }
 
-    public UserDto ToDto(User user)
+    public async Task<UserDto> ToDto(User user)
     {
 
         var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
+        var userImages = await _repository.GetUserImages(user.Id);
+        var userImagesDto = new List<UserImagesDto>();
+        
+        if (userImages is not null)
+        {
+            foreach (var userImage in userImages)
+            {
+                var userImageDto = new UserImagesDto
+                {
+                    Id = userImage.Id,
+                    ImageLocation = userImage.ImageLocation,
+                    Label = userImage.Label
+                };
+                userImagesDto.Add(userImageDto);
+            }
+        }
 
         string userRole = userIntRole switch
         {
@@ -208,7 +224,7 @@ public class UserService : IUserService
             Youtube = user.Youtube,
             Instagram = user.Instagram,
             Balance = user.UserTransactions.Sum(t => t.CreditAmount),
-            Photos = user.Photos,
+            UserImages = userImagesDto,
             ProfilePhoto = user.PhotoProfile,
             PerformerRoles = user.PerformerRoles
         };
@@ -269,7 +285,14 @@ public class UserService : IUserService
 
     public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
     {
-        await _repository.UploadPhoto(user, updateUserPhotoDto);
+        var userImage = new UserImage
+        {
+            ImageLocation = updateUserPhotoDto.Photo,
+            Label = updateUserPhotoDto.Label,
+            UserId = user.Id
+        };
+        
+        await _repository.UploadPhoto(userImage);
     }
 
     public async Task AddRole(User user, string role)

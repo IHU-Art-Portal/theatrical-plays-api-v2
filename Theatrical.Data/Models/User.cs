@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace Theatrical.Data.Models;
 
 public class User
@@ -16,10 +14,10 @@ public class User
     public bool _2FA_enabled { get; set; }
     public string? _2FA_code { get; set; }
     public string? UserSecret { get; set; }
-    public List<string>? Photos { get; set; }
     public string? PhotoProfile { get; set; }
     public List<string>? PerformerRoles { get; set; }
     public string? Facebook { get; set; }
     public string? Youtube { get; set; }
     public string? Instagram { get; set; }
+    public virtual List<UserImage>? UserImages { get; set; }
 }

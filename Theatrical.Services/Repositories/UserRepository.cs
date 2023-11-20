@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
-using Theatrical.Dto.UsersDtos;
 
 namespace Theatrical.Services.Repositories;
 
@@ -29,10 +28,11 @@ public interface IUserRepository
     Task OnRequestApproval(User user, Person person);
     Task UpdateUsername(User user, string username);
     Task UpdatePassword(User user, string hashedPassword);
-    Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto);
+    Task UploadPhoto(UserImage userImage);
     Task AddRole(User user, string role);
     Task RemoveRole(User user, string role);
     Task SetProfilePhoto(User user, string photo);
+    Task<List<UserImage>?> GetUserImages(int userId);
 }
 
 public class UserRepository : IUserRepository
@@ -130,11 +130,9 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UploadPhoto(User user, UpdateUserPhotoDto updateUserPhotoDto)
+    public async Task UploadPhoto(UserImage userImage)
     {
-        user.Photos ??= new List<string>();
-        
-        user.Photos.Add(updateUserPhotoDto.Photo);
+        await _context.UserImages.AddAsync(userImage);
         
         await _context.SaveChangesAsync();
     }
@@ -159,6 +157,16 @@ public class UserRepository : IUserRepository
     {
         user.PhotoProfile = photo;
         await _context.SaveChangesAsync();
+    }
+
+    //Should be used after user confirmation.
+    public async Task<List<UserImage>?> GetUserImages(int userId)
+    {
+        var user = await _context.Users
+            .Include(u => u.UserImages)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        return user?.UserImages?.ToList();
     }
 
     public async Task<User> Register(User user, int userRole)
