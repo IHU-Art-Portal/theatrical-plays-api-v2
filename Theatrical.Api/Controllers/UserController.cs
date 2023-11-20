@@ -911,6 +911,13 @@ public class UserController : ControllerBase
                 var errorImageResponse = new ApiResponse((ErrorCode)imageReport.ErrorCode!, imageReport.Message!);
                 return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
+            
+            var isOwner = _validation.ValidatePhotoOwnership(user!, userImage!);
+            if (!isOwner.Success)
+            {
+                var ownershipError = new ApiResponse((ErrorCode)isOwner.ErrorCode!, isOwner.Message!);
+                return new ObjectResult(ownershipError) { StatusCode = (int)HttpStatusCode.Forbidden };
+            }
 
             await _service.SetProfilePhoto(user!, userImage!, setProfilePhotoDto);
             
@@ -950,6 +957,13 @@ public class UserController : ControllerBase
             {
                 var errorImageResponse = new ApiResponse((ErrorCode)imageReport.ErrorCode!, imageReport.Message!);
                 return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            var isOwner = _validation.ValidatePhotoOwnership(user!, userImage!);
+            if (!isOwner.Success)
+            {
+                var ownershipError = new ApiResponse((ErrorCode)isOwner.ErrorCode!, isOwner.Message!);
+                return new ObjectResult(ownershipError) { StatusCode = (int)HttpStatusCode.Forbidden };
             }
 
             if (userImage!.IsProfile == false)
@@ -994,6 +1008,13 @@ public class UserController : ControllerBase
             {
                 var errorImageResponse = new ApiResponse((ErrorCode)imageReport.ErrorCode!, imageReport.Message!);
                 return new ObjectResult(errorImageResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            var isOwner = _validation.ValidatePhotoOwnership(user!, userImage!);
+            if (!isOwner.Success)
+            {
+                var ownershipError = new ApiResponse((ErrorCode)isOwner.ErrorCode!, isOwner.Message!);
+                return new ObjectResult(ownershipError) { StatusCode = (int)HttpStatusCode.Forbidden };
             }
             
             await _service.RemoveUserImage(userImage!);

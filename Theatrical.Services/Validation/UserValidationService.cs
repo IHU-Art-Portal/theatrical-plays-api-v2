@@ -30,6 +30,7 @@ public interface IUserValidationService
     Task<User?> ValidateWithEmail(string email);
     Task<ValidationReport> ValidateUserPersonUniqueness(int userId);            //Validates User-Person relation uniqueness.
     Task<(ValidationReport, UserImage?)> ValidateUserImageExistence(int imageId);
+    ValidationReport ValidatePhotoOwnership(User user, UserImage userImage);
 }
 
 public class UserValidationService : IUserValidationService
@@ -594,5 +595,22 @@ public class UserValidationService : IUserValidationService
 
         report.Success = true;
         return (report, userImage);
+    }
+
+    public ValidationReport ValidatePhotoOwnership(User user, UserImage userImage)
+    {
+        var report = new ValidationReport();
+        
+        if (userImage.UserId != user.Id)
+        {
+            report.Success = false;
+            report.Message = "You can't review other people's images";
+            report.ErrorCode = ErrorCode.Forbidden;
+            return report;
+        }
+
+        report.Success = true;
+        report.Message = "Validation passed";
+        return report;
     }
 }
