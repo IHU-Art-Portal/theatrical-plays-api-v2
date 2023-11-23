@@ -43,7 +43,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpPost("register")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(UserDtoRole), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegisterUserResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterUserDto registerUserDto)
     {
         try
@@ -66,7 +66,7 @@ public class UserController : ControllerBase
             await _emailService.SendConfirmationEmailAsync(registerUserDto.Email, verificationUrl);
             
             var userCreated = await _service.Register(registerUserDto, verificationToken);
-            var response = new ApiResponse<UserDtoRole>(userCreated, "Successfully Registered!");
+            var response = new ApiResponse<RegisterUserResponseDto>(userCreated, "Successfully Registered!");
             
             return new OkObjectResult(response);
         }

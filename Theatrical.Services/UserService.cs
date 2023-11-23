@@ -12,7 +12,7 @@ namespace Theatrical.Services;
 
 public interface IUserService
 {
-    Task<UserDtoRole> Register(RegisterUserDto registerUserDto, string verificationToken);
+    Task<RegisterUserResponseDto> Register(RegisterUserDto registerUserDto, string verificationToken);
     bool VerifyPassword(string hashedPassword, string providedPassword);
     JwtDto GenerateToken(User user);
     Task EnableAccount(User user);
@@ -57,7 +57,7 @@ public class UserService : IUserService
     /// <param name="registerUserDto"></param>
     /// <param name="verificationToken"></param>
     /// <returns>UserDtoRole</returns>
-    public async Task<UserDtoRole> Register(RegisterUserDto registerUserDto, string verificationToken)
+    public async Task<RegisterUserResponseDto> Register(RegisterUserDto registerUserDto, string verificationToken)
     {
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
 
@@ -76,7 +76,7 @@ public class UserService : IUserService
         }
         
         var userCreated = await _repository.Register(user, (int)registerUserDto.Role);
-        var userDtoRole = new UserDtoRole
+        var userDtoRole = new RegisterUserResponseDto
         {
             Id = userCreated.Id,
             Email = userCreated.Email,

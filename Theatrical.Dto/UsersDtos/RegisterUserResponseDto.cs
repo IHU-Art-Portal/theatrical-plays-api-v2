@@ -1,6 +1,6 @@
 ﻿namespace Theatrical.Dto.UsersDtos;
 
-public class UserDtoRole
+public class RegisterUserResponseDto
 {
     public int Id { get; set; }
     public string Email { get; set; }
