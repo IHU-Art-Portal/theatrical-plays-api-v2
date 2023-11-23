@@ -16,6 +16,6 @@ public class UserDto
     public string? Instagram { get; set; }
     public decimal? Balance { get; set; }
     public List<string>? PerformerRoles { get; set; }
-    public List<UserImagesDto>? UserImages { get; set; }
+    public List<UserImageDto>? UserImages { get; set; }
     public UserProfilePictureResponseDto? ProfilePhoto { get; set; }
 }

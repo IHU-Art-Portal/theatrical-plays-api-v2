@@ -1,6 +1,6 @@
 ﻿namespace Theatrical.Dto.UsersDtos;
 
-public class UserImagesDto
+public class UserImageDto
 {
     public int Id { get; set; }
     public string ImageLocation { get; set; }

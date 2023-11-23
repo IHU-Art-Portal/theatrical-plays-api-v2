@@ -178,7 +178,7 @@ public class UserService : IUserService
 
         var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
         var userImages = await _repository.GetUserImages(user.Id);
-        var userImagesDto = new List<UserImagesDto>();
+        var userImagesDto = new List<UserImageDto>();
         var userProfilePhoto = await _repository.GetFirstProfileImage(user.Id);
         var userProfilePictureResponseDto = new UserProfilePictureResponseDto();
 
@@ -193,7 +193,7 @@ public class UserService : IUserService
         {
             foreach (var userImage in userImages)
             {
-                var userImageDto = new UserImagesDto
+                var userImageDto = new UserImageDto
                 {
                     Id = userImage.Id,
                     ImageLocation = userImage.ImageLocation,
