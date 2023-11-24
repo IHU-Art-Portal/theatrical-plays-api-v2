@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
@@ -17,15 +18,17 @@ public interface IRoleRepository
 public class RoleRepository : IRoleRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ICaching _caching;
 
-    public RoleRepository(TheatricalPlaysDbContext context)
+    public RoleRepository(TheatricalPlaysDbContext context, ICaching caching)
     {
         _context = context;
+        _caching = caching;
     }
 
     public async Task<List<Role>> GetRoles()
     {
-        var roles = await _context.Roles.ToListAsync();
+        var roles = await _caching.GetOrSetAsync("all_roles", async () => await _context.Roles.ToListAsync());
         return roles;
     }
 

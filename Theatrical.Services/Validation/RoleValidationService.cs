@@ -7,7 +7,7 @@ namespace Theatrical.Services.Validation;
 public interface IRoleValidationService
 {
     Task<(ValidationReport report, Role? role)> ValidateForDelete(int id);
-    Task<(ValidationReport report, Role role)> ValidateForDelete(string roleToDelete);
+    Task<(ValidationReport report, Role? role)> ValidateForDelete(string roleToDelete);
     Task<(ValidationReport report, List<Role>? roles)> ValidateForFetch();
     Task<ValidationReport> ValidateForCreate(string searchRole);
 }
@@ -37,7 +37,7 @@ public class RoleValidationService : IRoleValidationService
         return (report, role);
     }
 
-    public async Task<(ValidationReport report, Role role)> ValidateForDelete(string roleToDelete)
+    public async Task<(ValidationReport report, Role? role)> ValidateForDelete(string roleToDelete)
     {
         var report = new ValidationReport();
         var role = await _repository.GetRoleByName(roleToDelete);

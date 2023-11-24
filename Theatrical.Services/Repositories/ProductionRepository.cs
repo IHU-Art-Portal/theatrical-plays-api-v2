@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
 public interface IProductionRepository
 {
    Task Create(Production production);
-   Task<List<Production>>? Get();
+   Task<List<Production>?> Get();
    Task<Production?> GetProduction(int id);
    Task Delete(Production production);
    Task UpdateRange(List<Production> productions);
@@ -16,10 +17,12 @@ public interface IProductionRepository
 public class ProductionRepository : IProductionRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ICaching _caching;
 
-    public ProductionRepository(TheatricalPlaysDbContext context)
+    public ProductionRepository(TheatricalPlaysDbContext context, ICaching caching)
     {
         _context = context;
+        _caching = caching;
     }
 
     public async Task Create(Production production)
@@ -34,9 +37,10 @@ public class ProductionRepository : IProductionRepository
         return production;
     }
 
-    public async Task<List<Production>>? Get()
+    public async Task<List<Production>?> Get()
     {
-        var productions = await _context.Productions.ToListAsync();
+        var productions = await _caching.GetOrSetAsync("all_productions", async () => await _context.Productions.ToListAsync());
+        
         return productions;
     }
 
