@@ -96,6 +96,37 @@ public class ProductionsController : ControllerBase
         }
     }
 
+    
+    [HttpGet]
+    [Route("{id}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(PaginationResult<ProductionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse>> GetProduction([FromRoute] int id)
+    {
+        try
+        {
+            var (validation, production) = await _validation.ValidateAndFetchProduction(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var productionDto = _service.ToDto(production!);
+            
+            var response = new ApiResponse<ProductionDto>(productionDto);
+            
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
     /*[HttpDelete]
     [TypeFilter(typeof(CustomAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DeleteProduction(int id)

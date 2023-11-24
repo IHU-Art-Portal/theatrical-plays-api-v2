@@ -10,7 +10,7 @@ public interface IProductionService
 {
     Task<ProductionDto> Create(CreateProductionDto createProductionDto);
     List<ProductionDto> ConvertToDto(List<Production> productions);
-    Task<ProductionDto> Get(int productionId);
+    ProductionDto ToDto(Production production);
     Task Delete(Production production);
     PaginationResult<ProductionDto> Paginate(int? page, int? size, List<ProductionDto> productionsDto);
 }
@@ -25,9 +25,8 @@ public class ProductionService : IProductionService
         _pagination = paginationService;
     }
 
-    public async Task<ProductionDto> Get(int productionId)
+    public ProductionDto ToDto(Production production)
     {
-        var production = await _repo.GetProduction(productionId);
         var productionDto = new ProductionDto
         {
             Id = production.Id,

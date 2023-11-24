@@ -1,5 +1,6 @@
 ﻿using Theatrical.Data.Models;
 using Theatrical.Dto.ProductionDtos;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;
@@ -9,6 +10,7 @@ public interface IProductionValidationService
     Task<(ValidationReport report, List<Production> productions)> ValidateAndFetch();
     Task<ValidationReport> ValidateForCreate(CreateProductionDto productionDto);
     Task<(ValidationReport report, Production production)> ValidateForDelete(int productionId);
+    Task<(ValidationReport, Production?)> ValidateAndFetchProduction(int productionId);
 }
 
 public class ProductionValidationService : IProductionValidationService
@@ -56,6 +58,23 @@ public class ProductionValidationService : IProductionValidationService
         report.Success = true;
 
         return (report, productions);
+    }
+
+    public async Task<(ValidationReport, Production?)> ValidateAndFetchProduction(int productionId)
+    {
+        var production = await _repository.GetProduction(productionId);
+        var report = new ValidationReport();
+        
+        if (production is null)
+        {
+            report.Message = "Production not found";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        return (report, production);
     }
 
     public async Task<(ValidationReport report, Production production)> ValidateForDelete(int productionId)
