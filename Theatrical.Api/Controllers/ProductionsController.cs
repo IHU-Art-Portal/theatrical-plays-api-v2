@@ -100,7 +100,7 @@ public class ProductionsController : ControllerBase
     [HttpGet]
     [Route("{id}")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(PaginationResult<ProductionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProductionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetProduction([FromRoute] int id)
     {
         try
