@@ -16,7 +16,7 @@
         }
 
         .container-success {
-            background-color: #333333; /* Darker background color */
+            background-color: #333333;
             padding: 20px;
             border-radius: 8px;
             max-width: 400px;
@@ -25,7 +25,7 @@
         }
         
         .container-failure{
-            background-color: #333333; /* Darker background color */
+            background-color: #333333;
             padding: 20px;
             border-radius: 8px;
             max-width: 400px;
@@ -34,7 +34,7 @@
         }
         
         .container-warning{
-            background-color: #333333; /* Darker background color */
+            background-color: #333333;
             padding: 20px;
             border-radius: 8px;
             max-width: 400px;
@@ -43,7 +43,7 @@
         }
         
         .container-internal-error{
-            background-color: darkslateblue; /* Darker background color */
+            background-color: darkslateblue;
             padding: 20px;
             border-radius: 8px;
             max-width: 400px;
@@ -73,18 +73,24 @@
         .already-verified {
             color: #ffc107;
         }
+        
+        .success-message{
+            font-size:  15px;
+            color: darkgrey;
+        }
     </style>
 </head>
 <body>
 <div class="@(Model.VerificationStatus == "success" ? "container-success" 
                 : Model.VerificationStatus == "failed" ? "container-failure" 
-                : Model.VerificationStatus == "already-verified" ? "container-warning" 
-                : Model.VerificationStatus == "internal-error" ? "container-internal-error"
-                : "")">
+                    : Model.VerificationStatus == "already-verified" ? "container-warning" 
+                        : Model.VerificationStatus == "internal-error" ? "container-internal-error"
+                            : "")">
     <h2>Email Verification</h2>
     @if (Model.VerificationStatus == "success")
     {
         <p class="success">@Model.VerificationMessage</p>
+        
     }
     else if (Model.VerificationStatus == "already-verified")
     {
@@ -99,5 +105,6 @@
         <p class="error" style="color: indianred">@Model.VerificationMessage</p>
     }
 </div>
+<p class="success-message">You can close this page now.</p>
 </body>
 </html>
