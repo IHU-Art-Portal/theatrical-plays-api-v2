@@ -81,13 +81,12 @@ public class UserController : ControllerBase
     /// <summary>
     /// Verification link points to this endpoint.
     /// Verifies the user and enabled the account.
+    /// Redirects to a page with the response. (For user friendly experience)
     /// </summary>
     /// <param name="token">verification code</param>
     /// <returns></returns>
     [HttpGet("verify-email")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status409Conflict)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse>> VerifyEmail([FromQuery]string token)
+    public async Task<IActionResult> VerifyEmail([FromQuery]string token)
     {
         try
         {
@@ -97,24 +96,18 @@ public class UserController : ControllerBase
             {
                 if (verification.ErrorCode == ErrorCode.AlreadyVerified)
                 {
-                    var responseVerified = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
-                    return new ConflictObjectResult(responseVerified);
+                    return Redirect($"/EmailVerification?status=already-verified");
                 }
-                var errorResponse = new ApiResponse((ErrorCode)verification.ErrorCode!, verification.Message!);
-                return new ObjectResult(errorResponse){StatusCode = (int)HttpStatusCode.BadRequest};
+                return Redirect($"/EmailVerification?status=failed");
             }
 
             await _service.EnableAccount(user!);
             
-            var response = new ApiResponse(verification.Message!);
-            
-            return new OkObjectResult(response);
+            return Redirect($"/EmailVerification?status=success");
         }
         catch (Exception e)
         {
-            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
-
-            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
+            return Redirect($"/EmailVerification?status=internal-error");
         }
     }
 

@@ -167,17 +167,27 @@ var logger = new LoggerConfiguration()
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
+//Using razor pages for UI. (Only for email verification endpoint)
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v2/swagger.json", "Theatrical.Api v2"));
-app.UseCors("AllowOrigin");
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+app.UseCors("AllowOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+});
 
 app.Run();

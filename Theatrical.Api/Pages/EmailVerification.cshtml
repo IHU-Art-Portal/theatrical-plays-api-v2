@@ -1,0 +1,103 @@
+﻿@page
+@model Theatrical.Api.Pages.EmailVerification
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a202c;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container-success {
+            background-color: #333333; /* Darker background color */
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 10px 10px 20px green, -10px -10px 20px green;
+        }
+        
+        .container-failure{
+            background-color: #333333; /* Darker background color */
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 10px 10px 20px #dc3545, -10px -10px 20px #dc3545;
+        }
+        
+        .container-warning{
+            background-color: #333333; /* Darker background color */
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 10px 10px 20px #ffc107, -10px -10px 20px #ffc107;
+        }
+        
+        .container-internal-error{
+            background-color: darkslateblue; /* Darker background color */
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 10px 10px 20px black, -10px -10px 20px black;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        p {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .already-verified {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+<div class="@(Model.VerificationStatus == "success" ? "container-success" 
+                : Model.VerificationStatus == "failed" ? "container-failure" 
+                : Model.VerificationStatus == "already-verified" ? "container-warning" 
+                : Model.VerificationStatus == "internal-error" ? "container-internal-error"
+                : "")">
+    <h2>Email Verification</h2>
+    @if (Model.VerificationStatus == "success")
+    {
+        <p class="success">@Model.VerificationMessage</p>
+    }
+    else if (Model.VerificationStatus == "already-verified")
+    {
+        <p class="already-verified">@Model.VerificationMessage</p>
+    }
+    else if (Model.VerificationStatus == "failed")
+    {
+        <p class="error">@Model.VerificationMessage</p>
+    }
+    else if (Model.VerificationStatus == "internal-error")
+    {
+        <p class="error" style="color: indianred">@Model.VerificationMessage</p>
+    }
+</div>
+</body>
+</html>
