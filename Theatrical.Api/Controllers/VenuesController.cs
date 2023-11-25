@@ -84,7 +84,9 @@ public class VenuesController : ControllerBase
 
             var venueDto = _service.ToDto(venue!);
 
-            return new OkObjectResult(venueDto);
+            var response = new ApiResponse<VenueDto>(venueDto);
+
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
