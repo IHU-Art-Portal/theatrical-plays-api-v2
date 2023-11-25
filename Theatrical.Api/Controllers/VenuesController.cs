@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
+using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services;
@@ -16,11 +18,13 @@ public class VenuesController : ControllerBase
 {
     private readonly IVenueService _service;
     private readonly IVenueValidationService _validation;
+    private readonly IProductionService _productionService;
 
-    public VenuesController(IVenueService service, IVenueValidationService validation)
+    public VenuesController(IVenueService service, IVenueValidationService validation, IProductionService productionService)
     {
         _service = service;
         _validation = validation;
+        _productionService = productionService;
     }
 
     /// <summary>
@@ -85,6 +89,36 @@ public class VenuesController : ControllerBase
             var venueDto = _service.ToDto(venue!);
 
             var response = new ApiResponse<VenueDto>(venueDto);
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
+    [HttpGet]
+    [Route("{venueId}/productions")]
+    public async Task<ActionResult<ApiResponse>> GetVenueProductions([FromRoute] int venueId, int? page, int? size)
+    {
+        try
+        {
+            var (validation, productions) = await _validation.ValidateAndFetchVenueProductions(venueId);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                return new NotFoundObjectResult(errorResponse);
+            }
+
+            var productionsDto = _service.ProductionsToDto(productions);
+
+            var paginationResult = _productionService.Paginate(page, size, productionsDto);
+            
+            var response = new ApiResponse<PaginationResult<ProductionDto>>(paginationResult);
 
             return new OkObjectResult(response);
         }

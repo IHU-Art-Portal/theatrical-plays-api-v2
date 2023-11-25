@@ -1,5 +1,6 @@
 ﻿using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
+using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
@@ -14,6 +15,7 @@ public interface IVenueService
     List<VenueDto> ToDto(List<Venue> venue);
     VenueDto ToDto(Venue venue);
     PaginationResult<VenueDto> Paginate(int? page, int? size, List<VenueDto> venuesDto);
+    List<ProductionDto> ProductionsToDto(List<Production> productions);
 }
 
 public class VenueService : IVenueService
@@ -103,5 +105,22 @@ public class VenueService : IVenueService
         });
         
         return result;
+    }
+
+    public List<ProductionDto> ProductionsToDto(List<Production> productions)
+    {
+        var productionsDto = productions.Select(prod => new ProductionDto
+        {
+            Id = prod.Id,
+            OrganizerId = prod.OrganizerId,
+            Title = prod.Title,
+            Description = prod.Description,
+            Url = prod.Url,
+            Producer = prod.Producer,
+            MediaUrl = prod.MediaUrl,
+            Duration = prod.Duration
+        }).ToList();
+        
+        return productionsDto;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Theatrical.Data.Models;
+using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Repositories;
 
@@ -10,6 +11,7 @@ public interface IVenueValidationService
     Task<(ValidationReport report, Venue? venue)> ValidateAndFetch(int venueId);
     Task<(ValidationReport report, Venue? venue)> ValidateForDelete(int venueId);
     Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
+    Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId);
 }
 
 public class VenueValidationService :  IVenueValidationService
@@ -87,5 +89,23 @@ public class VenueValidationService :  IVenueValidationService
         report.Success = true;
         report.Message = "Venue can be updated";
         return report;
+    }
+
+    public async Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId)
+    {
+        var productions = await _repository.GetVenueProductions(venueId);
+        var venue = await _repository.Get(venueId);
+        var report = new ValidationReport();
+
+        if (venue is null)
+        {
+            report.Success = false;
+            report.Message = $"Venue with id {venueId} not found";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null);
+        }
+
+        report.Success = true;
+        return (report, productions);
     }
 }

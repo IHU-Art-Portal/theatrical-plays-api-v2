@@ -107,14 +107,14 @@ public class ProductionService : IProductionService
         {
             return items.Select(prod => new ProductionDto
             {
-                Description = prod.Description,
                 Id = prod.Id,
-                Duration = prod.Duration,
-                MediaUrl = prod.MediaUrl,
                 OrganizerId = prod.OrganizerId,
-                Producer = prod.Producer,
                 Title = prod.Title,
-                Url = prod.Url
+                Description = prod.Description,
+                Url = prod.Url,
+                Producer = prod.Producer,
+                MediaUrl = prod.MediaUrl,
+                Duration = prod.Duration
             });
         });
 
