@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -102,6 +101,7 @@ public class VenuesController : ControllerBase
 
     [HttpGet]
     [Route("{venueId}/productions")]
+    [ProducesResponseType(typeof(ProductionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetVenueProductions([FromRoute] int venueId, int? page, int? size)
     {
         try
