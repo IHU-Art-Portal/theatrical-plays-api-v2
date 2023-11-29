@@ -157,6 +157,35 @@ public class VenuesController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+
+    [HttpPost]
+    [Route("range")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(VenuesCreationResponseDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse>> CreateVenues([FromBody] List<VenueCreateDto> venueCreateDto)
+    {
+        try
+        {
+            var existingVenues = await _service.GetVenuesByTitles(venueCreateDto.Select(dto => dto.Title).ToList());
+
+            var (venuesToUpdate,  venuesToCreate, responseList) = await _service.CreateUpdateList(existingVenues, venueCreateDto);
+
+            var venuesCreationResponseDto = new VenuesCreationResponseDto
+            {
+                CreatedCount = venuesToCreate.Count,
+                UpdatedCount = venuesToUpdate.Count,
+                VenueDtos = responseList
+            };
+
+            return Ok(new ApiResponse<VenuesCreationResponseDto>(venuesCreationResponseDto));
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
     
     /*/// <summary>
     /// Endpoint to deleting a venue.
@@ -165,21 +194,31 @@ public class VenuesController : ControllerBase
     /// <returns></returns>
     [HttpDelete]
     [Route("{id}")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> DeleteVenue(int id)
     {
-        var (validation, venue) = await _validation.ValidateForDelete(id);
-
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
+            var (validation, venue) = await _validation.ValidateForDelete(id);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
+                return new ObjectResult(errorResponse) { StatusCode = 404 };
+            }
+
+            await _service.Delete(venue);
+
+            ApiResponse response = new ApiResponse(message: $"Venue with ID: {id} has been deleted!");
+
+            return new ObjectResult(response);
         }
-        
-        await _service.Delete(venue);
-        
-        ApiResponse response = new ApiResponse(message: $"Venue with ID: {id} has been deleted!");
-        
-        return new ObjectResult(response);
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
     }*/
 
     /*/// <summary>

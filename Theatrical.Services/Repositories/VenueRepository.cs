@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Services.Caching;
@@ -13,8 +12,10 @@ public interface IVenueRepository
     Task<Venue> Create(Venue venue);
     Task Delete(Venue venue);
     Task Update(Venue venue);
-    Task UpdateRange(List<Venue> venues);
+    Task<List<Venue>> UpdateRange(List<Venue> venues);
     Task<List<Production>?> GetVenueProductions(int venueId);
+    Task<List<Venue>> GetVenuesByTitles(List<string> titles);
+    Task<List<Venue>> CreateRange(List<Venue> venues);
 }
 
 public class VenueRepository : IVenueRepository
@@ -53,6 +54,11 @@ public class VenueRepository : IVenueRepository
         });
         
         return venueProductions;
+    }
+
+    public async Task<List<Venue>> GetVenuesByTitles(List<string> titles)
+    {
+        return await _context.Venues.Where(venue => venue.Title != null && titles.Contains(venue.Title)).ToListAsync();
     }
 
     public async Task<Venue> Create(Venue venue)
@@ -121,9 +127,17 @@ public class VenueRepository : IVenueRepository
         });
     }
 
-    public async Task UpdateRange(List<Venue> venues)
+    public async Task<List<Venue>> UpdateRange(List<Venue> venues)
     {
         _context.Venues.UpdateRange(venues);
         await _context.SaveChangesAsync();
+        return venues;
+    }
+
+    public async Task<List<Venue>> CreateRange(List<Venue> venues)
+    {
+        await _context.Venues.AddRangeAsync(venues);
+        await _context.SaveChangesAsync();
+        return venues;
     }
 }

@@ -16,6 +16,10 @@ public interface IVenueService
     VenueDto ToDto(Venue venue);
     PaginationResult<VenueDto> Paginate(int? page, int? size, List<VenueDto> venuesDto);
     List<ProductionDto> ProductionsToDto(List<Production> productions);
+    Task<List<Venue>> GetVenuesByTitles(List<string> titles);
+
+    Task<(List<Venue> VenuesToUpdate, List<Venue> VenuesToCreate, List<VenueDto> responseList)> CreateUpdateList(
+        List<Venue> existingVenues, List<VenueCreateDto> venueCreateDto);
 }
 
 public class VenueService : IVenueService
@@ -35,7 +39,8 @@ public class VenueService : IVenueService
         {
             Title = venueCreateDto.Address,
             Address = venueCreateDto.Address,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            SystemId = venueCreateDto.SystemId
         }; 
         
         var createdVenue = await _repository.Create(venue);
@@ -122,5 +127,57 @@ public class VenueService : IVenueService
         }).ToList();
         
         return productionsDto;
+    }
+    
+    public async Task<List<Venue>> GetVenuesByTitles(List<string> titles)
+    {
+        return await _repository.GetVenuesByTitles(titles);
+    }
+
+    public async Task<(List<Venue> VenuesToUpdate, List<Venue> VenuesToCreate, List<VenueDto> responseList)> CreateUpdateList(List<Venue> existingVenues, List<VenueCreateDto> venueCreateDto)
+    {
+        var venuesToUpdate = new List<Venue>();
+        var venuesToCreate = new List<Venue>();
+        var responseList = new List<VenueDto>();
+
+        foreach (var dto in venueCreateDto)
+        {
+            var existingVenue = existingVenues.FirstOrDefault(v => v.Title == dto.Title);
+
+            if (existingVenue is not null)
+            {
+                existingVenue.Address = dto.Address;
+                existingVenue.Title = dto.Title;
+                existingVenue.SystemId = dto.SystemId;
+                    
+                venuesToUpdate.Add(existingVenue);
+            }
+            else
+            {
+                var newVenue = new Venue
+                {
+                    Title = dto.Title,
+                    Address = dto.Address,
+                    SystemId = dto.SystemId
+                };
+                venuesToCreate.Add(newVenue);
+            }
+        }
+        
+        //Saves changes for all updated venues
+        if (venuesToUpdate.Any())
+        {
+            var updatedVenues = await _repository.UpdateRange(venuesToUpdate);
+            responseList.AddRange(ToDto(updatedVenues));
+        }
+        
+        //Creates venues
+        if (venuesToCreate.Any())
+        {
+            var createdVenues = await _repository.CreateRange(venuesToCreate);
+            responseList.AddRange(ToDto(createdVenues));
+        }
+
+        return (venuesToUpdate, venuesToCreate, responseList);
     }
 }
