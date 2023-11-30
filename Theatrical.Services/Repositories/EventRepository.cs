@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
@@ -21,53 +22,51 @@ public class EventRepository : IEventRepository
 {
     private readonly TheatricalPlaysDbContext _context;
     private readonly ILogRepository _logRepository;
+    private readonly ICaching _caching;
 
-    public EventRepository(TheatricalPlaysDbContext context, ILogRepository logRepository)
+    public EventRepository(TheatricalPlaysDbContext context, ILogRepository logRepository, ICaching caching)
     {
         _context = context;
         _logRepository = logRepository;
+        _caching = caching;
     }
     
     public async Task<List<Event>> GetEventsForPerson(int personId)
     {
-        /*var events = await _context.Persons
-            .Where(p => p.Id == personId)
-            .SelectMany(p => p.Contributions)
-            .Include(c => c.Production)
-            .ThenInclude(p => p.Events)
-            .ThenInclude(e => e.Venue)
-            .SelectMany(c => c.Production.Events)
-            .Include(e => e.Production)
-            .ToListAsync();*/
         
-        var events = await _context.Persons
-            .Where(p => p.Id == personId)
-            .SelectMany(p => p.Contributions)
-            .SelectMany(c => c.Production.Events)
-            .ToListAsync();
-            
-
+        var events = await _caching.GetOrSetAsync($"Events_For_Person_{personId}", async () =>
+        {
+            return await _context.Persons
+                .Where(p => p.Id == personId)
+                .SelectMany(p => p.Contributions)
+                .SelectMany(c => c.Production.Events)
+                .ToListAsync();
+        });
+        
         return events;
     }
 
     public async Task<List<Event>?> GetEventsForProduction(int productionId)
     {
-        var events = await _context.Productions
-            .Where(p => p.Id == productionId)
-            .SelectMany(p => p.Events)
-            .ToListAsync();
+        var events = await _caching.GetOrSetAsync($"Events_For_Production_{productionId}", async () =>
+        {
+            return await _context.Productions
+                .Where(p => p.Id == productionId)
+                .SelectMany(p => p.Events)
+                .ToListAsync();
+        });
 
         return events;
     }
 
     public async Task<List<Event>?> Get()
     {
-        return await _context.Events.ToListAsync();
+        return await _caching.GetOrSetAsync("all_events", async () => await _context.Events.ToListAsync());
     }
 
     public async Task<Event?> GetEvent(int id)
     {
-        return await _context.Events.FindAsync(id);
+        return await _caching.GetOrSetAsync($"event_{id}", async () => await _context.Events.FindAsync(id));
     }
     
     public async Task<Event> Create(Event newEvent)
