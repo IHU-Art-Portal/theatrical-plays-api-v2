@@ -67,17 +67,9 @@ public class TheatricalPlaysDbContext : DbContext
         {
             entity.ToTable("contributions");
 
-            entity.HasIndex(e => e.PeopleId, "PeopleID");
-
-            entity.HasIndex(e => e.ProductionId, "ProductionID");
-
-            entity.HasIndex(e => e.RoleId, "RoleID");
-
-            entity.HasIndex(e => e.SystemId, "SystemID");
-
             entity.Property(e => e.Id).HasColumnName("ID");
 
-            entity.Property(e => e.PeopleId).HasColumnName("PeopleID");
+            entity.Property(e => e.PersonId).HasColumnName("PeopleID");
 
             entity.Property(e => e.ProductionId).HasColumnName("ProductionID");
 
@@ -93,31 +85,31 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasColumnType("timestamp")
                 .ValueGeneratedOnAddOrUpdate()
                 .HasColumnName("timestamp")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasDefaultValueSql("now()");
 
             entity.HasOne(d => d.People)
                 .WithMany(p => p.Contributions)
-                .HasForeignKey(d => d.PeopleId)
+                .HasForeignKey(d => d.PersonId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("contributions_ibfk_2");
+                .HasConstraintName("contributions_new_PeopleID_fkey");
 
             entity.HasOne(d => d.Production)
                 .WithMany(p => p.Contributions)
                 .HasForeignKey(d => d.ProductionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("contributions_ibfk_3");
+                .HasConstraintName("contributions_new_ProductionID_fkey");
 
             entity.HasOne(d => d.Role)
                 .WithMany(p => p.Contributions)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("contributions_ibfk_1");
+                .HasConstraintName("contributions_new_RoleID_fkey");
 
             entity.HasOne(d => d.System)
                 .WithMany(p => p.Contributions)
                 .HasForeignKey(d => d.SystemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("contributions_ibfk_4");
+                .HasConstraintName("contributions_new_SystemID_fkey");
         });
 
         modelBuilder.Entity<Event>(entity =>
@@ -143,8 +135,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.Timestamp)
                 .HasColumnType("timestamp")
                 .ValueGeneratedOnAddOrUpdate()
-                .HasColumnName("timestamp")
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasColumnName("Timestamp")
+                .HasDefaultValueSql("now()");
 
             entity.Property(e => e.VenueId).HasColumnName("VenueID");
 

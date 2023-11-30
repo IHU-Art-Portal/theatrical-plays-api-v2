@@ -100,7 +100,7 @@ public class CuratorController : ControllerBase
         var persons = await _person.Get();
 
         var contributionsToDelete = contributions
-            .Where(contribution => !persons.Any(person => person.Id == contribution.PeopleId))
+            .Where(contribution => !persons.Any(person => person.Id == contribution.PersonId))
             .ToList();
 
         var contrResp = new DeletedContributionsDto

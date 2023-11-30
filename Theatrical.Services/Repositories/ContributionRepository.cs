@@ -19,6 +19,7 @@ public interface IContributionRepository
 
     Task UpdateRange(List<Contribution> contributions);
     Task RemoveRange(List<Contribution> contributions);
+    Task<List<Contribution>> CreateRange(List<Contribution> contributionsToCreate);
 }
 
 public class ContributionRepository : IContributionRepository
@@ -42,7 +43,7 @@ public class ContributionRepository : IContributionRepository
         var columns = new List<(string ColumnName, string Value)>
         {
             ("ID", contribution.Id.ToString()),
-            ("PeopleID", contribution.PeopleId.ToString()),
+            ("PeopleID", contribution.PersonId.ToString()),
             ("ProductionID", contribution.ProductionId.ToString()),
             ("RoleID", contribution.RoleId.ToString())
         };
@@ -51,9 +52,7 @@ public class ContributionRepository : IContributionRepository
         {
             columns.Add(("subRole", contribution.SubRole));
         }
-        
         await _logRepository.UpdateLogs("insert", "contributions", columns);
-
         return contribution;
     }
     
@@ -71,7 +70,7 @@ public class ContributionRepository : IContributionRepository
     public async Task<List<Contribution>> GetByPerformer(int personId)
     {
         var contributions = await _context.Contributions
-            .Where(c => c.PeopleId == personId)
+            .Where(c => c.PersonId == personId)
             .ToListAsync();
         
         return contributions;
@@ -98,7 +97,7 @@ public class ContributionRepository : IContributionRepository
     public async Task<List<Contribution>> GetSpecific(int personId, int productionId, int roleId)
     {
         var contributions = await _context.Contributions
-            .Where(c => c.PeopleId == personId && c.ProductionId == productionId && c.RoleId == roleId)
+            .Where(c => c.PersonId == personId && c.ProductionId == productionId && c.RoleId == roleId)
             .ToListAsync();
         
         return contributions;
@@ -123,6 +122,13 @@ public class ContributionRepository : IContributionRepository
     {
         _context.Contributions.RemoveRange(contributions);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Contribution>> CreateRange(List<Contribution> contributionsToCreate)
+    {
+        await _context.Contributions.AddRangeAsync(contributionsToCreate);
+        await _context.SaveChangesAsync();
+        return contributionsToCreate;
     }
 }
 

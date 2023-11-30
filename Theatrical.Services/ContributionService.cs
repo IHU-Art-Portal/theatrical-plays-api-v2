@@ -11,8 +11,9 @@ public interface IContributionService
 {
     Task<Contribution> Create(CreateContributionDto createContributionDto);
     PaginationResult<ContributionDto> Paginate(int? page, int? size, List<ContributionDto> contributionDtos);
-    List<ContributionDto> ToDto(List<Contribution> contributions);
+    List<ContributionDto> ToDtoRange(List<Contribution> contributions);
     ContributionDto ToDto(Contribution contr);
+    Task<List<Contribution>> CreateRange(List<CreateContributionDto> contributionDto);
 }
 
 public class ContributionService : IContributionService
@@ -30,23 +31,24 @@ public class ContributionService : IContributionService
     {
         Contribution contribution = new Contribution
         {
-            PeopleId = createContributionDto.PeopleId,
+            PersonId = createContributionDto.PersonId,
             ProductionId = createContributionDto.ProductionId,
             RoleId = createContributionDto.RoleId,
             SubRole = createContributionDto.SubRole,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            SystemId = createContributionDto.SystemId
         };
 
         var createdContribution = await _repository.Create(contribution);
         return createdContribution;
     }
 
-    public List<ContributionDto> ToDto(List<Contribution> contributions)
+    public List<ContributionDto> ToDtoRange(List<Contribution> contributions)
     {
         return contributions.Select(contr => new ContributionDto
         {
             Id = contr.Id,
-            PeopleId = contr.PeopleId,
+            PeopleId = contr.PersonId,
             ProductionId = contr.ProductionId,
             RoleId = contr.RoleId,
             SubRole = contr.SubRole,
@@ -79,13 +81,28 @@ public class ContributionService : IContributionService
         return (new ContributionDto
         {
             Id = contr.Id,
-            PeopleId = contr.PeopleId,
+            PeopleId = contr.PersonId,
             ProductionId = contr.ProductionId,
             RoleId = contr.RoleId,
             SubRole = contr.SubRole,
             SystemId = contr.SystemId,
             Timestamp = contr.Timestamp
         });
+    }
+
+    public async Task<List<Contribution>> CreateRange(List<CreateContributionDto> contributionDto)
+    {
+        var contributionsToCreate = contributionDto.Select(dto => new Contribution
+        {
+            PersonId = dto.PersonId,
+            ProductionId = dto.ProductionId,
+            RoleId = dto.RoleId,
+            SubRole = dto.SubRole,
+            SystemId = dto.SystemId
+        }).ToList();
+
+        var contributionsCreated = await _repository.CreateRange(contributionsToCreate);
+        return contributionsCreated;
     }
 }
 

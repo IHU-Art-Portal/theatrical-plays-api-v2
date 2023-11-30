@@ -40,12 +40,12 @@ public class ContributionValidationService : IContributionValidationService
     public async Task<ValidationReport> ValidateForCreate(CreateContributionDto contributionDto)
     {
         var report = new ValidationReport();
-        var existence = await _repository.CheckExists(contributionDto.PeopleId, contributionDto.ProductionId, contributionDto.RoleId);
+        var existence = await _repository.CheckExists(contributionDto.PersonId, contributionDto.ProductionId, contributionDto.RoleId);
 
         if (!existence.performerExists)
         {
             report.Success = false;
-            report.Message = $"Performer with Id: {contributionDto.PeopleId} not found";
+            report.Message = $"Performer with Id: {contributionDto.PersonId} not found";
             return report;
         }
 

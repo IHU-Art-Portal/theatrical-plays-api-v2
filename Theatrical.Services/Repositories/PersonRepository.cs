@@ -175,7 +175,7 @@ public class PersonRepository : IPersonRepository
         return await _caching.GetOrSetAsync($"person_productions_{personId}", async () =>
         {
             var personProductions = await _context.Contributions
-                .Where(c => c.PeopleId == personId)
+                .Where(c => c.PersonId == personId)
                 .Include(c => c.Role)
                 .Select(c => new PersonProductionsRoleInfo
                 {

@@ -45,7 +45,7 @@ public class ContributionsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = StatusCodes.Status404NotFound };
             }
 
-            var contributionDtos = _service.ToDto(contributions);
+            var contributionDtos = _service.ToDtoRange(contributions);
 
             var paginationResult = _service.Paginate(page, size, contributionDtos);
             
@@ -67,7 +67,7 @@ public class ContributionsController : ControllerBase
     /// <param name="contributionDto"></param>
     /// <returns></returns>
     [HttpPost]
-    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    //[TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
@@ -87,6 +87,29 @@ public class ContributionsController : ControllerBase
 
             var response = new ApiResponse<ContributionDto>(createdContributionDto,"Successfully Created Contribution");
 
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
+    [HttpPost]
+    [Route("range")]
+    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse>> CreateContributions([FromBody] List<CreateContributionDto> contributionDto)
+    {
+        try
+        {
+            var createdContributions = await _service.CreateRange(contributionDto);
+            var createdContributionsDtos = _service.ToDtoRange(createdContributions);
+
+            var response = new ApiResponse<List<ContributionDto>>(createdContributionsDtos);
             return new OkObjectResult(response);
         }
         catch (Exception e)
