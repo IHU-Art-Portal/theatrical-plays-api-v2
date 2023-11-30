@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -64,6 +63,7 @@ public class EventsController : ControllerBase
 
     [HttpGet]
     [Route("person/{id:int}")]
+    [ProducesResponseType(typeof(PaginationResult<EventDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetEventsForPerson([FromRoute] int id, int? page, int? size)
     {
         try
@@ -91,6 +91,7 @@ public class EventsController : ControllerBase
     
     [HttpGet]
     [Route("production/{id:int}")]
+    [ProducesResponseType(typeof(PaginationResult<EventDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetEventsForProduction([FromRoute] int id, int? page, int? size)
     {
         try
@@ -123,6 +124,7 @@ public class EventsController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(EventDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateEvent([FromBody] CreateEventDto createEventDto)
     {
         try
@@ -151,7 +153,9 @@ public class EventsController : ControllerBase
 
     [HttpPost]
     [Route("range")]
-    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(List<EventDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResponse>> CreateEvents([FromBody] List<CreateEventDto> createEventDtos)
     {
         try
