@@ -58,6 +58,34 @@ public class ProductionsController : ControllerBase
         }
     }
 
+    [HttpPost]
+    [Route("range")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> CreateProductions([FromBody] List<CreateProductionDto> createProductionDtos)
+    {
+        try
+        {
+            var existingProductions = await _service.GetProductionsByTitles(createProductionDtos.Select(dto => dto.Title).ToList());
+            
+            var (updatedProductions, createdProductions, responseList) = await _service.UpdateOrCreateAndProduceResponseList(existingProductions, createProductionDtos);
+
+            var productionsCreationResponseDto = new ProductionsCreationResponseDto
+            {
+                CreatedCount = createdProductions.Count,
+                UpdatedCount = updatedProductions.Count,
+                ShortenedProductionDtos = responseList
+            };
+
+            return Ok(new ApiResponse<ProductionsCreationResponseDto>(productionsCreationResponseDto));
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
     /// <summary>
     /// Endpoint to fetching all productions
     /// Pagination Available.

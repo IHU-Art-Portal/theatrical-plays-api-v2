@@ -11,7 +11,9 @@ public interface IProductionRepository
    Task<List<Production>?> Get();
    Task<Production?> GetProduction(int id);
    Task Delete(Production production);
-   Task UpdateRange(List<Production> productions);
+   Task<List<Production>> UpdateRange(List<Production> productions);
+   Task<List<Production>> GetProductionsByTitles(List<string> productionsTitles);
+   Task<List<Production>> CreateRange(List<Production> productions);
 }
 
 public class ProductionRepository : IProductionRepository
@@ -50,9 +52,22 @@ public class ProductionRepository : IProductionRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateRange(List<Production> productions)
+    public async Task<List<Production>> UpdateRange(List<Production> productions)
     {
         _context.Productions.UpdateRange(productions);
         await _context.SaveChangesAsync();
+        return productions;
+    }
+
+    public async Task<List<Production>> CreateRange(List<Production> productions)
+    {
+        await _context.Productions.AddRangeAsync(productions);
+        await _context.SaveChangesAsync();
+        return productions;
+    }
+
+    public async Task<List<Production>> GetProductionsByTitles(List<string> productionsTitles)
+    {
+        return await _context.Productions.Where(p => productionsTitles.Contains(p.Title)).ToListAsync();
     }
 }

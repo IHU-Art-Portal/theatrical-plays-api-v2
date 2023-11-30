@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
-
-namespace Theatrical.Dto.ProductionDtos;
+﻿namespace Theatrical.Dto.ProductionDtos;
 
 public class CreateProductionDto
 {
@@ -12,5 +9,5 @@ public class CreateProductionDto
     public string Producer { get; set; }
     public string MediaUrl { get; set; }
     public string? Duration { get; set; }
-
+    public int SystemId { get; set; }
 }

@@ -13,7 +13,7 @@ public class Production
     public string Url { get; set; } = null!;
     public string Producer { get; set; } = null!;
     public string MediaUrl { get; set; } = null!;
-    public string Duration { get; set; } = null!;
+    public string? Duration { get; set; } = null!;
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
     public virtual Organizer? Organizer { get; set; }

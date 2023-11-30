@@ -13,6 +13,8 @@ public interface IProductionService
     ProductionDto ToDto(Production production);
     Task Delete(Production production);
     PaginationResult<ProductionDto> Paginate(int? page, int? size, List<ProductionDto> productionsDto);
+    Task<List<Production>> GetProductionsByTitles(List<string> productionsTitles);
+    Task<(List<Production> updatedProductions, List<Production> createdProductions, List<ShortenedProductionDto> responseList)> UpdateOrCreateAndProduceResponseList(List<Production> existingProductions, List<CreateProductionDto> createProductionDtos);
 }
 public class ProductionService : IProductionService
 {
@@ -53,7 +55,8 @@ public class ProductionService : IProductionService
             Producer = createProductionDto.Producer,
             MediaUrl = createProductionDto.MediaUrl,
             Duration = createProductionDto.Duration,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.UtcNow,
+            SystemId = createProductionDto.SystemId
         };
 
         await _repo.Create(production);
@@ -119,6 +122,76 @@ public class ProductionService : IProductionService
         });
 
         return paginationResult;
+    }
+
+    public async Task<List<Production>> GetProductionsByTitles(List<string> productionsTitles)
+    {
+        return await _repo.GetProductionsByTitles(productionsTitles);
+    }
+
+    public async Task<(List<Production> updatedProductions, List<Production> createdProductions, List<ShortenedProductionDto> responseList)> UpdateOrCreateAndProduceResponseList(List<Production> existingProductions, List<CreateProductionDto> createProductionDtos)
+    {
+        var productionsToUpdate = new List<Production>();
+        var productionsToCreate = new List<Production>();
+        var responseList = new List<ShortenedProductionDto>();
+
+        foreach (var dto in createProductionDtos)
+        {
+            var existingProduction = existingProductions.FirstOrDefault(p => p.Title == dto.Title);
+
+            if (existingProduction is not null)
+            {
+                existingProduction.OrganizerId = dto.OrganizerId;
+                existingProduction.Title = dto.Title;
+                existingProduction.Description = dto.Description;
+                existingProduction.Url = dto.Url;
+                existingProduction.Producer = dto.Producer;
+                existingProduction.MediaUrl = dto.MediaUrl;
+                existingProduction.Duration = dto.Duration;
+                existingProduction.SystemId = dto.SystemId;
+                
+                productionsToUpdate.Add(existingProduction);
+            }
+            else
+            {
+                var newProduction = new Production
+                {
+                    OrganizerId = dto.OrganizerId,
+                    Title = dto.Title,
+                    Description = dto.Description,
+                    Url = dto.Url,
+                    Producer = dto.Producer,
+                    MediaUrl = dto.MediaUrl,
+                    Duration = dto.Duration,
+                    SystemId = dto.SystemId,
+                };
+                productionsToCreate.Add(newProduction);
+            }
+        }
+
+        if (productionsToUpdate.Any())
+        {
+            var updatedProductions = await _repo.UpdateRange(productionsToUpdate);
+            responseList.AddRange(ToShortenedDto(updatedProductions));
+        }
+
+        if (productionsToCreate.Any())
+        {
+            var createdProductions = await _repo.CreateRange(productionsToCreate);
+            responseList.AddRange(ToShortenedDto(createdProductions));
+        }
+        
+        return (productionsToUpdate, productionsToCreate, responseList);
+    }
+
+    private List<ShortenedProductionDto> ToShortenedDto(List<Production> productions)
+    {
+        return productions.Select(prod => new ShortenedProductionDto
+        {
+            Id = prod.Id,
+            Title = prod.Title,
+            OrganizerId = prod.OrganizerId
+        }).ToList();
     }
 }
 
