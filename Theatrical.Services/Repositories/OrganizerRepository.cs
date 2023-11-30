@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
 
 public interface IOrganizerRepository
 {
     Task<Organizer?> Get(int id);
-    Task<List<Organizer?>> Get();
+    Task<List<Organizer>?> Get();
     Task Create(Organizer organizer);
     Task Delete(Organizer organizer);
     Task UpdateRange(List<Organizer> organizers);
@@ -16,10 +17,12 @@ public interface IOrganizerRepository
 public class OrganizerRepository : IOrganizerRepository
 {
     private readonly TheatricalPlaysDbContext _context;
+    private readonly ICaching _caching;
 
-    public OrganizerRepository(TheatricalPlaysDbContext context)
+    public OrganizerRepository(TheatricalPlaysDbContext context, ICaching caching)
     {
         _context = context;
+        _caching = caching;
     }
     
     public async Task<Organizer?> Get(int id)
@@ -28,9 +31,9 @@ public class OrganizerRepository : IOrganizerRepository
         return organizer;
     }
 
-    public async Task<List<Organizer?>> Get()
+    public async Task<List<Organizer>?> Get()
     {
-        var organizers = await _context.Organizers.ToListAsync();
+        var organizers = await _caching.GetOrSetAsync("all_organizers", async () => await _context.Organizers.ToListAsync());
         return organizers;
     }
 
