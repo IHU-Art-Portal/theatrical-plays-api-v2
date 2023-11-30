@@ -67,7 +67,7 @@ public class ContributionsController : ControllerBase
     /// <param name="contributionDto"></param>
     /// <returns></returns>
     [HttpPost]
-    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateContribution([FromBody] CreateContributionDto contributionDto)
@@ -99,7 +99,7 @@ public class ContributionsController : ControllerBase
 
     [HttpPost]
     [Route("range")]
-    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateContributions([FromBody] List<CreateContributionDto> contributionDto)
