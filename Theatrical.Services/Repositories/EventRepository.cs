@@ -16,6 +16,7 @@ public interface IEventRepository
     Task UpdatePriceEvent(Event @event, UpdateEventDto eventDto);
     Task<List<Event>> GetEventsForPerson(int personId);
     Task<List<Event>?> GetEventsForProduction(int productionId);
+    Task<List<Event>> CreateEvents(List<Event> events);
 }
 
 public class EventRepository : IEventRepository
@@ -56,6 +57,13 @@ public class EventRepository : IEventRepository
                 .ToListAsync();
         });
 
+        return events;
+    }
+
+    public async Task<List<Event>> CreateEvents(List<Event> events)
+    {
+        await _context.Events.AddRangeAsync(events);
+        await _context.SaveChangesAsync();
         return events;
     }
 

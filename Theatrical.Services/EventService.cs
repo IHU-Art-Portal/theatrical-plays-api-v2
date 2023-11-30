@@ -1,5 +1,5 @@
-﻿using Theatrical.Data.Models;
-using Theatrical.Dto.ContributionDtos;
+﻿using System.Globalization;
+using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.Pagination;
 using Theatrical.Services.Pagination;
@@ -10,9 +10,11 @@ namespace Theatrical.Services;
 public interface IEventService
 {
     Task<Event> Create(CreateEventDto createEventDto);
-    List<EventDto> ToDto(List<Event> events);
+    List<EventDto> ToDtoRange(List<Event> events);
     PaginationResult<EventDto> Paginate(int? page, int? size, List<EventDto> eventDtos);
     Task UpdatePriceRange(Event @event, UpdateEventDto eventDto);
+    EventDto ToDto(Event newEvent);
+    Task<List<Event>> CreateRange(List<CreateEventDto> createEventDtos);
 }
 
 public class EventService : IEventService
@@ -27,7 +29,7 @@ public class EventService : IEventService
     }
 
   
-    public List<EventDto> ToDto(List<Event> events)
+    public List<EventDto> ToDtoRange(List<Event> events)
     {
         return events.Select(event1 => new EventDto
         {
@@ -38,13 +40,39 @@ public class EventService : IEventService
         }).ToList();
     }
 
+    public EventDto ToDto(Event newEvent)
+    {
+        return new EventDto
+        {
+            PriceRange = newEvent.PriceRange,
+            DateEvent = newEvent.DateEvent,
+            ProductionId = newEvent.ProductionId,
+            VenueId = newEvent.VenueId
+        };
+    }
+
+    public async Task<List<Event>> CreateRange(List<CreateEventDto> createEventDtos)
+    {
+        var createEvents = createEventDtos.Select(dto => new Event
+        {
+            DateEvent = DateTime.SpecifyKind(DateTime.ParseExact(dto.DateEvent, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture), DateTimeKind.Utc),
+            PriceRange = dto.PriceRange,
+            ProductionId = dto.ProductionId,
+            VenueId = dto.VenueId,
+            SystemId = dto.SystemId
+        }).ToList();
+        
+        var events = await _repository.CreateEvents(createEvents);
+        return events;
+    }
+
     public async Task<Event> Create(CreateEventDto createEventDto)
     {
         var eventNew = new Event
         {
             ProductionId = createEventDto.ProductionId,
             VenueId = createEventDto.VenueId,
-            DateEvent = DateTime.Parse(createEventDto.DateEvent),
+            DateEvent = DateTime.SpecifyKind(DateTime.ParseExact(createEventDto.DateEvent, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture), DateTimeKind.Utc),
             PriceRange = createEventDto.PriceRange,
             Timestamp = DateTime.UtcNow,
             SystemId = createEventDto.SystemId

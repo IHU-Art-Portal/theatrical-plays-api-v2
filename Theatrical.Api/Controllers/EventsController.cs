@@ -47,7 +47,7 @@ public class EventsController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var eventDtos = _service.ToDto(events);
+            var eventDtos = _service.ToDtoRange(events);
 
             var paginationResult = _service.Paginate(page, size, eventDtos);
             
@@ -75,7 +75,7 @@ public class EventsController : ControllerBase
                 return new ObjectResult(errorResponse){StatusCode = 404};
             }
 
-            var eventsDto = _service.ToDto(ev);
+            var eventsDto = _service.ToDtoRange(ev);
             
             var paginationResult = _service.Paginate(page, size, eventsDto);
 
@@ -102,7 +102,7 @@ public class EventsController : ControllerBase
                 return new ObjectResult(errorResponse){StatusCode = 404};
             }
 
-            var eventsDto = _service.ToDto(ev);
+            var eventsDto = _service.ToDtoRange(ev);
             
             var paginationResult = _service.Paginate(page, size, eventsDto);
 
@@ -136,9 +136,32 @@ public class EventsController : ControllerBase
             }
 
             var newEvent = await _service.Create(createEventDto);
-            var response = new ApiResponse<Event>(newEvent,"Successfully Created Event");
+            var newEventDto = _service.ToDto(newEvent);
+            var response = new ApiResponse<EventDto>(newEventDto,"Successfully Created Event");
 
             return new ObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
+    [HttpPost]
+    [Route("range")]
+    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> CreateEvents([FromBody] List<CreateEventDto> createEventDtos)
+    {
+        try
+        {
+            var createdEvents = await _service.CreateRange(createEventDtos);
+            var createdEventsDto = _service.ToDtoRange(createdEvents);
+
+            var response = new ApiResponse<List<EventDto>>(createdEventsDto);
+            
+            return new OkObjectResult(response);
         }
         catch (Exception e)
         {
