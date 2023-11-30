@@ -11,6 +11,4 @@ public class OrganizerDto
     public string Email { get; set; } = null!;
     public string Doy { get; set; } = null!;
     public string Afm { get; set; } = null!;
-    public int SystemId { get; set; }
-    public DateTime Timestamp { get; set; }
 }

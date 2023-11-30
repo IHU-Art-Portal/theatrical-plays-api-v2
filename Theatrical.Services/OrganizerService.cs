@@ -13,6 +13,8 @@ public interface IOrganizerService
     Task Delete(Organizer organizer);
     List<OrganizerDto> ToDto(List<Organizer> organizers);
     PaginationResult<OrganizerDto> Paginate(int? page, int? size, List<OrganizerDto> organizerDtos);
+    Task<List<Organizer>> GetOrganizersByNames(List<string> organizersNames);
+    Task<(List<Organizer> organizersToUpdate, List<Organizer> organizersToCreate, List<OrganizerDto> responseList)> CreateListsAndUpdateCreate(List<Organizer> existingOrganizers, List<OrganizerCreateDto> organizerCreateDtos);
 }
 
 public class OrganizerService : IOrganizerService
@@ -43,7 +45,9 @@ public class OrganizerService : IOrganizerService
             Email = organizerCreateDto.Email,
             Doy = organizerCreateDto.Doy,
             Afm = organizerCreateDto.Afm,
-            Timestamp = DateTime.UtcNow
+            Postcode = organizerCreateDto.Postcode,
+            Timestamp = DateTime.UtcNow,
+            SystemId = organizerCreateDto.SystemId
         };
         await _repository.Create(organizer);
     }
@@ -65,8 +69,6 @@ public class OrganizerService : IOrganizerService
             Name = organizer.Name,
             Phone = organizer.Phone,
             Postcode = organizer.Postcode,
-            SystemId = organizer.SystemId,
-            Timestamp = organizer.Timestamp,
             Town = organizer.Town
         }).ToList();
     }
@@ -85,13 +87,75 @@ public class OrganizerService : IOrganizerService
                 Name = org.Name,
                 Phone = org.Phone,
                 Postcode = org.Postcode,
-                SystemId = org.SystemId,
-                Timestamp = org.Timestamp,
                 Town = org.Town
             });
         });
 
         return paginationResult;
+    }
+
+    public async Task<List<Organizer>> GetOrganizersByNames(List<string> organizersNames)
+    {
+        return await _repository.GetOrganizersByNames(organizersNames);
+    }
+
+    public async Task<(List<Organizer> organizersToUpdate, List<Organizer> organizersToCreate, List<OrganizerDto> responseList)> CreateListsAndUpdateCreate(List<Organizer> existingOrganizers, List<OrganizerCreateDto> organizerCreateDtos)
+    {
+        var organizersToUpdate = new List<Organizer>();
+        var organizersToCreate = new List<Organizer>();
+        var responseList = new List<OrganizerDto>();
+
+        foreach (var dto in organizerCreateDtos)
+        {
+            var existingOrganizer = existingOrganizers.FirstOrDefault(v => v.Name == dto.Name);
+
+            if (existingOrganizer is not null)
+            {
+                existingOrganizer.Name = dto.Name;
+                if (dto.Address != null) existingOrganizer.Address = dto.Address;
+                if (dto.Town != null) existingOrganizer.Town = dto.Town;
+                if (dto.Postcode != null) existingOrganizer.Postcode = dto.Postcode;
+                if (dto.Phone != null) existingOrganizer.Phone = dto.Phone;
+                if (dto.Email != null) existingOrganizer.Email = dto.Email;
+                if (dto.Doy != null) existingOrganizer.Doy = dto.Doy;
+                if (dto.Afm != null) existingOrganizer.Afm = dto.Afm;
+                existingOrganizer.SystemId = dto.SystemId;
+
+                organizersToUpdate.Add(existingOrganizer);
+            }
+            else
+            {
+                var newOrganizer = new Organizer
+                {
+                    Name = dto.Name,
+                    Address = dto.Address,
+                    Town = dto.Town,
+                    Postcode = dto.Postcode,
+                    Phone = dto.Phone,
+                    Email = dto.Email,
+                    Doy = dto.Doy,
+                    Afm = dto.Afm,
+                    SystemId = dto.SystemId
+                };
+                organizersToCreate.Add(newOrganizer);
+            }
+        }
+        
+        //Saves changes for all updated venues
+        if (organizersToUpdate.Any())
+        {
+            var updatedOrganizers = await _repository.UpdateRange(organizersToUpdate);
+            responseList.AddRange(ToDto(updatedOrganizers));
+        }
+        
+        //Creates venues
+        if (organizersToCreate.Any())
+        {
+            var createdVenues = await _repository.CreateRange(organizersToCreate);
+            responseList.AddRange(ToDto(createdVenues));
+        }
+
+        return (organizersToUpdate, organizersToCreate, responseList);
     }
 }
 

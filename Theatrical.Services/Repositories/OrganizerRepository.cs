@@ -11,7 +11,9 @@ public interface IOrganizerRepository
     Task<List<Organizer>?> Get();
     Task Create(Organizer organizer);
     Task Delete(Organizer organizer);
-    Task UpdateRange(List<Organizer> organizers);
+    Task<List<Organizer>> UpdateRange(List<Organizer> organizers);
+    Task<List<Organizer>> GetOrganizersByNames(List<string> organizersNames);
+    Task<List<Organizer>> CreateRange(List<Organizer> organizers);
 }
 
 public class OrganizerRepository : IOrganizerRepository
@@ -49,10 +51,23 @@ public class OrganizerRepository : IOrganizerRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateRange(List<Organizer> organizers)
+    public async Task<List<Organizer>> UpdateRange(List<Organizer> organizers)
     {
         _context.Organizers.UpdateRange(organizers);
         await _context.SaveChangesAsync();
+        return organizers;
+    }
+
+    public async Task<List<Organizer>> CreateRange(List<Organizer> organizers)
+    {
+        await _context.Organizers.AddRangeAsync(organizers);
+        await _context.SaveChangesAsync();
+        return organizers;
+    }
+
+    public async Task<List<Organizer>> GetOrganizersByNames(List<string> organizersNames)
+    {
+        return await _context.Organizers.Where(o => organizersNames.Contains(o.Name)).ToListAsync();
     }
 }
 

@@ -47,6 +47,34 @@ public class OrganizersController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+    
+    [HttpPost]
+    [Route("range")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> CreateOrganizers([FromBody] List<OrganizerCreateDto> organizerCreateDtos)
+    {
+        try
+        {
+            var existingOrganizers = await _service.GetOrganizersByNames(organizerCreateDtos.Select(dto => dto.Name).ToList());
+
+            var (updatedOrganizers,  createdOrganizers, responseList) = await _service.CreateListsAndUpdateCreate(existingOrganizers, organizerCreateDtos);
+
+            var organizersCreationResponseDto = new OrganizersCreationResponseDto
+            {
+                CreatedCount = createdOrganizers.Count,
+                UpdatedCount = updatedOrganizers.Count,
+                OrganizerDtos = responseList
+            };
+
+            return Ok(new ApiResponse<OrganizersCreationResponseDto>(organizersCreationResponseDto));
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
 
     /// <summary>
     /// Endpoint to fetching all Organizer(s).
