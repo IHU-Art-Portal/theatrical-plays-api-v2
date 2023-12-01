@@ -9,10 +9,11 @@ public interface IRoleRepository
 {
     Task<List<Role>> GetRoles();
     Task<Role?> GetRole(int id);
-    Task CreateRole(Role roles);
+    Task<Role> CreateRole(Role roles);
     Task DeleteRole(Role roles);
     Task<Role?> GetRoleByName(string searchRole);
     Task UpdateRange(List<Role> roles);
+    Task<List<Role>> CreateRoleRange(List<Role> rolesToAdd);
 }
 
 public class RoleRepository : IRoleRepository
@@ -51,10 +52,18 @@ public class RoleRepository : IRoleRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task CreateRole(Role role)
+    public async Task<List<Role>> CreateRoleRange(List<Role> rolesToAdd)
+    {
+        await _context.Roles.AddRangeAsync(rolesToAdd);
+        await _context.SaveChangesAsync();
+        return rolesToAdd;
+    }
+
+    public async Task<Role> CreateRole(Role role)
     {
         await _context.AddAsync(role);
         await _context.SaveChangesAsync();
+        return role;
     }
 
     public async Task DeleteRole(Role role)

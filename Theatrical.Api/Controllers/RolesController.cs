@@ -29,13 +29,13 @@ public class RolesController : ControllerBase
     /// <param name="role"></param>
     /// <returns></returns>
     [HttpPost]
-    [Route("{role}")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
-    public async Task<ActionResult<ApiResponse>> CreateRole(string role)
+    [ProducesResponseType(typeof(RolesDtoShortened), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse>> CreateRole([FromBody] CreateRoleDto createRoleDto)
     {
         try
         {
-            var rolelowercase = role.ToLower();
+            var rolelowercase = createRoleDto.Role.ToLower();
             var validation = await _validation.ValidateForCreate(rolelowercase);
 
             if (!validation.Success)
@@ -44,9 +44,40 @@ public class RolesController : ControllerBase
                 return new ConflictObjectResult(errorResponse);
             }
 
-            await _service.Create(rolelowercase);
+            var roleAdded = await _service.Create(createRoleDto);
+            var roleAddedDto = _service.ToDto(roleAdded);
 
-            var response = new ApiResponse($"Successfully Created Role: {rolelowercase}");
+            var response = new ApiResponse<RolesDtoShortened>(roleAddedDto);
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
+    [HttpPost]
+    [Route("range")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(RolesAddedRangeResponseDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse>> CreateRoles(List<CreateRoleDto> createRoleDtos)
+    {
+        try
+        {
+            var rolesAdded = await _service.CreateRange(createRoleDtos);
+            var rolesAddedDto = _service.ToDtoRangeShortened(rolesAdded);
+
+            var rolesAddedResponseDto = new RolesAddedRangeResponseDto
+            {
+                CountAdded = rolesAddedDto.Count,
+                OutOf = createRoleDtos.Count,
+                RolesAdded = rolesAddedDto
+            };
+
+            var response = new ApiResponse<RolesAddedRangeResponseDto>(rolesAddedResponseDto);
 
             return new OkObjectResult(response);
         }
@@ -81,7 +112,7 @@ public class RolesController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = 404 };
             }
 
-            var rolesDto = _service.ToDto(roles!);
+            var rolesDto = _service.ToDtoRange(roles!);
 
             var paginationResult = _service.Paginate(page, size, rolesDto);
             
