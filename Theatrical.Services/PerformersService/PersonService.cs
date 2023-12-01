@@ -22,8 +22,9 @@ public interface IPersonService
     List<ImageDto> ImagesToDto(List<Image> images);
     Task<List<Image>?> GetImages();
     Task DeleteTestData();
-    Task CreateList(List<CreatePersonDto> addingPeople);
-    Task UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto);
+    Task<List<Person>> CreateList(List<CreatePersonDto> addingPeople);
+    Task<List<Person>> UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto);
+    List<PersonDtoShortened> ToDtoRange(List<Person> alreadyExistingPeople);
 }
 
 public class PersonService : IPersonService
@@ -212,7 +213,7 @@ public class PersonService : IPersonService
         await _repository.DeleteTestData();
     }
 
-    public async Task CreateList(List<CreatePersonDto> addingPeople)
+    public async Task<List<Person>> CreateList(List<CreatePersonDto> addingPeople)
     {
         var finalPeopleToAdd = new List<Person>();
         foreach (var personDto in addingPeople)
@@ -263,10 +264,10 @@ public class PersonService : IPersonService
             }
         }
 
-        await _repository.CreateRange(finalPeopleToAdd);
+        return await _repository.CreateRange(finalPeopleToAdd);
     }
 
-    public async Task UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto)
+    public async Task<List<Person>> UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto)
     {
         foreach (var existingPerson in alreadyExistingPeople)
         {
@@ -309,5 +310,15 @@ public class PersonService : IPersonService
         }
 
         await _repository.SaveListChanges();
+        return alreadyExistingPeople;
+    }
+
+    public List<PersonDtoShortened> ToDtoRange(List<Person> alreadyExistingPeople)
+    {
+        return alreadyExistingPeople.Select(dto => new PersonDtoShortened
+        {
+            Id = dto.Id,
+            Fullname = dto.Fullname
+        }).ToList();
     }
 }

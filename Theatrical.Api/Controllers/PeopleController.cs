@@ -157,18 +157,23 @@ public class PeopleController : ControllerBase
 
             var (alreadyExistingPeople, addingPeople) = await _validation.ValidateForCreateList(validPeople);
 
+            var peopleUpdated = new List<Person>();
             if (alreadyExistingPeople is not null && alreadyExistingPeople.Count > 0)
             {
-                await _service.UpdateList(alreadyExistingPeople, validPeople);
+                peopleUpdated = await _service.UpdateList(alreadyExistingPeople, validPeople);
             }
             
-            await _service.CreateList(addingPeople!);
+            var peopleCreated = await _service.CreateList(addingPeople!);
+            var peopleCreatedShortenedDto = _service.ToDtoRange(peopleCreated);
+            var peopleUpdatedShortenedDto = _service.ToDtoRange(peopleUpdated);
 
             var statusReport = new CreatePeopleStatusReport
             {
                 AddedPeople = addingPeople!.Count - nullFullNamePeople.Count,
                 AlreadyExistingButUpdatedPeople = alreadyExistingPeople?.Count ?? 0,
-                NullNameNotAddedPeople = nullFullNamePeople.Count
+                NullNameNotAddedPeople = nullFullNamePeople.Count,
+                PeopleUpdated = peopleUpdatedShortenedDto,
+                PeopleCreated = peopleCreatedShortenedDto
             };
 
             var apiResponse = new ApiResponse<CreatePeopleStatusReport>(statusReport);
