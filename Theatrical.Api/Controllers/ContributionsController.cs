@@ -101,7 +101,7 @@ public class ContributionsController : ControllerBase
     [Route("range")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
-    [ProducesResponseType(typeof(ContributionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<ContributionDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateContributions([FromBody] List<CreateContributionDto> contributionDto)
     {
         try

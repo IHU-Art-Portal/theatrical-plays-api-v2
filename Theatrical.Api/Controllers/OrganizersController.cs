@@ -51,6 +51,7 @@ public class OrganizersController : ControllerBase
     [HttpPost]
     [Route("range")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(OrganizersCreationResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateOrganizers([FromBody] List<OrganizerCreateDto> organizerCreateDtos)
     {
         try

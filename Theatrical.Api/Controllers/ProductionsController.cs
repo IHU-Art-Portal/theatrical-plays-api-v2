@@ -61,6 +61,7 @@ public class ProductionsController : ControllerBase
     [HttpPost]
     [Route("range")]
     [TypeFilter(typeof(AdminAuthorizationFilter))]
+    [ProducesResponseType(typeof(ProductionsCreationResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreateProductions([FromBody] List<CreateProductionDto> createProductionDtos)
     {
         try
