@@ -49,8 +49,11 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
                         continue;
                     }
 
-                    similarRoles.Add(role2);
-                    addedRoles.Add(role2);
+                    if (!addedRoles.Contains(role2))
+                    {
+                        similarRoles.Add(role2);
+                        addedRoles.Add(role2);
+                    }
                 }
             }
         }
