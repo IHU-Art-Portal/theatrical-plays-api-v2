@@ -12,7 +12,7 @@ public interface IRoleRepository
     Task<Role> CreateRole(Role roles);
     Task DeleteRole(Role roles);
     Task<Role?> GetRoleByName(string searchRole);
-    Task UpdateRange(List<Role> roles);
+    Task<List<Role>> UpdateRange(List<Role> roles);
     Task<List<Role>> CreateRoleRange(List<Role> rolesToAdd);
 }
 
@@ -46,10 +46,11 @@ public class RoleRepository : IRoleRepository
         return role;
     }
 
-    public async Task UpdateRange(List<Role> roles)
+    public async Task<List<Role>> UpdateRange(List<Role> roles)
     {
         _context.Roles.UpdateRange(roles);
         await _context.SaveChangesAsync();
+        return roles;
     }
 
     public async Task<List<Role>> CreateRoleRange(List<Role> rolesToAdd)

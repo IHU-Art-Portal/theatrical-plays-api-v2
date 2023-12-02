@@ -7,6 +7,7 @@ using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.Responses;
 using Theatrical.Services.Repositories;
 using Theatrical.Dto.RoleDtos;
+using Theatrical.Services.Security.AuthorizationFilters;
 
 namespace Theatrical.Api.Controllers;
 
@@ -142,6 +143,7 @@ public class CuratorController : ControllerBase
 
     [HttpGet]
     [Route("Roles/Simplify/LevenshteinDistance")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> FindSimilarRoles()
     {
         List<Role> roles = await _role.GetRoles();
@@ -159,19 +161,21 @@ public class CuratorController : ControllerBase
 
         //Sends the list of roles for correction along with the dictionary.
         //This list will be used to update these entries in db.
-        List<Role> correctedRoles = _roleSimplifierCurator.MapWrongRolesToCorrect(similarRoles, dictionary);
+        var rolesToUpdate = _roleSimplifierCurator.MapWrongRolesToCorrect(similarRoles, dictionary);
 
-        correctedRoles = correctedRoles.OrderBy(role => role.Id).ToList();
-        correctedRoles = correctedRoles.DistinctBy(role => role.Id).ToList();
+        var updatedRoles = await _role.UpdateRange(rolesToUpdate);
+
+        updatedRoles = updatedRoles.OrderBy(role => role.Id).ToList();
+        updatedRoles = updatedRoles.DistinctBy(role => role.Id).ToList();
         
         var response = new CuratorRoleResponse
         {
-            CorrectedRoles = correctedRoles.Count,
-            roles = correctedRoles,
-            TotalRoles = roles.Count
+            TotalRoles = roles.Count,
+            CorrectedRoles = updatedRoles.Count,
+            roles = updatedRoles,
         };
 
-        return Ok(response);
+        return new OkObjectResult(response);
     }
     
     /*

@@ -35,9 +35,9 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
             for (int j = i + 1; j < roles.Count; j++)
             {
                 Role role2 = roles[j];
-                string roleName2 = CleanName(role2.Role1);
+                var roleName2 = CleanName(role2.Role1);
 
-                int similarityScore = CalculateLevenshteinDistance(roleName1, roleName2);
+                var similarityScore = CalculateLevenshteinDistance(roleName1, roleName2);
 
                 // If the similarity score is below the threshold, consider them similar
                 if (similarityScore <= similarityThreshold)
@@ -46,11 +46,11 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
                     {
                         similarRoles.Add(role1);
                         addedRoles.Add(role1);
+                        continue;
                     }
 
-                    addedRoles.Add(role2);
                     similarRoles.Add(role2);
-
+                    addedRoles.Add(role2);
                 }
             }
         }
@@ -61,26 +61,29 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
     
     public List<Role> MapWrongRolesToCorrect(List<Role> roles, Dictionary<string, string> dictionary)
     {
-        var correctedRolesList = new List<Role>();
-
+        var updatedRoles = new List<Role>();
+        
         foreach (var role in roles)
         {
-            string roleName = CleanName(role.Role1);
+            var roleName = CleanName(role.Role1);
 
             if (dictionary.ContainsKey(roleName))
             {
-                Role correctedRole = new Role
+                var updatedRole = new Role
                 {
                     Id = role.Id,
+                    Role1 = dictionary[roleName],
                     SystemId = role.SystemId,
-                    Timestamp = role.Timestamp,
-                    Role1 = dictionary[roleName]
+                    Timestamp = role.Timestamp
                 };
-                correctedRolesList.Add(correctedRole);
+                updatedRoles.Add(updatedRole);
+                continue;
             }
+            
+            updatedRoles.Add(role);
         }
 
-        return correctedRolesList;
+        return updatedRoles;
     }
     
     private string CleanName(string name)
@@ -242,6 +245,7 @@ public class RoleSimplifierCurator : IRoleSimplifierCurator
                 { "μουσική", "μουσικοί" },
                 { "μουσικός", "μουσικοί" },
                 { "moυσική", "μουσικοί" },
+                { "σκηνοθεσία", "σκηνοθέτες"},
                 { "απόδοση - σκηνοθεσία", "σκηνοθέτες" },
                 { "απόδοη-σκηνοθεσία", "σκηνοθέτες" },
                 { "απόδοση-σκηνοθεσία", "σκηνοθέτες" },
