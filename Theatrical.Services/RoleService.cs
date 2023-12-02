@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
+﻿using System.Xml;
 using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.RoleDtos;
@@ -14,7 +13,7 @@ public interface IRoleService
     Task Delete(Role roles);
     List<RoleDto> ToDtoRange(List<Role> roles);
     PaginationResult<RoleDto> Paginate(int? page, int? size, List<RoleDto> rolesDto);
-    Task<List<Role>> CreateRange(List<CreateRoleDto> createRoleDtos);
+    Task<(List<Role> rolesAdded, List<Role> existingRoles)> CreateRange(List<CreateRoleDto> createRoleDtos);
     List<RolesDtoShortened> ToDtoRangeShortened(List<Role> roles);
     RolesDtoShortened ToDto(Role roleAdded);
 }
@@ -95,7 +94,7 @@ public class RoleService : IRoleService
         return paginationResult;
     }
 
-    public async Task<List<Role>> CreateRange(List<CreateRoleDto> createRoleDtos)
+    public async Task<(List<Role> rolesAdded, List<Role> existingRoles)> CreateRange(List<CreateRoleDto> createRoleDtos)
     {
         List<Role> existingRoles = await _repository.GetRoles();
         
@@ -112,6 +111,12 @@ public class RoleService : IRoleService
         }).ToList();
 
         var rolesAdded = await _repository.CreateRoleRange(rolesToAdd);
-        return rolesAdded;
+
+        var existingRolesFromDto = createRoleDtos
+            .Where(dto => existingRoles.Any(role => role.Role1 == dto.Role))
+            .Select(dto => existingRoles.First(role => role.Role1 == dto.Role))
+            .ToList();
+        
+        return (rolesAdded, existingRolesFromDto);
     }
 }

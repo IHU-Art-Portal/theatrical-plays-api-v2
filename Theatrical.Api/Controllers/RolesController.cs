@@ -67,14 +67,16 @@ public class RolesController : ControllerBase
     {
         try
         {
-            var rolesAdded = await _service.CreateRange(createRoleDtos);
+            var (rolesAdded, existingRoles) = await _service.CreateRange(createRoleDtos);
             var rolesAddedDto = _service.ToDtoRangeShortened(rolesAdded);
+            var rolesExistedDto = _service.ToDtoRangeShortened(existingRoles);
 
             var rolesAddedResponseDto = new RolesAddedRangeResponseDto
             {
                 CountAdded = rolesAddedDto.Count,
                 OutOf = createRoleDtos.Count,
-                RolesAdded = rolesAddedDto
+                RolesAdded = rolesAddedDto,
+                RolesExisted = rolesExistedDto
             };
 
             var response = new ApiResponse<RolesAddedRangeResponseDto>(rolesAddedResponseDto);
