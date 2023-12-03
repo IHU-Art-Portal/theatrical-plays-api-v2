@@ -378,6 +378,7 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u.Youtube).HasColumnName("youtube");
             entity.Property(u => u.Instagram).HasColumnName("instagram");
             entity.Property(u => u.PerformerRoles).HasColumnName("artistRoles");
+            entity.Property(u => u.BioPdfLocation).HasColumnName("bio_pdf_location");
             
             entity.HasMany(u => u.UserImages)
                 .WithOne(ui => ui.User)
