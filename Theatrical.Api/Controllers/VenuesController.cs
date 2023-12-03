@@ -30,15 +30,18 @@ public class VenuesController : ControllerBase
     /// <summary>
     /// Endpoint to all venues.
     /// Customizable with page and size.
+    /// Search by titles. Order by alphabetical order.
     /// </summary>
     /// <param name="page">page number</param>
     /// <param name="size">size capacity for a page</param>
     /// <param name="alphabeticalOrder"></param>
     /// <param name="addressSearch"></param>
+    /// <param name="venueTitle"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder, string? addressSearch)
+    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder, string? addressSearch,
+         string? venueTitle)
     {
         try
         {
@@ -55,7 +58,14 @@ public class VenuesController : ControllerBase
             if (addressSearch is not null)
             {
                 venuesDto = venuesDto
-                    .Where(v => v.Address != null && v.Address.Contains(addressSearch, StringComparison.OrdinalIgnoreCase))
+                    .Where(v => v.Address != null && v.Address.Contains(addressSearch.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            
+            if (venueTitle is not null)
+            {
+                venuesDto = venuesDto
+                    .Where(v => v.Title != null && v.Title.Contains(venueTitle.Trim(), StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
             
