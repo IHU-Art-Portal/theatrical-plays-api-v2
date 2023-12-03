@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Theatrical.Data.Models
+﻿namespace Theatrical.Data.Models
 {
-    public partial class Event
+    public class Event
     {
         public int Id { get; set; }
         public int ProductionId { get; set; }
