@@ -111,6 +111,7 @@ public class PersonService : IPersonService
         if (showAvailableAccounts is true)
         {
             var availableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Available);
+            AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
             var paginationResult1 = PaginateAndProduceDtos(availableAccounts, page, size);
             return paginationResult1;
         }
@@ -118,23 +119,28 @@ public class PersonService : IPersonService
         if (showAvailableAccounts is false)
         {
             var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Unavailable);
+            AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
             var paginationResult2 = PaginateAndProduceDtos(nonAvailableAccounts, page, size);
             return paginationResult2;
         }
         
         //Normal flow if `showAvailableAccounts` is empty/null;
         List<Person> persons = await _repository.Get();
-
-        if (alphabeticalOrder == true)
-        {
-            persons = persons
-                .OrderBy(p => p.Fullname, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-        }
+        
+        AlphabeticalOrdering(persons, alphabeticalOrder);
         
         var paginationResult = PaginateAndProduceDtos(persons, page, size);
         
         return paginationResult;
+    }
+
+    //Makes the list in alphabetical order.
+    private void AlphabeticalOrdering(List<Person> people, bool? order)
+    {
+        if (order == true)
+        {
+            people.Sort((p1, p2) => string.Compare(p1.Fullname, p2.Fullname, StringComparison.OrdinalIgnoreCase));
+        }
     }
 
     public async Task Delete(Person person)
