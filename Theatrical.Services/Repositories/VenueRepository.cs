@@ -16,6 +16,7 @@ public interface IVenueRepository
     Task<List<Production>?> GetVenueProductions(int venueId);
     Task<List<Venue>> GetVenuesByTitles(List<string> titles);
     Task<List<Venue>> CreateRange(List<Venue> venues);
+    Task<Venue?> GetVenueByTitle(string venueTitle);
 }
 
 public class VenueRepository : IVenueRepository
@@ -139,5 +140,16 @@ public class VenueRepository : IVenueRepository
         await _context.Venues.AddRangeAsync(venues);
         await _context.SaveChangesAsync();
         return venues;
+    }
+
+    public async Task<Venue?> GetVenueByTitle(string venueTitle)
+    {
+        var uppercasedVenueTitle = venueTitle.ToUpper();
+        
+        var venue = await _context.Venues
+            .Where(v => v.Title != null && v.Title.ToUpper() == uppercasedVenueTitle)
+            .FirstOrDefaultAsync();
+
+        return venue;
     }
 }

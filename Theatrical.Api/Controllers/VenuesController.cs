@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Pkcs;
+using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -157,6 +157,14 @@ public class VenuesController : ControllerBase
     {
         try
         {
+            var (validation, venue) = await _validation.ValidateAndFetch(venueCreateDto.Title);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse<Venue>(venue, (ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new BadRequestObjectResult(errorResponse);
+            }
+            
             var createdVenue = await _service.Create(venueCreateDto);
 
             var createdVenueDto = _service.ToDto(createdVenue);

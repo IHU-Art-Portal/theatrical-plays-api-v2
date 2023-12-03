@@ -12,6 +12,7 @@ public interface IVenueValidationService
     Task<(ValidationReport report, Venue? venue)> ValidateForDelete(int venueId);
     Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
     Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId);
+    Task<(ValidationReport, Venue? venue)> ValidateAndFetch(string venueTitle);
 }
 
 public class VenueValidationService :  IVenueValidationService
@@ -107,5 +108,25 @@ public class VenueValidationService :  IVenueValidationService
 
         report.Success = true;
         return (report, productions);
+    }
+
+    public async Task<(ValidationReport, Venue? venue)> ValidateAndFetch(string venueTitle)
+    {
+        var venue = await _repository.GetVenueByTitle(venueTitle.Trim());
+
+        if (venue is not null)
+        {
+            return (new ValidationReport
+            {
+                Success = false,
+                Message = "Venue already exists and cannot be created again.",
+                ErrorCode = ErrorCode.AlreadyExists
+            }, venue);
+        }
+
+        return (new ValidationReport
+        {
+            Success = true
+        }, null);
     }
 }
