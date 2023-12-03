@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Theatrical.Data.Models;
+﻿namespace Theatrical.Data.Models;
 
 public class Role
 {

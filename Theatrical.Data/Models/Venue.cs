@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Theatrical.Data.Models;
 
-namespace Theatrical.Data.Models;
-
-public partial class Venue
+public class Venue
 {
     public int Id { get; set; }
     public string? Title { get; set; }
