@@ -37,6 +37,8 @@ public interface IUserRepository
     Task<UserImage?> GetFirstProfileImage(int userId);
     Task UnsetProfilePhoto(UserImage userImage);
     Task SetProfilePhoto(UserImage userImage);
+    Task SetBioPdfLocation(User user, string location);
+    Task UnsetBio(User user);
 }
 
 public class UserRepository : IUserRepository
@@ -191,6 +193,20 @@ public class UserRepository : IUserRepository
     public async Task SetProfilePhoto(UserImage userImage)
     {
         userImage.IsProfile = true;
+        await _context.SaveChangesAsync();
+    }
+
+    //Sets the user's bio_pdf_column to the location.
+    //Call this function after obtaining the location of the uploaded file.
+    public async Task SetBioPdfLocation(User user, string location)
+    {
+        user.BioPdfLocation = location;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UnsetBio(User user)
+    {
+        user.BioPdfLocation = null;
         await _context.SaveChangesAsync();
     }
 

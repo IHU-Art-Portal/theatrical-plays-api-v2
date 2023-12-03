@@ -1023,4 +1023,71 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
+
+    [HttpPost]
+    [Route("Upload/Bio")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    //Update this endpoint to include pdf bytes[] instead of location when there's a server setup.
+    public async Task<ActionResult<ApiResponse>> UploadPdf([FromBody] UploadPdfDto uploadPdfDto)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            //Modify after this part to actually upload the file on a server and get the file location.
+            await _service.SetBio(user!, uploadPdfDto.FileLocation);
+
+            var response = new ApiResponse("Successfully Set your Bio");
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
+    
+    [HttpPost]
+    [Route("Unset/Bio")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> UnsetBio()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user) = await _validation.ValidateUser(email!);
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var bioValidation = _validation.ValidateBioExistence(user!);
+            if (!bioValidation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)bioValidation.ErrorCode!, bioValidation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
+            await _service.UnsetBio(user!);
+
+            var response = new ApiResponse("Successfully Set your Bio");
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
+        }
+    }
 }

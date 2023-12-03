@@ -31,6 +31,7 @@ public interface IUserValidationService
     Task<ValidationReport> ValidateUserPersonUniqueness(int userId);            //Validates User-Person relation uniqueness.
     Task<(ValidationReport, UserImage?)> ValidateUserImageExistence(int imageId);
     ValidationReport ValidatePhotoOwnership(User user, UserImage userImage);
+    ValidationReport ValidateBioExistence(User user);
 }
 
 public class UserValidationService : IUserValidationService
@@ -611,6 +612,23 @@ public class UserValidationService : IUserValidationService
 
         report.Success = true;
         report.Message = "Validation passed";
+        return report;
+    }
+
+    public ValidationReport ValidateBioExistence(User user)
+    {
+        var report = new ValidationReport();
+        
+        if (user.BioPdfLocation is null)
+        {
+            report.Success = false;
+            report.Message = "Bio does not exist";
+            report.ErrorCode = ErrorCode.NotFound;
+            return report;
+        }
+
+        report.Success = true;
+        report.Message = "Bio exists!";
         return report;
     }
 }

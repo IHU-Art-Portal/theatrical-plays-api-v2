@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using Theatrical.Data.Models;
+﻿using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.RoleDtos;
 using Theatrical.Services.Pagination;

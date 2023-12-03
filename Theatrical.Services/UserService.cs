@@ -35,6 +35,8 @@ public interface IUserService
     Task SetProfilePhoto(User user, UserImage userImage, SetProfilePhotoDto setProfilePhotoDto);
     Task RemoveUserImage(UserImage userImage);
     Task UnsetProfilePhoto(UserImage userImage);
+    Task SetBio(User user, string location);
+    Task UnsetBio(User user);
 }
 
 public class UserService : IUserService
@@ -349,6 +351,16 @@ public class UserService : IUserService
     public async Task UnsetProfilePhoto(UserImage userImage)
     {
         await _repository.UnsetProfilePhoto(userImage);
+    }
+
+    public async Task SetBio(User user, string location)
+    {
+        await _repository.SetBioPdfLocation(user, location);
+    }
+
+    public async Task UnsetBio(User user)
+    {
+        await _repository.UnsetBio(user);
     }
 }
 
