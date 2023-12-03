@@ -34,10 +34,11 @@ public class VenuesController : ControllerBase
     /// <param name="page">page number</param>
     /// <param name="size">size capacity for a page</param>
     /// <param name="alphabeticalOrder"></param>
+    /// <param name="addressSearch"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder)
+    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder, string? addressSearch)
     {
         try
         {
@@ -50,6 +51,13 @@ public class VenuesController : ControllerBase
             }
 
             var venuesDto = _service.ToDto(venues!);
+
+            if (addressSearch is not null)
+            {
+                venuesDto = venuesDto
+                    .Where(v => v.Address != null && v.Address.Contains(addressSearch, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
             
             if (alphabeticalOrder == true)
             {
