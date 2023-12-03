@@ -67,15 +67,16 @@ public class PeopleController : ControllerBase
     /// <param name="page">Optional. The page number for pagination</param>
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <param name="showAvailableAccounts"></param>
+    /// <param name="alphabeticalOrder"></param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, bool? showAvailableAccounts)
+    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder)
     {
         try
         {
-            var peopleDto = await _service.GetAndPaginate(page, size, showAvailableAccounts);
-
+            var peopleDto = await _service.GetAndPaginate(page, size, showAvailableAccounts, alphabeticalOrder);
+            
             ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
 
             return new ObjectResult(response);

@@ -11,7 +11,7 @@ namespace Theatrical.Services.PerformersService;
 public interface IPersonService
 {
     Task<Person> Create(CreatePersonDto createPersonDto);
-    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts);
+    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
     PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size);
@@ -104,8 +104,9 @@ public class PersonService : IPersonService
     /// <param name="page"> integer (optional) </param>
     /// <param name="size"> integer (optional) </param>
     /// <param name="showAvailableAccounts"> boolean (optional)</param>
+    /// <param name="alphabeticalOrder"></param>
     /// <returns></returns>
-    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts)
+    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder)
     {
         if (showAvailableAccounts is true)
         {
@@ -123,6 +124,13 @@ public class PersonService : IPersonService
         
         //Normal flow if `showAvailableAccounts` is empty/null;
         List<Person> persons = await _repository.Get();
+
+        if (alphabeticalOrder == true)
+        {
+            persons = persons
+                .OrderBy(p => p.Fullname, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
         
         var paginationResult = PaginateAndProduceDtos(persons, page, size);
         
