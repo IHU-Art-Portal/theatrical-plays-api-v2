@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
@@ -32,10 +33,11 @@ public class VenuesController : ControllerBase
     /// </summary>
     /// <param name="page">page number</param>
     /// <param name="size">size capacity for a page</param>
+    /// <param name="alphabeticalOrder"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size)
+    public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder)
     {
         try
         {
@@ -48,6 +50,11 @@ public class VenuesController : ControllerBase
             }
 
             var venuesDto = _service.ToDto(venues!);
+            
+            if (alphabeticalOrder == true)
+            {
+                venuesDto.Sort((v1, v2) => string.Compare(v1.Title, v2.Title, StringComparison.OrdinalIgnoreCase));
+            }
 
             var paginationResult = _service.Paginate(page, size, venuesDto);
 
