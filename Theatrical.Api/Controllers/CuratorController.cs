@@ -41,6 +41,7 @@ public class CuratorController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("CurateSimple")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CurateAll()
     {
         try
@@ -95,6 +96,7 @@ public class CuratorController : ControllerBase
 
     [HttpGet]
     [Route("Contributions/Delete/ForNonExistent/People")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CorrectContr()
     {
         var contributions = await _contributions.Get();
@@ -119,6 +121,7 @@ public class CuratorController : ControllerBase
 
     [HttpGet]
     [Route("Contributions/Delete/ForNonExistent/Productions")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> CorrectContrProd()
     {
         var contributions = await _contributions.Get();
