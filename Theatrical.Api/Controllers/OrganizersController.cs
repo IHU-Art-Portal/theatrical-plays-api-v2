@@ -83,11 +83,12 @@ public class OrganizersController : ControllerBase
     /// </summary>
     /// <param name="page"></param>
     /// <param name="size"></param>
+    /// <param name="alphabeticalOrder"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PaginationResult<OrganizerDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetOrganizers(int? page, int? size)
+    public async Task<ActionResult<ApiResponse>> GetOrganizers(int? page, int? size, bool? alphabeticalOrder)
     {
         try
         {
@@ -100,6 +101,11 @@ public class OrganizersController : ControllerBase
             }
 
             var organizerDtos = _service.ToDto(organizers!);
+            
+            if (alphabeticalOrder == true)
+            {
+                organizerDtos.Sort((v1, v2) => string.Compare(v1.Name, v2.Name, StringComparison.OrdinalIgnoreCase));
+            }
 
             var paginationResult = _service.Paginate(page, size, organizerDtos);
 

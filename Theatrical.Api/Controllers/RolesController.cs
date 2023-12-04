@@ -98,11 +98,12 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <param name="page"></param>
     /// <param name="size"></param>
+    /// <param name="alphabeticalOrder"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(PaginationResult<RoleDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetRoles(int? page,  int? size)
+    public async Task<ActionResult<ApiResponse>> GetRoles(int? page, int? size, bool? alphabeticalOrder)
     {
         try
         {
@@ -115,6 +116,11 @@ public class RolesController : ControllerBase
             }
 
             var rolesDto = _service.ToDtoRange(roles!);
+            
+            if (alphabeticalOrder == true)
+            {
+                rolesDto.Sort((v1, v2) => string.Compare(v1.Role, v2.Role, StringComparison.OrdinalIgnoreCase));
+            }
 
             var paginationResult = _service.Paginate(page, size, rolesDto);
             
