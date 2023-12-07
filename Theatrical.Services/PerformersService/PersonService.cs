@@ -128,10 +128,22 @@ public class PersonService : IPersonService
         var heightFiltered = HeightFiltering(ageFiltered, height);
         var weightFiltered = WeightFiltering(heightFiltered, weight);
         var eyeColorFiltered = EyeColorFiltering(weightFiltered, eyeColor);
+        var hairColorFiltered = HairColorFiltering(eyeColorFiltered, hairColor);
 
-        var paginationResult = PaginateAndProduceDtos(eyeColorFiltered, page, size);
+        var paginationResult = PaginateAndProduceDtos(hairColorFiltered, page, size);
         
         return paginationResult;
+    }
+
+    private List<Person> HairColorFiltering(List<Person> people, string? hairColor)
+    {
+        if (hairColor is null) return people;
+
+        var filteredPeople = people
+            .Where(p => p.HairColor != null && p.HairColor.Contains(hairColor, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        return filteredPeople;
     }
 
     private List<Person> EyeColorFiltering(List<Person> people, string? eyeColor)
