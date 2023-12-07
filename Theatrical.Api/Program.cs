@@ -68,6 +68,7 @@ builder.Services.AddDbContext<TheatricalPlaysDbContext>(opt =>
 builder.Services.AddTransient<IPersonRepository, PersonRepository>();
 builder.Services.AddTransient<IPersonService, PersonService>();
 builder.Services.AddTransient<IPersonValidationService, PersonValidationService>();
+builder.Services.AddTransient<IFilteringMethods, FilteringMethods>();
 
 //role services
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();

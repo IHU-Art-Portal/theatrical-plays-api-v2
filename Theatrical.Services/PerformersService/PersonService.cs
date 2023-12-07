@@ -32,13 +32,15 @@ public class PersonService : IPersonService
     private readonly IPersonRepository _repository;
     private readonly IPaginationService _pagination;
     private readonly ICuratorIncomingData _curatorIncomingData;
+    private readonly IFilteringMethods _filtering;
 
     public PersonService(IPersonRepository repository, IPaginationService paginationService,
-        ICuratorIncomingData curatorIncomingData)
+        ICuratorIncomingData curatorIncomingData, IFilteringMethods filteringMethods)
     {
         _repository = repository;
         _pagination = paginationService;
         _curatorIncomingData = curatorIncomingData;
+        _filtering = filteringMethods;
     }
 
     public async Task<Person> Create(CreatePersonDto createPersonDto)
@@ -120,148 +122,19 @@ public class PersonService : IPersonService
         
         List<Person> persons = await _repository.Get();
 
-        var claimingStatusOrdered = ClaimingStatusOrdering(persons, showAvailableAccounts);
-
-        var alphabeticalOrdered = AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
-        var roleFiltered = RoleFiltering(alphabeticalOrdered, role);
-        var ageFiltered = AgeFiltering(roleFiltered, age);
-        var heightFiltered = HeightFiltering(ageFiltered, height);
-        var weightFiltered = WeightFiltering(heightFiltered, weight);
-        var eyeColorFiltered = EyeColorFiltering(weightFiltered, eyeColor);
-        var hairColorFiltered = HairColorFiltering(eyeColorFiltered, hairColor);
-        var languageFiltered = LanguageFiltering(hairColorFiltered, languageKnowledge);
+        var claimingStatusOrdered = _filtering.ClaimingStatusOrdering(persons, showAvailableAccounts);
+        var alphabeticalOrdered = _filtering.AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
+        var roleFiltered = _filtering.RoleFiltering(alphabeticalOrdered, role);
+        var ageFiltered = _filtering.AgeFiltering(roleFiltered, age);
+        var heightFiltered = _filtering.HeightFiltering(ageFiltered, height);
+        var weightFiltered = _filtering.WeightFiltering(heightFiltered, weight);
+        var eyeColorFiltered = _filtering.EyeColorFiltering(weightFiltered, eyeColor);
+        var hairColorFiltered = _filtering.HairColorFiltering(eyeColorFiltered, hairColor);
+        var languageFiltered = _filtering.LanguageFiltering(hairColorFiltered, languageKnowledge);
 
         var paginationResult = PaginateAndProduceDtos(languageFiltered, page, size);
         
         return paginationResult;
-    }
-
-    private List<Person> LanguageFiltering(List<Person> people, string? languageKnowledge)
-    {
-        if (languageKnowledge is null) return people;
-
-        var filteredPeople = people
-            .Where(p => p.Languages != null && p.Languages.Contains(languageKnowledge, StringComparer.OrdinalIgnoreCase))
-            .ToList();
-
-        return filteredPeople;
-    }
-
-    private List<Person> HairColorFiltering(List<Person> people, string? hairColor)
-    {
-        if (hairColor is null) return people;
-
-        var filteredPeople = people
-            .Where(p => p.HairColor != null && p.HairColor.Contains(hairColor, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        return filteredPeople;
-    }
-
-    private List<Person> EyeColorFiltering(List<Person> people, string? eyeColor)
-    {
-        if (eyeColor is not null)
-        {
-            var filteredPeople = people
-                .Where(p => p.EyeColor != null && p.EyeColor.Contains(eyeColor, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            return filteredPeople;
-        }
-
-        return people;
-    }
-
-    private List<Person> WeightFiltering(List<Person> people, string? weight)
-    {
-        if (weight is not null)
-        {
-            var filteredPeople = people
-                .Where(p => p.Weight != null && p.Weight.Equals(weight, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            
-            return filteredPeople;
-        }
-
-        return people;
-    }
-
-    private List<Person> ClaimingStatusOrdering(List<Person> people, bool? showAvailableAccounts)
-    {
-        ClaimingStatus? claimingStatus = showAvailableAccounts switch
-        {
-            true => ClaimingStatus.Available, 
-            false => ClaimingStatus.Unavailable,
-            _ => null
-        };
-        
-        if (claimingStatus is not null)
-        {
-            var claimingStatusFiltered = people.Where(p => p.ClaimingStatus == claimingStatus).ToList();
-            return claimingStatusFiltered;
-        }
-        
-        return people;
-    }
-
-    //Makes the list in alphabetical order.
-    private List<Person> AlphabeticalOrdering(List<Person> people, bool? order)
-    {
-        if (order == true)
-        {
-            var sortedPeople = people
-                .OrderBy(p => p.Fullname, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-            
-            return sortedPeople;
-        }
-
-        return people;
-    }
-
-    private List<Person> RoleFiltering(List<Person> people, string? role)
-    {
-        if (role is not null)
-        {
-            var filteredPeople = people
-                .Where(person => person.Roles != null && person.Roles.Contains(role, StringComparer.OrdinalIgnoreCase))
-                .ToList();
-
-            return filteredPeople;
-        }
-        return people;
-    }
-
-    private List<Person> AgeFiltering(List<Person> people, int? age)
-    {
-        if (age.HasValue)
-        {
-            // Calculate the birthdate range based on the specified age
-            var maxBirthdate = DateTime.Today.AddYears(-age.Value);
-            var minBirthdate = DateTime.Today.AddYears(-(age.Value + 1));
-
-            var filteredPeople = people
-                .Where(p => p.Birthdate.HasValue && p.Birthdate.Value <= maxBirthdate && p.Birthdate.Value > minBirthdate)
-                .ToList();
-
-            return filteredPeople;
-        }
-
-        return people;
-    }
-
-    private List<Person> HeightFiltering(List<Person> people, string? height)
-    {
-        if (height is not null)
-        {
-            var filteredPeople = people
-                .Where(p => p.Height != null && p.Height.Contains(height))
-                .ToList();
-
-            return filteredPeople;
-        }
-
-        return people;
     }
 
     public async Task Delete(Person person)
