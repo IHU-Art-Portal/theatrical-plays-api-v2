@@ -92,7 +92,7 @@ public class PeopleController : ControllerBase
     /// <summary>
     /// Endpoint to creating a new Person.
     /// Adding data requires you to specify your system/application.
-    /// System 2 for Python, 3 for C#, 10 for Spring, 11 for Android, 12 for iOS, 13 for Web App, 14 for Testing, 15 for React.
+    /// System 2 for Python, 3 for C#, 4 for C, 5 for C++, 10 for Java, 11 for Android, 12 for iOS, 13 for Javascript, 14 for Testing
     /// </summary>
     /// <param name="createPersonDto">Fullname, ImageLinks (if any), System ID</param>
     /// <returns></returns>
