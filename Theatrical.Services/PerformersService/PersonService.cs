@@ -268,7 +268,7 @@ public class PersonService : IPersonService
                 Languages = personsDto.Languages,
                 Weight = personsDto.Weight,
                 Height = personsDto.Height,
-                EyeColor = personsDto.Height,
+                EyeColor = personsDto.EyeColor,
                 HairColor = personsDto.HairColor,
                 Roles = personsDto.Roles,
                 Images = personsDto.Images,
