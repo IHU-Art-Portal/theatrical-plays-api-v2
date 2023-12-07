@@ -11,7 +11,7 @@ namespace Theatrical.Services.PerformersService;
 public interface IPersonService
 {
     Task<Person> Create(CreatePersonDto createPersonDto);
-    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder);
+    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor, string? hairColor, string? languageKnowledge);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
     PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size);
@@ -105,42 +105,73 @@ public class PersonService : IPersonService
     /// <param name="size"> integer (optional) </param>
     /// <param name="showAvailableAccounts"> boolean (optional)</param>
     /// <param name="alphabeticalOrder"></param>
+    /// <param name="role"></param>
+    /// <param name="age"></param>
+    /// <param name="height"></param>
+    /// <param name="weight"></param>
+    /// <param name="eyeColor"></param>
+    /// <param name="hairColor"></param>
+    /// <param name="languageKnowledge"></param>
     /// <returns></returns>
-    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder)
+    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, 
+        bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor, 
+        string? hairColor, string? languageKnowledge)
     {
         if (showAvailableAccounts is true)
         {
             var availableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Available);
-            AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
-            var paginationResult1 = PaginateAndProduceDtos(availableAccounts, page, size);
+            var alphabeticalOrderedPeople1 =AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
+            var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople1, role);
+            var paginationResult1 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
             return paginationResult1;
         }
 
         if (showAvailableAccounts is false)
         {
             var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Unavailable);
-            AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
-            var paginationResult2 = PaginateAndProduceDtos(nonAvailableAccounts, page, size);
+            var alphabeticalOrderedPeople2 =AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
+            var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople2, role);
+            var paginationResult2 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
             return paginationResult2;
         }
         
         //Normal flow if `showAvailableAccounts` is empty/null;
         List<Person> persons = await _repository.Get();
         
-        AlphabeticalOrdering(persons, alphabeticalOrder);
+        var alphabeticalOrderedPeople = AlphabeticalOrdering(persons, alphabeticalOrder);
+        var peopleRoleFiltered = RoleFiltering(alphabeticalOrderedPeople, role);
         
-        var paginationResult = PaginateAndProduceDtos(persons, page, size);
+        var paginationResult = PaginateAndProduceDtos(peopleRoleFiltered, page, size);
         
         return paginationResult;
     }
 
     //Makes the list in alphabetical order.
-    private void AlphabeticalOrdering(List<Person> people, bool? order)
+    private List<Person> AlphabeticalOrdering(List<Person> people, bool? order)
     {
         if (order == true)
         {
-            people.Sort((p1, p2) => string.Compare(p1.Fullname, p2.Fullname, StringComparison.OrdinalIgnoreCase));
+            var sortedPeople = people
+                .OrderBy(p => p.Fullname, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            
+            return sortedPeople;
         }
+
+        return people;
+    }
+
+    private List<Person> RoleFiltering(List<Person> people, string? role)
+    {
+        if (role is not null)
+        {
+            var filteredPeople = people
+                .Where(person => person.Roles != null && person.Roles.Contains(role, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            return filteredPeople;
+        }
+        return people;
     }
 
     public async Task Delete(Person person)
