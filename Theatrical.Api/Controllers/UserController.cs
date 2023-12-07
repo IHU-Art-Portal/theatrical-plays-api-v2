@@ -1044,9 +1044,10 @@ public class UserController : ControllerBase
 
             var fileLocation = await _minioService.PostUserBioPdf(uploadUserBioPdfDto.UserBioPdf, user!.Id);
 
-            await _service.SetBio(user!, fileLocation);
+            await _service.SetBio(user, fileLocation);
 
-            var response = new ApiResponse("Successfully Set your Bio");
+            var response = new ApiResponse($"Successfully Uploaded your Bio. " +
+                                           $"You can see your bio here: {fileLocation}");
             return new OkObjectResult(response);
         }
         catch (Exception e)
