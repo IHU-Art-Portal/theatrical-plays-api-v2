@@ -120,8 +120,9 @@ public class PersonService : IPersonService
         if (showAvailableAccounts is true)
         {
             var availableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Available);
-            var alphabeticalOrderedPeople1 =AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
+            var alphabeticalOrderedPeople1 = AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
             var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople1, role);
+            var ageFiltered1 = AgeFiltering(roleFilteredPeople, age);
             var paginationResult1 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
             return paginationResult1;
         }
@@ -129,8 +130,9 @@ public class PersonService : IPersonService
         if (showAvailableAccounts is false)
         {
             var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Unavailable);
-            var alphabeticalOrderedPeople2 =AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
+            var alphabeticalOrderedPeople2 = AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
             var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople2, role);
+            var ageFiltered2 = AgeFiltering(roleFilteredPeople, age);
             var paginationResult2 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
             return paginationResult2;
         }
@@ -140,8 +142,9 @@ public class PersonService : IPersonService
         
         var alphabeticalOrderedPeople = AlphabeticalOrdering(persons, alphabeticalOrder);
         var peopleRoleFiltered = RoleFiltering(alphabeticalOrderedPeople, role);
+        var ageFiltered = AgeFiltering(peopleRoleFiltered, age);
         
-        var paginationResult = PaginateAndProduceDtos(peopleRoleFiltered, page, size);
+        var paginationResult = PaginateAndProduceDtos(ageFiltered, page, size);
         
         return paginationResult;
     }
@@ -171,6 +174,24 @@ public class PersonService : IPersonService
 
             return filteredPeople;
         }
+        return people;
+    }
+
+    private List<Person> AgeFiltering(List<Person> people, int? age)
+    {
+        if (age.HasValue)
+        {
+            // Calculate the birthdate range based on the specified age
+            var maxBirthdate = DateTime.Today.AddYears(-age.Value);
+            var minBirthdate = DateTime.Today.AddYears(-(age.Value + 1));
+
+            var filteredPeople = people
+                .Where(p => p.Birthdate.HasValue && p.Birthdate.Value <= maxBirthdate && p.Birthdate.Value > minBirthdate)
+                .ToList();
+
+            return filteredPeople;
+        }
+
         return people;
     }
 
