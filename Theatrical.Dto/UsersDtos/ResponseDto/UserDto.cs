@@ -18,4 +18,5 @@ public class UserDto
     public List<string>? PerformerRoles { get; set; }
     public List<UserImageDto>? UserImages { get; set; }
     public UserProfilePictureResponseDto? ProfilePhoto { get; set; }
+    public string? BioPdfLocation { get; set; }
 }

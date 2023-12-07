@@ -239,7 +239,8 @@ public class UserService : IUserService
             Balance = user.UserTransactions.Sum(t => t.CreditAmount),
             UserImages = userImagesDto,
             ProfilePhoto = userProfilePictureResponseDto,
-            PerformerRoles = user.PerformerRoles
+            PerformerRoles = user.PerformerRoles,
+            BioPdfLocation = user.BioPdfLocation
         };
 
         return userDto;

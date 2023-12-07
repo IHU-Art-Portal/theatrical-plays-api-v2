@@ -24,12 +24,14 @@ public class UserController : ControllerBase
     private readonly IUserValidationService _validation;
     private readonly IUserService _service;
     private readonly IEmailService _emailService;
+    private readonly IMinioService _minioService;
 
-    public UserController(IUserValidationService validation, IUserService service, IEmailService emailService)
+    public UserController(IUserValidationService validation, IUserService service, IEmailService emailService, IMinioService minioService)
     {
         _validation = validation;
         _service = service;
         _emailService = emailService;
+        _minioService = minioService;
     }
     
     /// <summary>
@@ -1027,8 +1029,7 @@ public class UserController : ControllerBase
     [HttpPost]
     [Route("Upload/Bio")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
-    //Update this endpoint to include pdf bytes[] instead of location when there's a server setup.
-    public async Task<ActionResult<ApiResponse>> UploadPdf([FromBody] UploadPdfDto uploadPdfDto)
+    public async Task<ActionResult<ApiResponse>> UploadPdf([FromBody] UploadUserBioPdfDto uploadUserBioPdfDto)
     {
         try
         {
@@ -1041,8 +1042,9 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
-            //Modify after this part to actually upload the file on a server and get the file location.
-            await _service.SetBio(user!, uploadPdfDto.FileLocation);
+            var fileLocation = await _minioService.PostUserBioPdf(uploadUserBioPdfDto.UserBioPdf, user!.Id);
+
+            await _service.SetBio(user!, fileLocation);
 
             var response = new ApiResponse("Successfully Set your Bio");
             return new OkObjectResult(response);
