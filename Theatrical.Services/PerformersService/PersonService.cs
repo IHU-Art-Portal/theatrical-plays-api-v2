@@ -127,10 +127,25 @@ public class PersonService : IPersonService
         var ageFiltered = AgeFiltering(roleFiltered, age);
         var heightFiltered = HeightFiltering(ageFiltered, height);
         var weightFiltered = WeightFiltering(heightFiltered, weight);
+        var eyeColorFiltered = EyeColorFiltering(weightFiltered, eyeColor);
 
-        var paginationResult = PaginateAndProduceDtos(weightFiltered, page, size);
+        var paginationResult = PaginateAndProduceDtos(eyeColorFiltered, page, size);
         
         return paginationResult;
+    }
+
+    private List<Person> EyeColorFiltering(List<Person> people, string? eyeColor)
+    {
+        if (eyeColor is not null)
+        {
+            var filteredPeople = people
+                .Where(p => p.EyeColor != null && p.EyeColor.Contains(eyeColor, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            return filteredPeople;
+        }
+
+        return people;
     }
 
     private List<Person> WeightFiltering(List<Person> people, string? weight)
