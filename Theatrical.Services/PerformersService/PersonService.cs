@@ -134,10 +134,12 @@ public class PersonService : IPersonService
 
     private List<Person> ClaimingStatusOrdering(List<Person> people, bool? showAvailableAccounts)
     {
-        ClaimingStatus? claimingStatus = showAvailableAccounts == true
-            ? ClaimingStatus.Available
-            : showAvailableAccounts == false ? ClaimingStatus.Unavailable
-                : null;
+        ClaimingStatus? claimingStatus = showAvailableAccounts switch
+        {
+            true => ClaimingStatus.Available, 
+            false => ClaimingStatus.Unavailable,
+            _ => null
+        };
         
         if (claimingStatus is not null)
         {
