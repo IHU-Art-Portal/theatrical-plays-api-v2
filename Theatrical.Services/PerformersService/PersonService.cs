@@ -122,14 +122,29 @@ public class PersonService : IPersonService
 
         var claimingStatusOrdered = ClaimingStatusOrdering(persons, showAvailableAccounts);
 
-        var alphabeticalOrderedPeople = AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
-        var peopleRoleFiltered = RoleFiltering(alphabeticalOrderedPeople, role);
-        var ageFiltered = AgeFiltering(peopleRoleFiltered, age);
+        var alphabeticalOrdered = AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
+        var roleFiltered = RoleFiltering(alphabeticalOrdered, role);
+        var ageFiltered = AgeFiltering(roleFiltered, age);
         var heightFiltered = HeightFiltering(ageFiltered, height);
+        var weightFiltered = WeightFiltering(heightFiltered, weight);
 
-        var paginationResult = PaginateAndProduceDtos(heightFiltered, page, size);
+        var paginationResult = PaginateAndProduceDtos(weightFiltered, page, size);
         
         return paginationResult;
+    }
+
+    private List<Person> WeightFiltering(List<Person> people, string? weight)
+    {
+        if (weight is not null)
+        {
+            var filteredPeople = people
+                .Where(p => p.Weight != null && p.Weight.Equals(weight, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            
+            return filteredPeople;
+        }
+
+        return people;
     }
 
     private List<Person> ClaimingStatusOrdering(List<Person> people, bool? showAvailableAccounts)
