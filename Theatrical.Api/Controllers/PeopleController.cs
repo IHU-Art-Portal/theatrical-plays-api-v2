@@ -190,20 +190,6 @@ public class PeopleController : ControllerBase
     }
 
     /// <summary>
-    /// Search function not implemented yet.
-    /// </summary>
-    /// <param name="role"></param>
-    /// <param name="page"></param>
-    /// <param name="size"></param>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("search")]
-    public ActionResult GetPerformersRole(string? role, int? page, int? size)
-    {
-        return StatusCode((int)HttpStatusCode.NotImplemented, "This function is not implemented yet and might be subject to changes.");
-    }
-
-    /// <summary>
     /// Endpoint to fetching all Person(s) by a specific role.
     /// Pagination Available.
     /// </summary>
