@@ -190,7 +190,11 @@ public class UserService : IUserService
             userProfilePictureResponseDto.ImageLocation = userProfilePhoto.ImageLocation;
             userProfilePictureResponseDto.Label = userProfilePhoto.Label;
         }
-        
+        else
+        {
+            userProfilePictureResponseDto = null;
+        }
+
         if (userImages is not null)
         {
             foreach (var userImage in userImages)
