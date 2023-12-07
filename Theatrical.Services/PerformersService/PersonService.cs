@@ -117,36 +117,35 @@ public class PersonService : IPersonService
         bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor, 
         string? hairColor, string? languageKnowledge)
     {
-        if (showAvailableAccounts is true)
-        {
-            var availableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Available);
-            var alphabeticalOrderedPeople1 = AlphabeticalOrdering(availableAccounts, alphabeticalOrder);
-            var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople1, role);
-            var ageFiltered1 = AgeFiltering(roleFilteredPeople, age);
-            var paginationResult1 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
-            return paginationResult1;
-        }
-
-        if (showAvailableAccounts is false)
-        {
-            var nonAvailableAccounts = await _repository.GetPeopleByClaimingStatus(ClaimingStatus.Unavailable);
-            var alphabeticalOrderedPeople2 = AlphabeticalOrdering(nonAvailableAccounts, alphabeticalOrder);
-            var roleFilteredPeople = RoleFiltering(alphabeticalOrderedPeople2, role);
-            var ageFiltered2 = AgeFiltering(roleFilteredPeople, age);
-            var paginationResult2 = PaginateAndProduceDtos(roleFilteredPeople, page, size);
-            return paginationResult2;
-        }
         
-        //Normal flow if `showAvailableAccounts` is empty/null;
         List<Person> persons = await _repository.Get();
-        
-        var alphabeticalOrderedPeople = AlphabeticalOrdering(persons, alphabeticalOrder);
+
+        var claimingStatusOrdered = ClaimingStatusOrdering(persons, showAvailableAccounts);
+
+        var alphabeticalOrderedPeople = AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
         var peopleRoleFiltered = RoleFiltering(alphabeticalOrderedPeople, role);
         var ageFiltered = AgeFiltering(peopleRoleFiltered, age);
-        
-        var paginationResult = PaginateAndProduceDtos(ageFiltered, page, size);
+        var heightFiltered = HeightFiltering(ageFiltered, height);
+
+        var paginationResult = PaginateAndProduceDtos(heightFiltered, page, size);
         
         return paginationResult;
+    }
+
+    private List<Person> ClaimingStatusOrdering(List<Person> people, bool? showAvailableAccounts)
+    {
+        ClaimingStatus? claimingStatus = showAvailableAccounts == true
+            ? ClaimingStatus.Available
+            : showAvailableAccounts == false ? ClaimingStatus.Unavailable
+                : null;
+        
+        if (claimingStatus is not null)
+        {
+            var claimingStatusFiltered = people.Where(p => p.ClaimingStatus == claimingStatus).ToList();
+            return claimingStatusFiltered;
+        }
+        
+        return people;
     }
 
     //Makes the list in alphabetical order.
@@ -187,6 +186,20 @@ public class PersonService : IPersonService
 
             var filteredPeople = people
                 .Where(p => p.Birthdate.HasValue && p.Birthdate.Value <= maxBirthdate && p.Birthdate.Value > minBirthdate)
+                .ToList();
+
+            return filteredPeople;
+        }
+
+        return people;
+    }
+
+    private List<Person> HeightFiltering(List<Person> people, string? height)
+    {
+        if (height is not null)
+        {
+            var filteredPeople = people
+                .Where(p => p.Height != null && p.Height.Contains(height))
                 .ToList();
 
             return filteredPeople;

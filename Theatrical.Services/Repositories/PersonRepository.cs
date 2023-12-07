@@ -20,7 +20,6 @@ public interface IPersonRepository
     Task<List<Image>?> GetPersonsImages(int personId);
     Task UpdateRange(List<Person> people);
     Task<List<Image>?> GetImages();
-    Task<List<Person>> GetPeopleByClaimingStatus(ClaimingStatus claimingStatus);
     Task CreateRequest(Person person);
     Task ApproveRequest(RequestActionDto requestActionDto);
     Task RejectRequest(RequestActionDto requestActionDto);
@@ -64,20 +63,6 @@ public class PersonRepository : IPersonRepository
         var person = await _caching.GetOrSetAsync($"person_{id}", async () => await _context.Persons.FindAsync(id));
             
         return person;
-    }
-
-    /// <summary>
-    /// USE THIS METHOD TO GET LIST OF PEOPLE ACCORDING TO THEIR CLAIMING STATUS.
-    /// Caches the result for a minute with a unique key, for quick access, across many requests.
-    /// </summary>
-    /// <param name="claimingStatus">claimingStatus.Available for example</param>
-    /// <returns>A list of people</returns>
-    public async Task<List<Person>> GetPeopleByClaimingStatus(ClaimingStatus claimingStatus)
-    {
-        return await _caching.GetOrSetAsync($"people_by_claim_status_{claimingStatus}", async () =>
-        {
-            return await _context.Persons.Where(person => person.ClaimingStatus == claimingStatus).Include(p => p.Images).ToListAsync();
-        });
     }
 
     /// <summary>
