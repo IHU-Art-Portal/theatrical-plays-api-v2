@@ -77,13 +77,11 @@ public class PeopleController : ControllerBase
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder, 
-        string? role, int? age, string? height, string? weight, string? eyeColor, string? hairColor, string? languageKnowledge)
+    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, SearchFilters searchFilters)
     {
         try
         {
-            var peopleDto = await _service.GetAndPaginate(page, size, showAvailableAccounts, alphabeticalOrder,
-                role, age, height, weight, eyeColor, hairColor, languageKnowledge);
+            var peopleDto = await _service.GetAndPaginate(page, size, searchFilters);
             
             ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
 

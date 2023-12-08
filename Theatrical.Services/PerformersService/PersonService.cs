@@ -11,7 +11,7 @@ namespace Theatrical.Services.PerformersService;
 public interface IPersonService
 {
     Task<Person> Create(CreatePersonDto createPersonDto);
-    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor, string? hairColor, string? languageKnowledge);
+    Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, SearchFilters searchFilters);
     Task Delete(Person person);
     PersonDto ToDto(Person person);
     PaginationResult<PersonDto> PaginateAndProduceDtos(List<Person> persons, int? page, int? size);
@@ -105,32 +105,22 @@ public class PersonService : IPersonService
     /// </summary>
     /// <param name="page"> integer (optional) </param>
     /// <param name="size"> integer (optional) </param>
-    /// <param name="showAvailableAccounts"> boolean (optional)</param>
-    /// <param name="alphabeticalOrder"></param>
-    /// <param name="role"></param>
-    /// <param name="age"></param>
-    /// <param name="height"></param>
-    /// <param name="weight"></param>
-    /// <param name="eyeColor"></param>
-    /// <param name="hairColor"></param>
-    /// <param name="languageKnowledge"></param>
+    /// <param name="searchFilters"></param>
     /// <returns></returns>
-    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, bool? showAvailableAccounts, 
-        bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor, 
-        string? hairColor, string? languageKnowledge)
+    public async Task<PaginationResult<PersonDto>> GetAndPaginate(int? page, int? size, SearchFilters searchFilters)
     {
         
         List<Person> persons = await _repository.Get();
 
-        var claimingStatusOrdered = _filtering.ClaimingStatusOrdering(persons, showAvailableAccounts);
-        var alphabeticalOrdered = _filtering.AlphabeticalOrdering(claimingStatusOrdered, alphabeticalOrder);
-        var roleFiltered = _filtering.RoleFiltering(alphabeticalOrdered, role);
-        var ageFiltered = _filtering.AgeFiltering(roleFiltered, age);
-        var heightFiltered = _filtering.HeightFiltering(ageFiltered, height);
-        var weightFiltered = _filtering.WeightFiltering(heightFiltered, weight);
-        var eyeColorFiltered = _filtering.EyeColorFiltering(weightFiltered, eyeColor);
-        var hairColorFiltered = _filtering.HairColorFiltering(eyeColorFiltered, hairColor);
-        var languageFiltered = _filtering.LanguageFiltering(hairColorFiltered, languageKnowledge);
+        var claimingStatusOrdered = _filtering.ClaimingStatusOrdering(persons, searchFilters.ShowAvailableAccounts);
+        var alphabeticalOrdered = _filtering.AlphabeticalOrdering(claimingStatusOrdered, searchFilters.AlphabeticalOrder);
+        var roleFiltered = _filtering.RoleFiltering(alphabeticalOrdered, searchFilters.Role);
+        var ageFiltered = _filtering.AgeFiltering(roleFiltered, searchFilters.Age);
+        var heightFiltered = _filtering.HeightFiltering(ageFiltered, searchFilters.Height);
+        var weightFiltered = _filtering.WeightFiltering(heightFiltered, searchFilters.Weight);
+        var eyeColorFiltered = _filtering.EyeColorFiltering(weightFiltered, searchFilters.EyeColor);
+        var hairColorFiltered = _filtering.HairColorFiltering(eyeColorFiltered, searchFilters.HairColor);
+        var languageFiltered = _filtering.LanguageFiltering(hairColorFiltered, searchFilters.LanguageKnowledge);
 
         var paginationResult = PaginateAndProduceDtos(languageFiltered, page, size);
         
