@@ -27,7 +27,7 @@ public class TransactionService : ITransactionService
         var transaction = new Transaction
         {
             UserId = user.Id,
-            CreditAmount = (decimal)5,
+            CreditAmount = 5,
             Reason = "Credit Purchase",
         };
         
