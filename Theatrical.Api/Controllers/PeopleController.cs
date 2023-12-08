@@ -65,17 +65,9 @@ public class PeopleController : ControllerBase
     /// </summary>
     /// <param name="page">Optional. The page number for pagination</param>
     /// <param name="size">Optional. THe page size for pagination</param>
-    /// <param name="showAvailableAccounts"></param>
-    /// <param name="alphabeticalOrder"></param>
-    /// <param name="role"></param>
-    /// <param name="age"></param>
-    /// <param name="height"></param>
-    /// <param name="weight"></param>
-    /// <param name="eyeColor"></param>
-    /// <param name="hairColor"></param>
-    /// <param name="languageKnowledge"></param>
+    /// <param name="searchFilters"></param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
-    [HttpGet]
+    [HttpPost("fetch")]
     [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, SearchFilters searchFilters)
     {
