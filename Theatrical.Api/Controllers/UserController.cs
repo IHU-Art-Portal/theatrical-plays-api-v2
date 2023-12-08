@@ -25,13 +25,16 @@ public class UserController : ControllerBase
     private readonly IUserService _service;
     private readonly IEmailService _emailService;
     private readonly IMinioService _minioService;
+    private readonly ITransactionService _transactions;
 
-    public UserController(IUserValidationService validation, IUserService service, IEmailService emailService, IMinioService minioService)
+    public UserController(IUserValidationService validation, IUserService service, IEmailService emailService, IMinioService minioService,
+        ITransactionService transactionService)
     {
         _validation = validation;
         _service = service;
         _emailService = emailService;
         _minioService = minioService;
+        _transactions = transactionService;
     }
     
     /// <summary>
@@ -104,6 +107,7 @@ public class UserController : ControllerBase
             }
 
             await _service.EnableAccount(user!);
+            await _transactions.VerifiedEmailCredits(user!);
             
             return Redirect($"/EmailVerification?status=success");
         }

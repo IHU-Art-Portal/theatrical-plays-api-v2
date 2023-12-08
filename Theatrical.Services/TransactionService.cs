@@ -11,6 +11,7 @@ public interface ITransactionService
     TransactionResponseDto TransactionToResponseDto(Transaction transcation);
     List<TransactionDtoFetch> TransactionListToDto(List<Transaction> transactions);
     Task<Transaction> PostTransaction(User user);
+    Task VerifiedEmailCredits(User user);
 }
 
 public class TransactionService : ITransactionService
@@ -27,12 +28,24 @@ public class TransactionService : ITransactionService
         var transaction = new Transaction
         {
             UserId = user.Id,
-            CreditAmount = 5,
+            CreditAmount = 5.00m,
             Reason = "Credit Purchase",
         };
         
         var newTransaction = await _repository.PostTransaction(transaction);
         return newTransaction;
+    }
+
+    public async Task VerifiedEmailCredits(User user)
+    {
+        var transaction = new Transaction
+        {
+            UserId = user.Id,
+            CreditAmount = 1.01m,
+            Reason = "Email Verification",
+        };
+        
+        await _repository.PostTransaction(transaction);
     }
     
     public TransactionDtoFetch TransactionToDto(Transaction transaction)
