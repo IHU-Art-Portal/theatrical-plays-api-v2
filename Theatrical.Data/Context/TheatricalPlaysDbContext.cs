@@ -468,14 +468,17 @@ public class TheatricalPlaysDbContext : DbContext
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.ToTable("transactions");
+            entity.Property(t => t.Id).HasColumnName("id");
+            entity.Property(t => t.UserId).HasColumnName("userid");
+            entity.Property(t => t.CreditAmount).HasColumnName("creditamount");
+            entity.Property(t => t.Reason).HasColumnName("reason");
+            entity.Property(t => t.DateCreated).HasColumnName("datecreated").HasDefaultValueSql("now()");
+            
             entity.HasOne(t => t.User)
                 .WithMany(u => u.UserTransactions)
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.NoAction)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("usertransactions_ut1");
-
-            entity.Property(t => t.TransactionId).HasColumnName("TransactionID");
-            entity.Property(t => t.NetworkTransactionId).HasColumnName("NetworkTransactionID");
         });
 
         modelBuilder.Entity<AccountRequest>(entity =>

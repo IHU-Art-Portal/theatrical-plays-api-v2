@@ -231,11 +231,7 @@ public class UserService : IUserService
                 UserId = t.UserId,
                 CreditAmount = t.CreditAmount,
                 Reason = t.Reason,
-                DateCreated = t.DateCreated,
-                TransactionId = t.TransactionId.ToString(),
-                AuthCode = t.AuthCode,
-                AccountNumber = t.AccountNumber,
-                AccountType = t.AccountType
+                DateCreated = t.DateCreated
             }).ToList(),
             Facebook = user.Facebook,
             Youtube = user.Youtube,

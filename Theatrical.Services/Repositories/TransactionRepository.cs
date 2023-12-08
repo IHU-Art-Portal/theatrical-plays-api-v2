@@ -28,14 +28,13 @@ public class TransactionRepository : ITransactionRepository
         await _context.Transactions.AddAsync(transaction);
         await _context.SaveChangesAsync();
 
-        await _logRepository.UpdateLogs("insert", "transactions", new List<(string ColumnName, string Value)>
+        /*await _logRepository.UpdateLogs("insert", "transactions", new List<(string ColumnName, string Value)>
         {
             ("Id", transaction.Id.ToString()),
             ("UserId", transaction.UserId.ToString()),
             ("CreditAmount", transaction.CreditAmount.ToString(CultureInfo.CurrentCulture)),
             ("Reason", transaction.Reason)
-        });
-
+        });*/
         return transaction;
     }
     

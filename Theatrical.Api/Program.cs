@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Minio;
 using Newtonsoft.Json;
 using Serilog;
+using Stripe;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Theatrical.Api.Swagger;
 using Theatrical.Data.Context;
@@ -22,6 +23,9 @@ using Theatrical.Services.Repositories;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Security.Jwt;
 using Theatrical.Services.Validation;
+using EventService = Theatrical.Services.EventService;
+using PersonService = Theatrical.Services.PerformersService.PersonService;
+using TokenService = Theatrical.Services.Security.Jwt.TokenService;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -148,6 +152,9 @@ builder.Services.AddMinio("3PKAzdLuyugb3rlAat8s", "yDDnd26PLVu0jmaTqpuFVGLYcpJH2
 
 //Assigned Users Services
 builder.Services.AddTransient<IAssignedUserRepository, AssignedUserRepository>();
+
+//Stripe Config
+StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeSettings:SecretKey");
 
 //cors
 builder.Services.AddCors(options =>
