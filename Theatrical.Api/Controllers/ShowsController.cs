@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.ShowsLocal;
@@ -25,11 +25,57 @@ public class ShowsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetShows(int page = 1, int size = 10)
+    public async Task<ActionResult<ApiResponse>> GetShows(string? venueAddress, int? venueId, string? eventDate, 
+        string? organizerName, string? productionTitle, int page = 1, int size = 10)
     {
         try
         {
+            if (eventDate is not null)
+            {
+                if (!DateTime.TryParseExact(eventDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
+                {
+                    return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, "Wrong date format. Make sure it looks like: dd-MM-yyyy"));
+                }
+            }
             var shows = await _repo.GetShows();
+
+            if (venueAddress is not null)
+            {
+                shows = shows
+                    .Where(s => s.VenueResponseDto != null && s.VenueResponseDto.Address.Contains(venueAddress, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (venueId is not null)
+            {
+                shows = shows
+                    .Where(s => s.VenueResponseDto != null && s.VenueResponseDto.Id == venueId)
+                    .ToList();
+            }
+
+            if (eventDate is not null)
+            {
+                if (DateTime.TryParseExact(eventDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
+                {
+                    shows = shows
+                        .Where(s => s.EventDate.HasValue && s.EventDate.Value.Date == parsedDate.Date)
+                        .ToList();
+                }
+            }
+
+            if (organizerName is not null)
+            {
+                shows = shows
+                    .Where(s => s.OrganizerShortenedDto.Name.Contains(organizerName, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (productionTitle is not null)
+            {
+                shows = shows
+                    .Where(s => s.Production.Title.Contains(productionTitle, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
             var paginationResult = _pagination.GetPaginated(page, size, shows, items =>
             {
