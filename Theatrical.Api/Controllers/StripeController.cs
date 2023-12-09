@@ -36,6 +36,12 @@ public class StripeController : ControllerBase
                     // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     Price = "price_1OKrZFFkSW4xPENMeITAfqUV",
                     Quantity = 1,
+                    AdjustableQuantity = new SessionLineItemAdjustableQuantityOptions
+                    {
+                        Enabled = true,
+                        Minimum = 1,
+                        Maximum = 100
+                    },
                 },
             },
             Mode = "payment",
