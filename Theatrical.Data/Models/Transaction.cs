@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Theatrical.Data.Models;
+﻿namespace Theatrical.Data.Models;
 
 public class Transaction
 {
@@ -9,5 +7,6 @@ public class Transaction
     public virtual User User { get; set; }
     public decimal CreditAmount { get; set; }
     public string Reason { get; set; }
+    public string? SessionId { get; set; }
     public DateTime DateCreated { get; set; }
 }

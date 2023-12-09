@@ -473,6 +473,7 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(t => t.CreditAmount).HasColumnName("creditamount");
             entity.Property(t => t.Reason).HasColumnName("reason");
             entity.Property(t => t.DateCreated).HasColumnName("datecreated").HasDefaultValueSql("now()");
+            entity.Property(t => t.SessionId).HasColumnName("sessionid");
             
             entity.HasOne(t => t.User)
                 .WithMany(u => u.UserTransactions)

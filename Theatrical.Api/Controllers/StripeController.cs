@@ -71,6 +71,7 @@ public class StripeController : ControllerBase
                 // Retrieve information about the completed session
                 var paymentStatus = session.PaymentStatus; // Check if the payment was successful
                 var customerEmail = session.CustomerDetails.Email; // Get customer email
+                var sessionId = session.Id;
 
                 var amountTotalPaidInCents = session.AmountTotal;
                 var amountTotalInEuros = amountTotalPaidInCents / 100;
@@ -86,7 +87,7 @@ public class StripeController : ControllerBase
 
                 
                     // Perform actions based on the successful payment
-                    await _transactionService.PostTransaction(user!, amountTotalInEuros);
+                    await _transactionService.PostTransaction(user!, amountTotalInEuros, sessionId);
                     
                     return new OkObjectResult(new ApiResponse("Credits have been added!"));
                 }
