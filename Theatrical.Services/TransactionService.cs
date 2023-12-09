@@ -10,7 +10,7 @@ public interface ITransactionService
     TransactionDtoFetch TransactionToDto(Transaction transaction);
     TransactionResponseDto TransactionToResponseDto(Transaction transcation);
     List<TransactionDtoFetch> TransactionListToDto(List<Transaction> transactions);
-    Task<Transaction> PostTransaction(User user, long? amountTotalInEuros, string sessionId);
+    Task<Transaction> PostTransaction(User user, long? amountTotalInEuros, string sessionId, string stripeEventId);
     Task VerifiedEmailCredits(User user);
     Task VerifiedEmailCredits(List<User> usersNotPaid);
     Task<List<User>> GetUsersWithVerifiedEmailNotPaid();
@@ -25,14 +25,15 @@ public class TransactionService : ITransactionService
         _repository = repository;
     }
     
-    public async Task<Transaction> PostTransaction(User user, long? amountTotalInEuros, string sessionId)
+    public async Task<Transaction> PostTransaction(User user, long? amountTotalInEuros, string sessionId, string stripeEventId)
     {
         var transaction = new Transaction
         {
             UserId = user.Id,
             CreditAmount = Convert.ToDecimal(amountTotalInEuros),
             Reason = "Credit Purchase",
-            SessionId = sessionId
+            SessionId = sessionId,
+            StripeEventId = stripeEventId,
         };
         
         var newTransaction = await _repository.PostTransaction(transaction);

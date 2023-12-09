@@ -8,5 +8,6 @@ public class Transaction
     public decimal CreditAmount { get; set; }
     public string Reason { get; set; }
     public string? SessionId { get; set; }
+    public string? StripeEventId { get; set; }
     public DateTime DateCreated { get; set; }
 }

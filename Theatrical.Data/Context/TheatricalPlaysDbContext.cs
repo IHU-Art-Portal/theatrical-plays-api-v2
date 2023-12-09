@@ -474,6 +474,7 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(t => t.Reason).HasColumnName("reason");
             entity.Property(t => t.DateCreated).HasColumnName("datecreated").HasDefaultValueSql("now()");
             entity.Property(t => t.SessionId).HasColumnName("sessionid");
+            entity.Property(t => t.StripeEventId).HasColumnName("stripeeventid");
             
             entity.HasOne(t => t.User)
                 .WithMany(u => u.UserTransactions)
