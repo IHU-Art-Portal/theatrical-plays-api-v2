@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.ShowsLocal;
+using Theatrical.Services;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
@@ -17,11 +18,13 @@ public class ShowsController : ControllerBase
 {
     private readonly IEventRepository _repo;
     private readonly IPaginationService _pagination;
+    private readonly IShowService _showService;
 
-    public ShowsController(IEventRepository repository, IPaginationService paginationService)
+    public ShowsController(IEventRepository repository, IPaginationService paginationService, IShowService showService)
     {
         _repo = repository;
         _pagination = paginationService;
+        _showService = showService;
     }
 
     [HttpGet]
@@ -39,56 +42,9 @@ public class ShowsController : ControllerBase
             }
             var shows = await _repo.GetShows();
 
-            if (venueAddress is not null)
-            {
-                shows = shows
-                    .Where(s => s.VenueResponseDto != null && s.VenueResponseDto.Address.Contains(venueAddress, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+            var filteredShows = _showService.ShowsFiltering(shows, venueAddress, venueId, eventDate, organizerName, productionTitle);
 
-            if (venueId is not null)
-            {
-                shows = shows
-                    .Where(s => s.VenueResponseDto != null && s.VenueResponseDto.Id == venueId)
-                    .ToList();
-            }
-
-            if (eventDate is not null)
-            {
-                if (DateTime.TryParseExact(eventDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
-                {
-                    shows = shows
-                        .Where(s => s.EventDate.HasValue && s.EventDate.Value.Date == parsedDate.Date)
-                        .ToList();
-                }
-            }
-
-            if (organizerName is not null)
-            {
-                shows = shows
-                    .Where(s => s.OrganizerShortenedDto.Name.Contains(organizerName, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            if (productionTitle is not null)
-            {
-                shows = shows
-                    .Where(s => s.Production.Title.Contains(productionTitle, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            var paginationResult = _pagination.GetPaginated(page, size, shows, items =>
-            {
-                return items.Select(show => new Show
-                {
-                    OrganizerShortenedDto = show.OrganizerShortenedDto,
-                    VenueResponseDto = show.VenueResponseDto,
-                    Production = show.Production,
-                    Event = show.Event,
-                    EventDate = show.EventDate
-                }).ToList();
-            });
-            
+            var paginationResult = _showService.PaginateShows(page, size, filteredShows);
             
             var apiResponse = new ApiResponse<PaginationResult<Show>>(paginationResult);
             return Ok(apiResponse);

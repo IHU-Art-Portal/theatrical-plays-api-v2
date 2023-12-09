@@ -156,6 +156,8 @@ builder.Services.AddTransient<IAssignedUserRepository, AssignedUserRepository>()
 //Stripe Config
 StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeSettings:SecretKey");
 
+builder.Services.AddTransient<IShowService, ShowService>();
+
 //cors
 builder.Services.AddCors(options =>
 {
