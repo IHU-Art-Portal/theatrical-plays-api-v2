@@ -7,7 +7,7 @@ public class Venue
     public string? Address { get; set; }
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
-
     public virtual System System { get; set; } = null!;
     public virtual List<Event> Events { get; set; }
+    public virtual List<UserVenue> UserVenues { get; set; }
 }

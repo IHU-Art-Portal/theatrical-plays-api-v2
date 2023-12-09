@@ -31,6 +31,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<AccountRequest> AccountRequests { get; set; } = null!;
     public virtual DbSet<AssignedUser> AssignedUsers { get; set; } = null!;
     public virtual DbSet<UserImage> UserImages { get; set; } = null!;
+    public virtual DbSet<UserVenue> UserVenues { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -547,5 +548,24 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasForeignKey(up => up.RequestId);
         });
 
+        modelBuilder.Entity<UserVenue>(entity =>
+        {
+            entity.HasKey(uv => uv.Id);
+            entity.Property(uv => uv.Id).ValueGeneratedOnAdd();
+            entity.Property(uv => uv.Id).HasColumnName("id");
+            entity.Property(uv => uv.DateCreated).HasColumnName("date_created").HasDefaultValueSql("now()");
+            entity.Property(uv => uv.UserId).HasColumnName("user_id");
+            entity.Property(uv => uv.VenueId).HasColumnName("venue_id");
+            
+            entity.HasOne(uv => uv.User)
+                .WithMany(user => user.UserVenue)
+                .HasForeignKey(uv => uv.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(uv => uv.Venue)
+                .WithMany(venue => venue.UserVenues)
+                .HasForeignKey(uv => uv.VenueId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }); 
     }
 }

@@ -21,4 +21,5 @@ public class User
     
     public virtual List<UserAuthority> UserAuthorities { get; set; }
     public virtual List<Transaction> UserTransactions { get; set; }
+    public virtual List<UserVenue> UserVenue { get; set; }
 }
