@@ -10,6 +10,8 @@ public interface ITransactionRepository
     Task<Transaction> PostTransaction(Transaction transaction);
     Task<List<Transaction>> GetTransactions(int userId);
     Task<Transaction?> GetTransaction(int transactionId);
+    Task<List<User>> GetUsersWithVerifiedEmailNotPaid();
+    Task PostTransactions(List<Transaction> transactions);
 }
 
 public class TransactionRepository : ITransactionRepository
@@ -51,5 +53,19 @@ public class TransactionRepository : ITransactionRepository
     {
         var transaction = await _context.Transactions.FindAsync(transactionId);
         return transaction;
+    }
+
+    public async Task<List<User>> GetUsersWithVerifiedEmailNotPaid()
+    {
+        return await _context.Users
+            .Where(u => u.Enabled == true)
+            .Where(u => u.UserTransactions.All(t => t.Reason != "Email Verification"))
+            .ToListAsync();
+    }
+
+    public async Task PostTransactions(List<Transaction> transactions)
+    {
+        await _context.Transactions.AddRangeAsync(transactions);
+        await _context.SaveChangesAsync();
     }
 }

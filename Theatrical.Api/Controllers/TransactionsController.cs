@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services;
+using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
 
 namespace Theatrical.Api.Controllers;
@@ -21,29 +22,6 @@ public class TransactionsController : ControllerBase
         _service = transactionService;
     }
 
-    /*/// <summary>
-    /// Endpoint to making a new transaction.
-    /// </summary>
-    /// <param name="transactionDto"></param>
-    /// <returns></returns>
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse>> PostTransaction([FromBody]TransactionDto transactionDto)
-    {
-        try
-        {
-            var transaction = await _service.PostTransaction(transactionDto);
-            
-            var response = new ApiResponse<Transaction>(transaction, "Transaction Successful!");
-            
-            return new OkObjectResult(response);
-        }
-        catch (Exception e)
-        {
-            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
-            return new ObjectResult(exceptionResponse) { StatusCode = 500 };
-        }
-    }*/
-
     /// <summary>
     /// Get a specific transaction
     /// </summary>
@@ -51,6 +29,7 @@ public class TransactionsController : ControllerBase
     /// <returns>TransactionDtoFetch</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(TransactionDtoFetch), StatusCodes.Status200OK)]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> GetTransaction([FromRoute] int id)
     {
         try
@@ -83,6 +62,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("user/{id}")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(TransactionDtoFetch), StatusCodes.Status200OK)]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> GetUserTransactions([FromRoute] int id)
     {
         try
@@ -104,6 +84,32 @@ public class TransactionsController : ControllerBase
         catch (Exception e)
         {
             var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException.Message);
+            return new ObjectResult(exceptionResponse) { StatusCode = 500 };
+        }
+    }
+    
+    [HttpGet("Pay-Verified-Emails-Not-Paid")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> PayVerifiedEmailsNotPaid()
+    {
+        try
+        {
+            var usersNotPaid = await _service.GetUsersWithVerifiedEmailNotPaid();
+
+            if (usersNotPaid.Any())
+            {
+                await _service.VerifiedEmailCredits(usersNotPaid);
+
+                var apiResponse = new ApiResponse("Verified users without an initial payment have been paid out.");
+
+                return new OkObjectResult(apiResponse);
+            }
+
+            return Ok(new ApiResponse("There are no unpaid users!"));
+        }
+        catch (Exception e)
+        {
+            var exceptionResponse = new ApiResponse(ErrorCode.ServerError, e.InnerException?.Message ?? e.Message);
             return new ObjectResult(exceptionResponse) { StatusCode = 500 };
         }
     }

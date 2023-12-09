@@ -12,6 +12,8 @@ public interface ITransactionService
     List<TransactionDtoFetch> TransactionListToDto(List<Transaction> transactions);
     Task<Transaction> PostTransaction(User user, long? amountTotalInEuros);
     Task VerifiedEmailCredits(User user);
+    Task VerifiedEmailCredits(List<User> usersNotPaid);
+    Task<List<User>> GetUsersWithVerifiedEmailNotPaid();
 }
 
 public class TransactionService : ITransactionService
@@ -47,7 +49,24 @@ public class TransactionService : ITransactionService
         
         await _repository.PostTransaction(transaction);
     }
-    
+
+    public async Task VerifiedEmailCredits(List<User> usersNotPaid)
+    {
+        var transactions = usersNotPaid.Select(u => new Transaction
+        {
+            UserId = u.Id,
+            CreditAmount = 1.01m,
+            Reason = "Email Verification",
+        }).ToList();
+
+        await _repository.PostTransactions(transactions);
+    }
+
+    public async Task<List<User>> GetUsersWithVerifiedEmailNotPaid()
+    {
+        return await _repository.GetUsersWithVerifiedEmailNotPaid();
+    }
+
     public TransactionDtoFetch TransactionToDto(Transaction transaction)
     {
 
