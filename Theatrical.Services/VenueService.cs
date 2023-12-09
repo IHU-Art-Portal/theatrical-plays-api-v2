@@ -73,8 +73,7 @@ public class VenueService : IVenueService
             {
                 Id = venue.Id,
                 Title = venue.Title,
-                Address = venue.Address,
-                SystemId = venue.SystemId
+                Address = venue.Address
             };
             venuesDtos.Add(venueDto);
         }
@@ -89,8 +88,7 @@ public class VenueService : IVenueService
         {
             Id = venue.Id,
             Title = venue.Title,
-            Address = venue.Address,
-            SystemId = venue.SystemId
+            Address = venue.Address
         };
         
         return venueDto;
@@ -104,7 +102,6 @@ public class VenueService : IVenueService
             {
                 Address = venue.Address,
                 Id = venue.Id,
-                SystemId = venue.SystemId,
                 Title = venue.Title
             });
         });
