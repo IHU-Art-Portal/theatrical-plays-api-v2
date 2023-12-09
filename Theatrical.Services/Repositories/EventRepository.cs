@@ -1,8 +1,13 @@
 ﻿using System.Globalization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
+using Theatrical.Dto.OrganizerDtos;
+using Theatrical.Dto.ProductionDtos;
+using Theatrical.Dto.ShowsLocal;
+using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
@@ -17,6 +22,7 @@ public interface IEventRepository
     Task<List<Event>> GetEventsForPerson(int personId);
     Task<List<Event>?> GetEventsForProduction(int productionId);
     Task<List<Event>> CreateEvents(List<Event> events);
+    Task<List<Show>> GetShows();
 }
 
 public class EventRepository : IEventRepository
@@ -65,6 +71,47 @@ public class EventRepository : IEventRepository
         await _context.Events.AddRangeAsync(events);
         await _context.SaveChangesAsync();
         return events;
+    }
+
+    public async Task<List<Show>> GetShows()
+    {
+        var shows = await _caching.GetOrSetAsyncWithSlidingWindow("All_Shows", async () =>
+        {
+            //This function returns all events, productions and venues. needs optimizing if caching is not used.
+            return await _context.Events
+                .Include(e => e.Production)
+                .Include(e => e.Venue)
+                .Select(e => new Show
+                {
+                    Production = new ProductionDto
+                    {
+                        Id = e.Production.Id,
+                        OrganizerId = e.Production.OrganizerId,
+                        Title = e.Production.Title,
+                        Description = e.Production.Description,
+                        Url = e.Production.Url,
+                        Producer = e.Production.Producer,
+                        MediaUrl = e.Production.MediaUrl,
+                        Duration = e.Production.Duration
+                    },
+                    VenueResponseDto = new VenueResponseDto
+                    {
+                        Id = e.Venue.Id,
+                        Address = e.Venue.Address,
+                        Title = e.Venue.Title
+                    },
+                    OrganizerShortenedDto = new OrganizerShortenedDto
+                    {
+                        Id = e.Production.Organizer!.Id,
+                        Email = e.Production.Organizer.Email,
+                        Name = e.Production.Organizer.Name,
+                        Phone = e.Production.Organizer.Phone
+                    },
+                    EventDate = e.DateEvent
+                }).ToListAsync();
+        });
+
+        return shows;
     }
 
     public async Task<List<Event>?> Get()
