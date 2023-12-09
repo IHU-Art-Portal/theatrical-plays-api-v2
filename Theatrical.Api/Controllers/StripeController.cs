@@ -72,23 +72,31 @@ public class StripeController : ControllerBase
                 var paymentStatus = session.PaymentStatus; // Check if the payment was successful
                 var customerEmail = session.CustomerDetails.Email; // Get customer email
 
-                var (userValidation, user) = await _userValidation.ValidateUser(customerEmail);
-
-                if (!userValidation.Success)
+                var amountTotalPaidInCents = session.AmountTotal;
+                var amountTotalInEuros = amountTotalPaidInCents / 100;
+                
+                if (paymentStatus.Equals("paid"))
                 {
-                    return new BadRequestObjectResult(new ApiResponse((ErrorCode)userValidation.ErrorCode!, userValidation.Message!));
+                    var (userValidation, user) = await _userValidation.ValidateUser(customerEmail);
+
+                    if (!userValidation.Success)
+                    {
+                        return new BadRequestObjectResult(new ApiResponse((ErrorCode)userValidation.ErrorCode!, userValidation.Message!));
+                    }
+
+                
+                    // Perform actions based on the successful payment
+                    await _transactionService.PostTransaction(user!, amountTotalInEuros);
+                    
+                    return new OkObjectResult(new ApiResponse("Credits have been added!"));
                 }
 
-                // Perform actions based on the successful payment
-                await _transactionService.PostTransaction(user!);
+                return Ok("Not Paid. Credits have not been added.");
             }
-            else
-            {
-                Console.WriteLine("Unhandled event type: {0}", stripeEvent.Type);
-            }
-
-
-            return Ok();
+            
+            Console.WriteLine("Unhandled event type: {0}", stripeEvent.Type);
+            
+            return new OkObjectResult(new ApiResponse($"Unhandled event type: {stripeEvent.Type}"));
         }
         catch (Exception e)
         {

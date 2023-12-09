@@ -10,7 +10,7 @@ public interface ITransactionService
     TransactionDtoFetch TransactionToDto(Transaction transaction);
     TransactionResponseDto TransactionToResponseDto(Transaction transcation);
     List<TransactionDtoFetch> TransactionListToDto(List<Transaction> transactions);
-    Task<Transaction> PostTransaction(User user);
+    Task<Transaction> PostTransaction(User user, long? amountTotalInEuros);
     Task VerifiedEmailCredits(User user);
 }
 
@@ -23,12 +23,12 @@ public class TransactionService : ITransactionService
         _repository = repository;
     }
     
-    public async Task<Transaction> PostTransaction(User user)
+    public async Task<Transaction> PostTransaction(User user, long? amountTotalInEuros)
     {
         var transaction = new Transaction
         {
             UserId = user.Id,
-            CreditAmount = 5.00m,
+            CreditAmount = Convert.ToDecimal(amountTotalInEuros),
             Reason = "Credit Purchase",
         };
         
