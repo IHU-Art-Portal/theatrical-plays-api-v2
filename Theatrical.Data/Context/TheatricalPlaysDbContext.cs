@@ -470,11 +470,13 @@ public class TheatricalPlaysDbContext : DbContext
             entity.ToTable("transactions");
             entity.Property(t => t.Id).HasColumnName("id");
             entity.Property(t => t.UserId).HasColumnName("userid");
-            entity.Property(t => t.CreditAmount).HasColumnName("creditamount");
+            entity.Property(t => t.CreditAmount).HasColumnName("creditAmount");
+            entity.Property(t => t.AmountPaid).HasColumnName("amountPaid");
+            entity.Property(t => t.DiscountAmount).HasColumnName("amountDiscount");
             entity.Property(t => t.Reason).HasColumnName("reason");
             entity.Property(t => t.DateCreated).HasColumnName("datecreated").HasDefaultValueSql("now()");
-            entity.Property(t => t.SessionId).HasColumnName("sessionid");
-            entity.Property(t => t.StripeEventId).HasColumnName("stripeeventid");
+            entity.Property(t => t.SessionId).HasColumnName("sessionId");
+            entity.Property(t => t.StripeEventId).HasColumnName("stripeEventId");
             
             entity.HasOne(t => t.User)
                 .WithMany(u => u.UserTransactions)

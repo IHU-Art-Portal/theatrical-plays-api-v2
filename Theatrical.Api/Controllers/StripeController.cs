@@ -44,6 +44,7 @@ public class StripeController : ControllerBase
                     },
                 },
             },
+            AllowPromotionCodes = true,
             Mode = "payment",
             SuccessUrl = domain + "/Success",
             CancelUrl = domain + "/Cancel",
@@ -81,8 +82,13 @@ public class StripeController : ControllerBase
                 var sessionId = session.Id;
                 var stripeEventId = stripeEvent.Id;
                 
-                var amountTotalPaidInCents = session.AmountTotal;
-                var amountTotalInEuros = amountTotalPaidInCents / 100;
+                var amountSubTotalInCents = session.AmountSubtotal;
+                var amountSubTotalInEuros = amountSubTotalInCents / 100;
+                
+                var amountTotalInCents = session.AmountTotal;
+                var amountTotalInEuros = amountTotalInCents / 100;
+                
+                var discountAmount = session.TotalDetails.AmountDiscount / 100;
                 
                 if (paymentStatus.Equals("paid"))
                 {
@@ -95,7 +101,7 @@ public class StripeController : ControllerBase
 
                 
                     // Perform actions based on the successful payment
-                    await _transactionService.PostTransaction(user!, amountTotalInEuros, sessionId, stripeEventId);
+                    await _transactionService.PostTransaction(user!, amountSubTotalInEuros, amountTotalInEuros, discountAmount, sessionId, stripeEventId);
                     
                     return new OkObjectResult(new ApiResponse("Credits have been added!"));
                 }
