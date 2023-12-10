@@ -23,7 +23,7 @@ public interface IUserService
     Task ActivateTwoFactorAuthentication(User user);
     Task DeactivateTwoFactorAuthentication(User user);
     ClaimsPrincipal? VerifyToken(string token);
-    Task<UserDto> ToDto(User user);
+    Task<UserDto> ConstructUserInfo(User user);
     Task UpdateFacebook(User user, string link);
     Task UpdateInstagram(User user, string link);
     Task UpdateYoutube(User user, string link);
@@ -181,43 +181,18 @@ public class UserService : IUserService
         return _tokenService.VerifyToken(token);
     }
 
-    public async Task<UserDto> ToDto(User user)
+    public async Task<UserDto> ConstructUserInfo(User user)
     {
 
         var userIntRole = user.UserAuthorities.FirstOrDefault()?.AuthorityId;
         var userImages = await _repository.GetUserImages(user.Id);
-        var userImagesDto = new List<UserImageDto>();
-        var userProfilePhoto = await _repository.GetFirstProfileImage(user.Id);
-        var userProfilePictureResponseDto = new UserProfilePictureResponseDto();
+        var userImagesDto = CreateUserImagesDto(userImages);
+        var userProfilePhoto = GetUserProfilePhotoFromImagesList(userImages);
+        var userProfilePictureResponseDto = CreateUserProfilePhotoDto(userProfilePhoto);
         var claimedPerson = await GetClaimedPersonForUser(user);
         var claimedVenues = await GetClaimedVenuesForUser(user);
 
-        if (userProfilePhoto is not null)
-        {
-            userProfilePictureResponseDto.Id = userProfilePhoto.Id;
-            userProfilePictureResponseDto.ImageLocation = userProfilePhoto.ImageLocation;
-            userProfilePictureResponseDto.Label = userProfilePhoto.Label;
-        }
-        else
-        {
-            userProfilePictureResponseDto = null;
-        }
-
-        if (userImages is not null)
-        {
-            foreach (var userImage in userImages)
-            {
-                var userImageDto = new UserImageDto
-                {
-                    Id = userImage.Id,
-                    ImageLocation = userImage.ImageLocation,
-                    Label = userImage.Label
-                };
-                userImagesDto.Add(userImageDto);
-            }
-        }
-
-        string userRole = userIntRole switch
+        var userRole = userIntRole switch
         {
             1 => "admin",
             2 => "user",
@@ -254,6 +229,50 @@ public class UserService : IUserService
         };
 
         return userDto;
+    }
+
+    private UserImage? GetUserProfilePhotoFromImagesList(List<UserImage>? userImages)
+    {
+        if (userImages is null) return null;
+
+        return userImages.FirstOrDefault(ui => ui.IsProfile == true);
+    }
+
+    private List<UserImageDto> CreateUserImagesDto(List<UserImage>? userImages)
+    {
+        var userImagesDto = new List<UserImageDto>();
+        
+        if (userImages is not null)
+        {
+            foreach (var userImage in userImages)
+            {
+                var userImageDto = new UserImageDto
+                {
+                    Id = userImage.Id,
+                    ImageLocation = userImage.ImageLocation,
+                    Label = userImage.Label
+                };
+                userImagesDto.Add(userImageDto);
+            }
+        }
+
+        return userImagesDto;
+    }
+
+    private UserProfilePictureResponseDto? CreateUserProfilePhotoDto(UserImage? userProfilePhoto)
+    {
+        var userProfilePictureResponseDto = new UserProfilePictureResponseDto();
+        
+        if (userProfilePhoto is not null)
+        {
+            userProfilePictureResponseDto.Id = userProfilePhoto.Id;
+            userProfilePictureResponseDto.ImageLocation = userProfilePhoto.ImageLocation;
+            userProfilePictureResponseDto.Label = userProfilePhoto.Label;
+            return userProfilePictureResponseDto;
+        }
+        
+        userProfilePictureResponseDto = null;
+        return userProfilePictureResponseDto;
     }
 
     public async Task UpdateFacebook(User user, string link)

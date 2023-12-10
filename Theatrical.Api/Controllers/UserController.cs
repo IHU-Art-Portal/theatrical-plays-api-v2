@@ -380,7 +380,7 @@ public class UserController : ControllerBase
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
             
-            var userDto = await _service.ToDto(user!);
+            var userDto = await _service.ConstructUserInfo(user!);
 
             var response = new ApiResponse<UserDto>(userDto);
 
