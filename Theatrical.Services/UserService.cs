@@ -3,9 +3,11 @@ using Theatrical.Data.Models;
 using Theatrical.Services.Repositories;
 using OtpNet;
 using Theatrical.Data.enums;
+using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Dto.UsersDtos;
 using Theatrical.Dto.UsersDtos.ResponseDto;
+using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Security.Jwt;
 
 namespace Theatrical.Services;
@@ -43,11 +45,15 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
     private readonly ITokenService _tokenService;
+    private readonly IAssignedUserRepository _assignedUserRepo;
+    private readonly IUserVenueRepository _userVenueRepo;
 
-    public UserService(IUserRepository repository, ITokenService tokenService)
+    public UserService(IUserRepository repository, ITokenService tokenService, IAssignedUserRepository assignedUserRepository, IUserVenueRepository userVenueRepository)
     {
         _repository = repository;
         _tokenService = tokenService;
+        _assignedUserRepo = assignedUserRepository;
+        _userVenueRepo = userVenueRepository;
     }
 
     /// <summary>
@@ -183,6 +189,8 @@ public class UserService : IUserService
         var userImagesDto = new List<UserImageDto>();
         var userProfilePhoto = await _repository.GetFirstProfileImage(user.Id);
         var userProfilePictureResponseDto = new UserProfilePictureResponseDto();
+        var claimedPerson = await GetClaimedPersonForUser(user);
+        var claimedVenues = await GetClaimedVenuesForUser(user);
 
         if (userProfilePhoto is not null)
         {
@@ -240,7 +248,9 @@ public class UserService : IUserService
             UserImages = userImagesDto,
             ProfilePhoto = userProfilePictureResponseDto,
             PerformerRoles = user.PerformerRoles,
-            BioPdfLocation = user.BioPdfLocation
+            BioPdfLocation = user.BioPdfLocation,
+            ClaimedPerson = claimedPerson,
+            ClaimedVenues = claimedVenues
         };
 
         return userDto;
@@ -362,6 +372,47 @@ public class UserService : IUserService
     public async Task UnsetBio(User user)
     {
         await _repository.UnsetBio(user);
+    }
+
+    private async Task<PersonDto?> GetClaimedPersonForUser(User user)
+    {
+        var claimedPerson = await _assignedUserRepo.GetClaimedPersonForUser(user.Id);
+        
+        if (claimedPerson is null) return null;
+        
+        var personDto = new PersonDto
+        {
+            Id = claimedPerson.Id,
+            Fullname = claimedPerson.Fullname,
+            Birthdate = claimedPerson.Birthdate?.ToString("dd-MM-yyyy"),
+            Bio = claimedPerson.Bio,
+            Description = claimedPerson.Description,
+            Languages = claimedPerson.Languages,
+            Weight = claimedPerson.Weight,
+            Height = claimedPerson.Height,
+            EyeColor = claimedPerson.EyeColor,
+            HairColor = claimedPerson.HairColor,
+            Roles = claimedPerson.Roles,
+            Images = claimedPerson.Images,
+            IsClaimed = claimedPerson.IsClaimed
+        };
+        
+        return personDto;
+    }
+    
+    private async Task<List<VenueDto>?> GetClaimedVenuesForUser(User user)
+    {
+        var claimedVenuesForUser = await _userVenueRepo.GetClaimedVenuesForUser(user.Id);
+
+        var venueDtos = claimedVenuesForUser?.Select(v => new VenueDto
+        {
+            Id = v.Id,
+            Address = v.Address,
+            Title = v.Title,
+            IsClaimed = v.isClaimed
+        }).ToList();
+        
+        return venueDtos;
     }
 }
 

@@ -1,4 +1,6 @@
-﻿using Theatrical.Dto.TransactionDtos;
+﻿using Theatrical.Dto.PersonDtos;
+using Theatrical.Dto.TransactionDtos;
+using Theatrical.Dto.VenueDtos;
 
 namespace Theatrical.Dto.UsersDtos.ResponseDto;
 
@@ -19,4 +21,6 @@ public class UserDto
     public List<UserImageDto>? UserImages { get; set; }
     public UserProfilePictureResponseDto? ProfilePhoto { get; set; }
     public string? BioPdfLocation { get; set; }
+    public PersonDto? ClaimedPerson { get; set; }
+    public List<VenueDto>? ClaimedVenues { get; set; }
 }

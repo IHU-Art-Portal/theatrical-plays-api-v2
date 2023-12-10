@@ -6,7 +6,6 @@ public class PersonDto
 {
     public int Id { get; set; }
     public string Fullname { get; set; }
-    public int? SystemID { get; set; }
     public string? Birthdate { get; set; }
     public string? Bio { get; set; }
     public string? Description { get; set; }

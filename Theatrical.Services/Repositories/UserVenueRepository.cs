@@ -9,6 +9,7 @@ public interface IUserVenueRepository
     Task<User?> GetUserWithVenues(string email);
     Task Create(UserVenue userVenue);
     Task Claim(Venue venue);
+    Task<List<Venue>?> GetClaimedVenuesForUser(int userId);
 }
 
 public class UserVenueRepository : IUserVenueRepository
@@ -39,5 +40,18 @@ public class UserVenueRepository : IUserVenueRepository
     {
         venue.isClaimed = true;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Venue>?> GetClaimedVenuesForUser(int userId)
+    {
+        var userVenues = await _context.UserVenues.Where(uv => uv.UserId == userId).ToListAsync();
+
+        var venueIds = userVenues.Select(uv => uv.VenueId).ToList();
+
+        var claimedVenues = await _context.Venues
+            .Where(v => venueIds.Contains(v.Id))
+            .ToListAsync();
+
+        return claimedVenues;
     }
 }

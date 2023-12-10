@@ -379,7 +379,7 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
-
+            
             var userDto = await _service.ToDto(user!);
 
             var response = new ApiResponse<UserDto>(userDto);
