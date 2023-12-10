@@ -42,11 +42,12 @@ public class VenuesController : ControllerBase
     /// <param name="alphabeticalOrder"></param>
     /// <param name="addressSearch"></param>
     /// <param name="venueTitle"></param>
+    /// <param name="availableForClaim"></param>
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<VenueDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> GetVenues(int? page, int? size, bool? alphabeticalOrder, string? addressSearch,
-         string? venueTitle)
+         string? venueTitle, bool? availableForClaim)
     {
         try
         {
@@ -60,24 +61,7 @@ public class VenuesController : ControllerBase
 
             var venuesDto = _service.ToDto(venues!);
 
-            if (addressSearch is not null)
-            {
-                venuesDto = venuesDto
-                    .Where(v => v.Address != null && v.Address.Contains(addressSearch.Trim(), StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-            
-            if (venueTitle is not null)
-            {
-                venuesDto = venuesDto
-                    .Where(v => v.Title != null && v.Title.Contains(venueTitle.Trim(), StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-            
-            if (alphabeticalOrder == true)
-            {
-                venuesDto.Sort((v1, v2) => string.Compare(v1.Title, v2.Title, StringComparison.OrdinalIgnoreCase));
-            }
+            venuesDto = _service.Filtering(venuesDto, alphabeticalOrder, addressSearch, venueTitle, availableForClaim);
 
             var paginationResult = _service.Paginate(page, size, venuesDto);
 

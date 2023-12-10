@@ -20,6 +20,8 @@ public interface IVenueService
 
     Task<(List<Venue> VenuesToUpdate, List<Venue> VenuesToCreate, List<VenueDto> responseList)> CreateUpdateList(
         List<Venue> existingVenues, List<VenueCreateDto> venueCreateDto);
+
+    List<VenueDto> Filtering(List<VenueDto> venuesDto, bool? alphabeticalOrder, string? addressSearch, string? venueTitle, bool? availableForClaim);
 }
 
 public class VenueService : IVenueService
@@ -73,7 +75,8 @@ public class VenueService : IVenueService
             {
                 Id = venue.Id,
                 Title = venue.Title,
-                Address = venue.Address
+                Address = venue.Address,
+                IsClaimed = venue.isClaimed
             };
             venuesDtos.Add(venueDto);
         }
@@ -88,7 +91,8 @@ public class VenueService : IVenueService
         {
             Id = venue.Id,
             Title = venue.Title,
-            Address = venue.Address
+            Address = venue.Address,
+            IsClaimed = venue.isClaimed
         };
         
         return venueDto;
@@ -102,7 +106,8 @@ public class VenueService : IVenueService
             {
                 Address = venue.Address,
                 Id = venue.Id,
-                Title = venue.Title
+                Title = venue.Title,
+                IsClaimed = venue.IsClaimed
             });
         });
         
@@ -176,5 +181,39 @@ public class VenueService : IVenueService
         }
 
         return (venuesToUpdate, venuesToCreate, responseList);
+    }
+
+    public List<VenueDto> Filtering(List<VenueDto> venuesDto, bool? alphabeticalOrder, string? addressSearch, string? venueTitle,
+        bool? availableForClaim)
+    {
+        if (addressSearch is not null)
+        {
+            venuesDto = venuesDto
+                .Where(v => v.Address != null && v.Address.Contains(addressSearch.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+            
+        if (venueTitle is not null)
+        {
+            venuesDto = venuesDto
+                .Where(v => v.Title != null && v.Title.Contains(venueTitle.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+            
+        if (alphabeticalOrder == true)
+        {
+            venuesDto = venuesDto
+                .OrderBy(v => v.Title, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        if (availableForClaim == true)
+        {
+            venuesDto = venuesDto
+                .Where(v => v.IsClaimed == true)
+                .ToList();
+        }
+
+        return venuesDto;
     }
 }
