@@ -13,15 +13,18 @@ public interface IVenueValidationService
     Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
     Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId);
     Task<(ValidationReport, Venue? venue)> ValidateAndFetch(string venueTitle);
+    Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenues(string email, int id);
 }
 
 public class VenueValidationService :  IVenueValidationService
 {
     private readonly IVenueRepository _repository;
+    private readonly IUserVenueRepository _uvRepository;
 
-    public VenueValidationService(IVenueRepository repository)
+    public VenueValidationService(IVenueRepository repository, IUserVenueRepository userVenueRepository)
     {
         _repository = repository;
+        _uvRepository = userVenueRepository;
     }
 
     public async Task<(ValidationReport report, List<Venue>? venue)> ValidateAndFetch()
@@ -128,5 +131,48 @@ public class VenueValidationService :  IVenueValidationService
         {
             Success = true
         }, null);
+    }
+
+    public async Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenues(string email, int id)
+    {
+        var user = await _uvRepository.GetUserWithVenues(email);
+        var report = new ValidationReport();
+        var venue = await _repository.Get(id);
+
+        if (venue is null)
+        {
+            report.Success = false;
+            report.Message = "Venue not found.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null, null);
+        }
+
+        if (user is null)
+        {
+            report.Success = false;
+            report.Message = "User not found.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null, null);
+        }
+
+        if (user.UserVenues.Any(uv => uv.VenueId == id))
+        {
+            report.Success = false;
+            report.Message = "User has already claimed this venue.";
+            report.ErrorCode = ErrorCode.UserAlreadyClaimedVenue;
+            return (report, null, null);
+        }
+
+        if (venue.isClaimed)
+        {
+            report.Success = false;
+            report.Message = "This venue is already claimed by someone else.";
+            report.ErrorCode = ErrorCode.UserAlreadyClaimedVenue;
+            return (report, null, null);
+        }
+
+        report.Success = true;
+        report.Message = "User can claim this venue";
+        return (report, user, venue);
     }
 }

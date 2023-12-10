@@ -158,6 +158,9 @@ StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeSetti
 
 builder.Services.AddTransient<IShowService, ShowService>();
 
+builder.Services.AddTransient<IUserVenueRepository, UserVenueRepository>();
+builder.Services.AddTransient<IUserVenueService, UserVenueService>();
+
 //cors
 builder.Services.AddCors(options =>
 {

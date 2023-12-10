@@ -21,7 +21,8 @@ public enum ErrorCode
     AlreadyLoggedIn,
     NoAvailablePhotos,
     InvalidCharacters,
-    RoleNotFound
+    RoleNotFound,
+    UserAlreadyClaimedVenue
 }
 
 public class ApiResponse

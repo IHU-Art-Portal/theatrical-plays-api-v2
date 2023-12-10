@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System.Net;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
@@ -19,12 +21,15 @@ public class VenuesController : ControllerBase
     private readonly IVenueService _service;
     private readonly IVenueValidationService _validation;
     private readonly IProductionService _productionService;
+    private readonly IUserVenueService _userVenueService;
 
-    public VenuesController(IVenueService service, IVenueValidationService validation, IProductionService productionService)
+    public VenuesController(IVenueService service, IVenueValidationService validation, IProductionService productionService,
+        IUserVenueService userVenueService)
     {
         _service = service;
         _validation = validation;
         _productionService = productionService;
+        _userVenueService = userVenueService;
     }
 
     /// <summary>
@@ -219,7 +224,43 @@ public class VenuesController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
-    
+
+    [HttpPost]
+    [Route("claim-venue/{id}")]
+    [TypeFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<ActionResult<ApiResponse>> ClaimVenue([FromRoute] int id)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            var (validation, user, venue) = await _validation.ValidateUserWithVenues(email!, id);
+            //fail case
+            if (!validation.Success)
+            {
+                if (validation.ErrorCode == ErrorCode.NotFound)
+                {
+                    var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                    return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+                }
+
+                var errorResponse1 = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse1){StatusCode = (int)HttpStatusCode.BadRequest};
+            }
+            
+            //success case
+            await _userVenueService.CreateUserVenue(user!, venue!);
+
+            return Ok(new ApiResponse("You have successfully claimed this place!"));
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
+
     /*/// <summary>
     /// Endpoint to deleting a venue.
     /// </summary>

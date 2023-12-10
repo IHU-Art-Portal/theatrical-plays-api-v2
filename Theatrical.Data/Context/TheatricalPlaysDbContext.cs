@@ -464,6 +464,8 @@ public class TheatricalPlaysDbContext : DbContext
                 .HasForeignKey(d => d.SystemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("venue_ibfk_1");
+
+            entity.Property(v => v.isClaimed).HasColumnName("claimed").HasDefaultValue(false);
         });
 
         modelBuilder.Entity<Transaction>(entity =>
@@ -550,6 +552,8 @@ public class TheatricalPlaysDbContext : DbContext
 
         modelBuilder.Entity<UserVenue>(entity =>
         {
+            entity.ToTable("user_venues");
+            
             entity.HasKey(uv => uv.Id);
             entity.Property(uv => uv.Id).ValueGeneratedOnAdd();
             entity.Property(uv => uv.Id).HasColumnName("id");
@@ -558,7 +562,7 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(uv => uv.VenueId).HasColumnName("venue_id");
             
             entity.HasOne(uv => uv.User)
-                .WithMany(user => user.UserVenue)
+                .WithMany(user => user.UserVenues)
                 .HasForeignKey(uv => uv.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
