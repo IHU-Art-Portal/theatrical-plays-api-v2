@@ -12,6 +12,7 @@ public interface IEventValidationService
     Task<(ValidationReport, Event?)> ValidateForFetch(int eventId);
     Task<(ValidationReport validation, List<Event>? events)> FetchEventsForPerson(int id);
     Task<(ValidationReport validation, List<Event>? events)> FetchEventsForProduction(int id);
+    Task<(ValidationReport validation, User? user, Event? @event)> ValidateUserWithEventsForClaim(string email, int id);
 }
 
 public class EventValidationService : IEventValidationService
@@ -19,12 +20,15 @@ public class EventValidationService : IEventValidationService
     private readonly IEventRepository _repository;
     private readonly IProductionRepository _productionRepo;
     private readonly IVenueRepository _venueRepo;
+    private readonly IUserEventRepository _userEventRepo;
 
-    public EventValidationService(IEventRepository repository, IProductionRepository productionRepository, IVenueRepository venueRepository)
+    public EventValidationService(IEventRepository repository, IProductionRepository productionRepository, 
+        IVenueRepository venueRepository, IUserEventRepository userEventRepository)
     {
         _repository = repository;
         _productionRepo = productionRepository;
         _venueRepo = venueRepository;
+        _userEventRepo = userEventRepository;
     }
 
     public async Task<ValidationReport> ValidateForCreate(CreateEventDto createEventDto)
@@ -130,6 +134,50 @@ public class EventValidationService : IEventValidationService
         report.Message = "Found events";
         
         return (report, events);
+    }
+
+    public async Task<(ValidationReport validation, User? user, Event? @event)> ValidateUserWithEventsForClaim(string email, int id)
+    {
+        var userWithEvents = await _userEventRepo.GetUserWithEvents(email);
+        var report = new ValidationReport();
+        var @event = await _repository.GetEvent(id);
+
+        if (@event is null)
+        {
+            report.Success = false;
+            report.Message = "Event not found.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null, null);
+        }
+        
+        if (userWithEvents is null)
+        {
+            report.Success = false;
+            report.Message = "User not found.";
+            report.ErrorCode = ErrorCode.NotFound;
+            return (report, null, null);
+        }
+
+        if (userWithEvents.UserEvents.Any(ue => ue.EventId == id))
+        {
+            report.Success = false;
+            report.Message = "User has already claimed this event.";
+            report.ErrorCode = ErrorCode.UserAlreadyClaimedEvent;
+            return (report, null, null);
+        }
+
+        if (@event.IsClaimed)
+        {
+            report.Success = false;
+            report.Message = "This event is already claimed by someone else.";
+            report.ErrorCode = ErrorCode.UserAlreadyClaimedVenue;
+            return (report, null, null);
+        }
+        
+        report.Success = true;
+        report.Message = "User can claim this venue";
+        return (report, userWithEvents, @event);
+        
     }
 }
 

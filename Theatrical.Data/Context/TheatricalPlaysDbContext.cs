@@ -32,6 +32,7 @@ public class TheatricalPlaysDbContext : DbContext
     public virtual DbSet<AssignedUser> AssignedUsers { get; set; } = null!;
     public virtual DbSet<UserImage> UserImages { get; set; } = null!;
     public virtual DbSet<UserVenue> UserVenues { get; set; } = null!;
+    public virtual DbSet<UserEvent> UserEvents { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -132,6 +133,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(e => e.ProductionId).HasColumnName("ProductionID");
 
             entity.Property(e => e.SystemId).HasColumnName("SystemID");
+
+            entity.Property(e => e.IsClaimed).HasColumnName("claimed").HasDefaultValue(false);
 
             entity.Property(e => e.Timestamp)
                 .HasColumnType("timestamp")
@@ -570,6 +573,27 @@ public class TheatricalPlaysDbContext : DbContext
                 .WithMany(venue => venue.UserVenues)
                 .HasForeignKey(uv => uv.VenueId)
                 .OnDelete(DeleteBehavior.Cascade);
-        }); 
+        });
+
+        modelBuilder.Entity<UserEvent>(e =>
+        {
+            e.ToTable("user_events");
+            e.HasKey(ue => ue.Id);
+            e.Property(ue => ue.Id).ValueGeneratedOnAdd();
+            e.Property(ue => ue.Id).HasColumnName("id");
+            e.Property(ue => ue.DateCreated).HasColumnName("date_created").HasDefaultValueSql("now()");
+            e.Property(ue => ue.UserId).HasColumnName("user_id");
+            e.Property(ue => ue.EventId).HasColumnName("event_id");
+
+            e.HasOne(ue => ue.User)
+                .WithMany(u => u.UserEvents)
+                .HasForeignKey(ue => ue.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(ue => ue.Event)
+                .WithMany(ev => ev.UserEvents)
+                .HasForeignKey(ue => ue.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

@@ -22,7 +22,8 @@ public enum ErrorCode
     NoAvailablePhotos,
     InvalidCharacters,
     RoleNotFound,
-    UserAlreadyClaimedVenue
+    UserAlreadyClaimedVenue,
+    UserAlreadyClaimedEvent
 }
 
 public class ApiResponse

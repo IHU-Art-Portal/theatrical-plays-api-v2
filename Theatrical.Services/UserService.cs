@@ -3,6 +3,7 @@ using Theatrical.Data.Models;
 using Theatrical.Services.Repositories;
 using OtpNet;
 using Theatrical.Data.enums;
+using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Dto.UsersDtos;
@@ -47,13 +48,16 @@ public class UserService : IUserService
     private readonly ITokenService _tokenService;
     private readonly IAssignedUserRepository _assignedUserRepo;
     private readonly IUserVenueRepository _userVenueRepo;
+    private readonly IUserEventRepository _userEventRepo;
 
-    public UserService(IUserRepository repository, ITokenService tokenService, IAssignedUserRepository assignedUserRepository, IUserVenueRepository userVenueRepository)
+    public UserService(IUserRepository repository, ITokenService tokenService, IAssignedUserRepository assignedUserRepository, 
+        IUserVenueRepository userVenueRepository, IUserEventRepository userEventRepository)
     {
         _repository = repository;
         _tokenService = tokenService;
         _assignedUserRepo = assignedUserRepository;
         _userVenueRepo = userVenueRepository;
+        _userEventRepo = userEventRepository;
     }
 
     /// <summary>
@@ -191,6 +195,7 @@ public class UserService : IUserService
         var userProfilePictureResponseDto = CreateUserProfilePhotoDto(userProfilePhoto);
         var claimedPerson = await GetClaimedPersonForUser(user);
         var claimedVenues = await GetClaimedVenuesForUser(user);
+        var claimedEvents = await GetClaimedEventsForUser(user);
 
         var userRole = userIntRole switch
         {
@@ -225,10 +230,28 @@ public class UserService : IUserService
             PerformerRoles = user.PerformerRoles,
             BioPdfLocation = user.BioPdfLocation,
             ClaimedPerson = claimedPerson,
-            ClaimedVenues = claimedVenues
+            ClaimedVenues = claimedVenues,
+            ClaimedEvents = claimedEvents
         };
 
         return userDto;
+    }
+
+    private async Task<List<EventDto>?> GetClaimedEventsForUser(User user)
+    {
+        var events = await _userEventRepo.GetClaimedEventsByUser(user.Id);
+        
+        var eventsDtos = events?.Select(e => new EventDto
+        {
+            Id = e.Id,
+            VenueId = e.VenueId,
+            ProductionId = e.ProductionId,
+            PriceRange = e.PriceRange,
+            DateEvent = e.DateEvent
+        })
+        .ToList();
+        
+        return eventsDtos;
     }
 
     private UserImage? GetUserProfilePhotoFromImagesList(List<UserImage>? userImages)

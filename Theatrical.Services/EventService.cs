@@ -33,10 +33,12 @@ public class EventService : IEventService
     {
         return events.Select(event1 => new EventDto
         {
+            Id = event1.Id,
             PriceRange = event1.PriceRange,
             DateEvent = event1.DateEvent,
             ProductionId = event1.ProductionId,
-            VenueId = event1.VenueId
+            VenueId = event1.VenueId,
+            IsClaimed = event1.IsClaimed
         }).ToList();
     }
 
@@ -44,10 +46,12 @@ public class EventService : IEventService
     {
         return new EventDto
         {
+            Id = newEvent.Id,
             PriceRange = newEvent.PriceRange,
             DateEvent = newEvent.DateEvent,
             ProductionId = newEvent.ProductionId,
-            VenueId = newEvent.VenueId
+            VenueId = newEvent.VenueId,
+            IsClaimed = newEvent.IsClaimed
         };
     }
 
@@ -88,10 +92,12 @@ public class EventService : IEventService
         {
             return items.Select(ev => new EventDto
             {
+                Id = ev.Id,
                 ProductionId = ev.ProductionId,
                 DateEvent = ev.DateEvent,
                 PriceRange = ev.PriceRange,
-                VenueId = ev.VenueId
+                VenueId = ev.VenueId,
+                IsClaimed = ev.IsClaimed
             });
         });
 

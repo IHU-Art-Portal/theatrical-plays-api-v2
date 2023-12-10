@@ -218,7 +218,7 @@ public class VenuesController : ControllerBase
         {
             var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            var (validation, user, venue) = await _validation.ValidateUserWithVenues(email!, id);
+            var (validation, user, venue) = await _validation.ValidateUserWithVenuesForClaim(email!, id);
             //fail case
             if (!validation.Success)
             {

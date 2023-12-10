@@ -13,7 +13,7 @@ public interface IVenueValidationService
     Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
     Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId);
     Task<(ValidationReport, Venue? venue)> ValidateAndFetch(string venueTitle);
-    Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenues(string email, int id);
+    Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenuesForClaim(string email, int id);
 }
 
 public class VenueValidationService :  IVenueValidationService
@@ -133,7 +133,7 @@ public class VenueValidationService :  IVenueValidationService
         }, null);
     }
 
-    public async Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenues(string email, int id)
+    public async Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenuesForClaim(string email, int id)
     {
         var user = await _uvRepository.GetUserWithVenues(email);
         var report = new ValidationReport();

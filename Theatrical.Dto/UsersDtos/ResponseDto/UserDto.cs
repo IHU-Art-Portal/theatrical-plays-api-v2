@@ -1,4 +1,5 @@
-﻿using Theatrical.Dto.PersonDtos;
+﻿using Theatrical.Dto.EventDtos;
+using Theatrical.Dto.PersonDtos;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Dto.VenueDtos;
 
@@ -23,4 +24,5 @@ public class UserDto
     public string? BioPdfLocation { get; set; }
     public PersonDto? ClaimedPerson { get; set; }
     public List<VenueDto>? ClaimedVenues { get; set; }
+    public List<EventDto>? ClaimedEvents { get; set; }
 }
