@@ -8,6 +8,6 @@ public class UserVenue
     public DateTime DateCreated { get; set; }
 
     // Navigation properties
-    public User User { get; set; }
-    public Venue Venue { get; set; }
+    public virtual User User { get; set; }
+    public virtual Venue Venue { get; set; }
 }
