@@ -11,8 +11,6 @@ using Theatrical.Services.Email;
 using Theatrical.Services.PhoneVerification.Twilio;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
-using Twilio;
-using Twilio.Rest.Verify.V2.Service;
 
 namespace Theatrical.Api.Controllers;
 
@@ -157,7 +155,7 @@ public class UserController : ControllerBase
         }
     }
     
-    [HttpPost("send-verification-phone-number")]
+    [HttpPost("request-verification-phone-number")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<IActionResult> SendVerificationCode(string phoneNumber)
     {
@@ -179,6 +177,16 @@ public class UserController : ControllerBase
                 return new OkObjectResult(verifiedResponse);
             }
             
+            var userBalance = user.UserTransactions.Sum(t => t.CreditAmount);
+
+            const decimal cost = 0.20M;
+            if (userBalance - cost < 0)
+            {
+                var insufficientBalanceError = new ApiResponse(ErrorCode.InsufficientBalance, "Not enough balance to verify. Cost: 0.20€");
+                return new BadRequestObjectResult(insufficientBalanceError);
+            }
+            
+            //Use twilio to send verification code to user's phone number
             var result = await _twilio.SendVerificationCode(phoneNumber);
 
             if (!result.Success)
@@ -186,6 +194,9 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)result.ErrorCode!, result.Message!);
                 return new BadRequestObjectResult(errorResponse);
             }
+            
+            //charge user.
+            await _transactions.VerificationPhoneNumberCost(user, cost);
 
             var response = new ApiResponse($"Sent your verification to your number. State: {result.Message!}");
 

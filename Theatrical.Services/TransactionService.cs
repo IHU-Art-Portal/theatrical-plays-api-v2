@@ -10,10 +10,14 @@ public interface ITransactionService
     TransactionDtoFetch TransactionToDto(Transaction transaction);
     TransactionResponseDto TransactionToResponseDto(Transaction transcation);
     List<TransactionDtoFetch> TransactionListToDto(List<Transaction> transactions);
-    Task<Transaction> PostTransaction(User user, long? subTotal, long? total, long? discount, string sessionId, string stripeEventId);
+
+    Task<Transaction> PostTransaction(User user, long? subTotal, long? total, long? discount, string sessionId,
+        string stripeEventId);
+
     Task VerifiedEmailCredits(User user);
     Task VerifiedEmailCredits(List<User> usersNotPaid);
     Task<List<User>> GetUsersWithVerifiedEmailNotPaid();
+    Task<Transaction> VerificationPhoneNumberCost(User user, decimal cost);
 }
 
 public class TransactionService : ITransactionService
@@ -37,6 +41,23 @@ public class TransactionService : ITransactionService
             Reason = "Credit Purchase",
             SessionId = sessionId,
             StripeEventId = stripeEventId,
+        };
+        
+        var newTransaction = await _repository.PostTransaction(transaction);
+        return newTransaction;
+    }
+    
+    public async Task<Transaction> VerificationPhoneNumberCost(User user, decimal cost)
+    {
+        var transaction = new Transaction
+        {
+            UserId = user.Id,
+            CreditAmount = cost * -1,
+            AmountPaid = cost,
+            DiscountAmount = 0,
+            Reason = "Verified Phone Number",
+            SessionId = "Phone Verification",
+            StripeEventId = null,
         };
         
         var newTransaction = await _repository.PostTransaction(transaction);
@@ -113,4 +134,3 @@ public class TransactionService : ITransactionService
         return transactionDtoFetches;
     }
 }
-

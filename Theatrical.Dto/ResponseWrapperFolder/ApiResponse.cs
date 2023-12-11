@@ -24,7 +24,8 @@ public enum ErrorCode
     RoleNotFound,
     UserAlreadyClaimedVenue,
     UserAlreadyClaimedEvent,
-    TwilioError
+    TwilioError,
+    InsufficientBalance
 }
 
 public class ApiResponse
