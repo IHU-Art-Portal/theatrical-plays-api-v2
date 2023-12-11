@@ -8,8 +8,11 @@ using Theatrical.Dto.UsersDtos;
 using Theatrical.Dto.UsersDtos.ResponseDto;
 using Theatrical.Services;
 using Theatrical.Services.Email;
+using Theatrical.Services.PhoneVerification.Twilio;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Validation;
+using Twilio;
+using Twilio.Rest.Verify.V2.Service;
 
 namespace Theatrical.Api.Controllers;
 
@@ -26,15 +29,17 @@ public class UserController : ControllerBase
     private readonly IEmailService _emailService;
     private readonly IMinioService _minioService;
     private readonly ITransactionService _transactions;
+    private readonly ITwilioService _twilio;
 
     public UserController(IUserValidationService validation, IUserService service, IEmailService emailService, IMinioService minioService,
-        ITransactionService transactionService)
+        ITransactionService transactionService, ITwilioService twilioService)
     {
         _validation = validation;
         _service = service;
         _emailService = emailService;
         _minioService = minioService;
         _transactions = transactionService;
+        _twilio = twilioService;
     }
     
     /// <summary>
@@ -82,41 +87,7 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
         }
     }
-
-    /// <summary>
-    /// Verification link points to this endpoint.
-    /// Verifies the user and enabled the account.
-    /// Redirects to a page with the response. (For user friendly experience)
-    /// </summary>
-    /// <param name="token">verification code</param>
-    /// <returns></returns>
-    [HttpGet("verify-email")]
-    public async Task<IActionResult> VerifyEmail([FromQuery]string token)
-    {
-        try
-        {
-            var (verification, user) = await _validation.VerifyEmailToken(token);
-            
-            if (!verification.Success)
-            {
-                if (verification.ErrorCode == ErrorCode.AlreadyVerified)
-                {
-                    return Redirect($"/EmailVerification?status=already-verified");
-                }
-                return Redirect($"/EmailVerification?status=failed");
-            }
-
-            await _service.EnableAccount(user!);
-            await _transactions.VerifiedEmailCredits(user!);
-            
-            return Redirect($"/EmailVerification?status=success");
-        }
-        catch (Exception e)
-        {
-            return Redirect($"/EmailVerification?status=internal-error");
-        }
-    }
-
+    
     /// <summary>
     /// Use this to login in.
     /// Checks the request authorization header. (If the user is already logged in).
@@ -186,6 +157,88 @@ public class UserController : ControllerBase
         }
     }
     
+    [HttpPost("send-verification-phone-number")]
+    public async Task<IActionResult> SendVerificationCode(string phoneNumber)
+    {
+        try
+        {
+            var result = await _twilio.SendVerificationCode(phoneNumber);
+
+            if (!result.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)result.ErrorCode!, result.Message!);
+                return new BadRequestObjectResult(errorResponse);
+            }
+
+            var response = new ApiResponse($"Sent your verification to your number. State: {result.Message!}");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception)
+        {
+            return BadRequest("There was an error sending the verification code, please check the phone number is correct and try again");
+        }
+    }
+    
+    [HttpPost("confirm-verification-phone-number")]
+    public async Task<IActionResult> CheckVerificationCode(string phoneNumber, string verificationCode)
+    {
+        try
+        {
+            var result = await _twilio.CheckVerificationCode(phoneNumber, verificationCode);
+            
+            if (!result.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)result.ErrorCode!, result.Message!);
+                return new BadRequestObjectResult(errorResponse);
+            }
+
+            var response = new ApiResponse($"Your number has been {result.Message!}!");
+
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
+        }
+    }
+
+    /// <summary>
+    /// Verification link points to this endpoint.
+    /// Verifies the user and enabled the account.
+    /// Redirects to a page with the response. (For user friendly experience)
+    /// </summary>
+    /// <param name="token">verification code</param>
+    /// <returns></returns>
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromQuery]string token)
+    {
+        try
+        {
+            var (verification, user) = await _validation.VerifyEmailToken(token);
+            
+            if (!verification.Success)
+            {
+                if (verification.ErrorCode == ErrorCode.AlreadyVerified)
+                {
+                    return Redirect($"/EmailVerification?status=already-verified");
+                }
+                return Redirect($"/EmailVerification?status=failed");
+            }
+
+            await _service.EnableAccount(user!);
+            await _transactions.VerifiedEmailCredits(user!);
+            
+            return Redirect($"/EmailVerification?status=success");
+        }
+        catch (Exception e)
+        {
+            return Redirect($"/EmailVerification?status=internal-error");
+        }
+    }
+
     /// <summary>
     /// Enables two factor authentication for the logged in user.
     /// Checks authorization header and retrieves the email => User validation logic.

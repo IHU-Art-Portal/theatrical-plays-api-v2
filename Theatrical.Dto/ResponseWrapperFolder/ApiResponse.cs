@@ -23,7 +23,8 @@ public enum ErrorCode
     InvalidCharacters,
     RoleNotFound,
     UserAlreadyClaimedVenue,
-    UserAlreadyClaimedEvent
+    UserAlreadyClaimedEvent,
+    TwilioError
 }
 
 public class ApiResponse

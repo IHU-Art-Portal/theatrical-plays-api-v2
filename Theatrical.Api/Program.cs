@@ -19,6 +19,7 @@ using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Email;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.PerformersService;
+using Theatrical.Services.PhoneVerification.Twilio;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Security.Jwt;
@@ -165,6 +166,9 @@ builder.Services.AddTransient<IUserVenueService, UserVenueService>();
 //Services for user claiming an event
 builder.Services.AddTransient<IUserEventRepository, UserEventRepository>();
 builder.Services.AddTransient<IUserEventService, UserEventService>();
+
+//Twilio Service
+builder.Services.AddTransient<ITwilioService, TwilioService>();
 
 //cors
 builder.Services.AddCors(options =>
