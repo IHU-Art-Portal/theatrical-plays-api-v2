@@ -39,6 +39,7 @@ public interface IUserRepository
     Task SetProfilePhoto(UserImage userImage);
     Task SetBioPdfLocation(User user, string location);
     Task UnsetBio(User user);
+    Task UpdateVerifiedPhoneNumber(User user, string number);
 }
 
 public class UserRepository : IUserRepository
@@ -287,6 +288,13 @@ public class UserRepository : IUserRepository
         user._2FA_enabled = false;
         user._2FA_code = null;
         user.UserSecret = null;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateVerifiedPhoneNumber(User user, string number)
+    {
+        user.PhoneNumber = number;
+        user.PhoneNumberVerified = true;
         await _context.SaveChangesAsync();
     }
 }

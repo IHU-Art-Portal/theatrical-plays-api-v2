@@ -17,8 +17,11 @@ public class User
     public string? Youtube { get; set; }
     public string? Instagram { get; set; }
     public string? BioPdfLocation { get; set; }
-    public virtual List<UserImage>? UserImages { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool? PhoneNumberVerified { get; set; }
     
+    //Navigational Properties
+    public virtual List<UserImage>? UserImages { get; set; }
     public virtual List<UserAuthority> UserAuthorities { get; set; }
     public virtual List<Transaction> UserTransactions { get; set; }
     public virtual List<UserVenue> UserVenues { get; set; }

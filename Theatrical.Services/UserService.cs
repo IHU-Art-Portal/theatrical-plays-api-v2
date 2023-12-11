@@ -40,6 +40,7 @@ public interface IUserService
     Task UnsetProfilePhoto(UserImage userImage);
     Task SetBio(User user, string location);
     Task UnsetBio(User user);
+    Task UpdateVerifiedPhoneNumber(User user, string number);
 }
 
 public class UserService : IUserService
@@ -231,7 +232,9 @@ public class UserService : IUserService
             BioPdfLocation = user.BioPdfLocation,
             ClaimedPerson = claimedPerson,
             ClaimedVenues = claimedVenues,
-            ClaimedEvents = claimedEvents
+            ClaimedEvents = claimedEvents,
+            PhoneNumber = user.PhoneNumber,
+            PhoneVerified = user.PhoneNumberVerified,
         };
 
         return userDto;
@@ -414,6 +417,11 @@ public class UserService : IUserService
     public async Task UnsetBio(User user)
     {
         await _repository.UnsetBio(user);
+    }
+
+    public async Task UpdateVerifiedPhoneNumber(User user, string number)
+    {
+        await _repository.UpdateVerifiedPhoneNumber(user, number);
     }
 
     private async Task<PersonDto?> GetClaimedPersonForUser(User user)

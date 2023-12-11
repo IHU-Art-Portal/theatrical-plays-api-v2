@@ -25,4 +25,6 @@ public class UserDto
     public PersonDto? ClaimedPerson { get; set; }
     public List<VenueDto>? ClaimedVenues { get; set; }
     public List<EventDto>? ClaimedEvents { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool? PhoneVerified { get; set; }
 }

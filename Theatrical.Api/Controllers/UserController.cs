@@ -158,10 +158,21 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("send-verification-phone-number")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<IActionResult> SendVerificationCode(string phoneNumber)
     {
         try
         {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
             var result = await _twilio.SendVerificationCode(phoneNumber);
 
             if (!result.Success)
@@ -181,10 +192,21 @@ public class UserController : ControllerBase
     }
     
     [HttpPost("confirm-verification-phone-number")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<IActionResult> CheckVerificationCode(string phoneNumber, string verificationCode)
     {
         try
         {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+            
             var result = await _twilio.CheckVerificationCode(phoneNumber, verificationCode);
             
             if (!result.Success)
@@ -193,6 +215,8 @@ public class UserController : ControllerBase
                 return new BadRequestObjectResult(errorResponse);
             }
 
+            await _service.UpdateVerifiedPhoneNumber(user!, phoneNumber);
+            
             var response = new ApiResponse($"Your number has been {result.Message!}!");
 
             return new OkObjectResult(response);

@@ -383,6 +383,8 @@ public class TheatricalPlaysDbContext : DbContext
             entity.Property(u => u.Instagram).HasColumnName("instagram");
             entity.Property(u => u.PerformerRoles).HasColumnName("artistRoles");
             entity.Property(u => u.BioPdfLocation).HasColumnName("bio_pdf_location");
+            entity.Property(u => u.PhoneNumber).HasColumnName("phone_number");
+            entity.Property(u => u.PhoneNumberVerified).HasColumnName("phone_number_verified").HasDefaultValue(false);
             
             entity.HasMany(u => u.UserImages)
                 .WithOne(ui => ui.User)
