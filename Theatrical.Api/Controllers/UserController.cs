@@ -172,6 +172,12 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
+
+            if (user!.PhoneNumberVerified == true)
+            {
+                var verifiedResponse = new ApiResponse("Your phone is already verified!");
+                return new OkObjectResult(verifiedResponse);
+            }
             
             var result = await _twilio.SendVerificationCode(phoneNumber);
 
