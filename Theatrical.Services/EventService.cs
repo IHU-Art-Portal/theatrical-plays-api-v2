@@ -15,6 +15,7 @@ public interface IEventService
     Task UpdatePriceRange(Event @event, UpdateEventDto eventDto);
     EventDto ToDto(Event newEvent);
     Task<List<Event>> CreateRange(List<CreateEventDto> createEventDtos);
+    Task<EventDto> UpdateEvent(Event eventToUpdate, UpdateEventDto1 updateEventDto1);
 }
 
 public class EventService : IEventService
@@ -68,6 +69,33 @@ public class EventService : IEventService
         
         var events = await _repository.CreateEvents(createEvents);
         return events;
+    }
+
+    //Basic method to update an event.
+    public async Task<EventDto> UpdateEvent(Event eventToUpdate, UpdateEventDto1 updateEventDto1)
+    {
+        if (updateEventDto1.PriceRange != null) eventToUpdate.PriceRange = updateEventDto1.PriceRange;
+
+        eventToUpdate.DateEvent = DateTime.SpecifyKind(DateTime.ParseExact(updateEventDto1.EventDate!, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture), DateTimeKind.Utc);
+        
+        eventToUpdate.SystemId = updateEventDto1.SystemId;
+        
+        if (updateEventDto1.ProductionId != null) eventToUpdate.ProductionId = (int)updateEventDto1.ProductionId;
+        if (updateEventDto1.VenueId != null) eventToUpdate.VenueId = (int)updateEventDto1.VenueId;
+
+        var updatedEvent = await _repository.UpdateEvent(eventToUpdate);
+
+        var eventDto = new EventDto
+        {
+            DateEvent = updatedEvent.DateEvent,
+            Id = updatedEvent.Id,
+            IsClaimed = updatedEvent.IsClaimed,
+            PriceRange = updatedEvent.PriceRange,
+            ProductionId = updatedEvent.ProductionId,
+            VenueId = updatedEvent.VenueId
+        };
+
+        return eventDto;
     }
 
     public async Task<Event> Create(CreateEventDto createEventDto)

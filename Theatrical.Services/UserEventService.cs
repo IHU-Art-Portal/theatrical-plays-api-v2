@@ -6,6 +6,7 @@ namespace Theatrical.Services;
 public interface IUserEventService
 {
     Task CreateUserEvent(User user, Event @event);
+    Task<List<UserEvent>?> GetUserEvents(string email);
 }
 
 public class UserEventService : IUserEventService
@@ -27,6 +28,12 @@ public class UserEventService : IUserEventService
 
         await _repository.Claim(@event);
         await _repository.Create(userEvent);
+    }
+
+    public async Task<List<UserEvent>?> GetUserEvents(string email)
+    {
+        var user = await _repository.GetUserWithEvents(email);
+        return user?.UserEvents;
     }
 }
 

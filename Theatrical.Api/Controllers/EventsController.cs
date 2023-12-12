@@ -266,4 +266,50 @@ public class EventsController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
         }
     }
+
+    [HttpPut("update")]
+    [TypeFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventDto1 updateEventDto1)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var userEvents = await _userEventService.GetUserEvents(email!);
+
+            //validates data before updating.
+            var (validation, userEvent) = await _validation.ValidateForUpdate(userEvents, updateEventDto1);
+
+            if (!validation.Success)
+            {
+                if (validation.ErrorCode == ErrorCode.NotFound)
+                {
+                    var notFoundResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                    return new NotFoundObjectResult(notFoundResponse);
+                }
+
+                if (validation.ErrorCode == ErrorCode.WrongDateFormat)
+                {
+                    var wrongDateResponse = new ApiResponse(ErrorCode.WrongDateFormat, validation.Message!);
+                    return new BadRequestObjectResult(wrongDateResponse);
+                }
+
+                var errorResponse = new ApiResponse(ErrorCode.BadRequest, validation.Message!);
+                return new BadRequestObjectResult(errorResponse);
+            }
+
+            //updates the event object.
+            var updatedEvent = await _service.UpdateEvent(userEvent!.Event, updateEventDto1);
+
+            var response = new ApiResponse<EventDto>(updatedEvent, "You have successfully edited your event!");
+
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
 }

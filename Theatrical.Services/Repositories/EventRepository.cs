@@ -23,6 +23,7 @@ public interface IEventRepository
     Task<List<Event>?> GetEventsForProduction(int productionId);
     Task<List<Event>> CreateEvents(List<Event> events);
     Task<List<Show>> GetShows();
+    Task<Event> UpdateEvent(Event eventToUpdate);
 }
 
 public class EventRepository : IEventRepository
@@ -112,6 +113,13 @@ public class EventRepository : IEventRepository
         });
 
         return shows;
+    }
+
+    public async Task<Event> UpdateEvent(Event eventToUpdate)
+    {
+        _context.Events.Update(eventToUpdate);
+        await _context.SaveChangesAsync();
+        return eventToUpdate;
     }
 
     public async Task<List<Event>?> Get()

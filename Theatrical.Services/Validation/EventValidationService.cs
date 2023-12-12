@@ -1,4 +1,5 @@
-﻿using Theatrical.Data.Models;
+﻿using System.Globalization;
+using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Repositories;
@@ -13,6 +14,8 @@ public interface IEventValidationService
     Task<(ValidationReport validation, List<Event>? events)> FetchEventsForPerson(int id);
     Task<(ValidationReport validation, List<Event>? events)> FetchEventsForProduction(int id);
     Task<(ValidationReport validation, User? user, Event? @event)> ValidateUserWithEventsForClaim(string email, int id);
+    Task<(ValidationReport validation, UserEvent? userEvent)> ValidateForUpdate(List<UserEvent>? userEvents,
+        UpdateEventDto1 updateEventDto1);
 }
 
 public class EventValidationService : IEventValidationService
@@ -178,6 +181,64 @@ public class EventValidationService : IEventValidationService
         report.Message = "User can claim this venue";
         return (report, userWithEvents, @event);
         
+    }
+
+    public async Task<(ValidationReport validation, UserEvent? userEvent)> ValidateForUpdate(List<UserEvent>? userEvents, UpdateEventDto1 updateEventDto1)
+    {
+        var validation = new ValidationReport();
+
+        if (string.IsNullOrEmpty(updateEventDto1.EventDate) || !DateTime.TryParseExact(updateEventDto1.EventDate, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+        {
+            validation.Success = false;
+            validation.Message = "Wrong date format. Correct format: dd-MM-yyyy HH:mm:ss. Date can't be left empty";
+            validation.ErrorCode = ErrorCode.WrongDateFormat;
+            return (validation, null);
+        }
+        
+        if (userEvents != null && !userEvents.Any())
+        {
+            validation.Success = false;
+            validation.Message = "You don't have any claimed events to edit.";
+            validation.ErrorCode = ErrorCode.NotFound;
+            return (validation, null);
+            
+        }
+
+        var userEvent = userEvents?.FirstOrDefault(ue => ue.Event.Id == updateEventDto1.EventId);
+        if (userEvent is null)
+        {
+            validation.Success = false;
+            validation.Message = "You don't have permissions to edit this event or the event does not exist!";
+            validation.ErrorCode = ErrorCode.BadRequest;
+            return (validation, null);
+        }
+
+        if (updateEventDto1.VenueId != null)
+        {
+            var venue = await _venueRepo.Get((int)updateEventDto1.VenueId);
+            if (venue is null)
+            {
+                validation.Success = false;
+                validation.Message = "The venue you were trying to set for your event was not found.";
+                validation.ErrorCode = ErrorCode.NotFound;
+                return (validation, null);
+            }
+        }
+
+        if (updateEventDto1.ProductionId != null)
+        {
+            var production = await _productionRepo.GetProduction((int)updateEventDto1.ProductionId);
+            if (production is null)
+            {
+                validation.Success = false;
+                validation.Message = "The production you were trying to set for your event was not found.";
+                validation.ErrorCode = ErrorCode.NotFound;
+                return (validation, null);
+            }
+        }
+
+        validation.Success = true;
+        return (validation, userEvent);
     }
 }
 

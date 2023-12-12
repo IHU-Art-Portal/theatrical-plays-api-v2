@@ -25,7 +25,8 @@ public enum ErrorCode
     UserAlreadyClaimedVenue,
     UserAlreadyClaimedEvent,
     TwilioError,
-    InsufficientBalance
+    InsufficientBalance,
+    WrongDateFormat
 }
 
 public class ApiResponse
