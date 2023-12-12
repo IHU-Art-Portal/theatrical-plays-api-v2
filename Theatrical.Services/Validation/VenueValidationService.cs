@@ -10,7 +10,8 @@ public interface IVenueValidationService
     Task<(ValidationReport report, List<Venue>? venue)> ValidateAndFetch();
     Task<(ValidationReport report, Venue? venue)> ValidateAndFetch(int venueId);
     Task<(ValidationReport report, Venue? venue)> ValidateForDelete(int venueId);
-    Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto);
+    (ValidationReport validation, Venue? venue) ValidateForUpdate(List<UserVenue>? userVenues,
+        VenueUpdateDto venueDto);
     Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId);
     Task<(ValidationReport, Venue? venue)> ValidateAndFetch(string venueTitle);
     Task<(ValidationReport validation, User? user, Venue? venue)> ValidateUserWithVenuesForClaim(string email, int id);
@@ -78,21 +79,30 @@ public class VenueValidationService :  IVenueValidationService
         return (report, venue);
     }
 
-    public async Task<ValidationReport> ValidateForUpdate(VenueUpdateDto venueDto)
+    public (ValidationReport validation, Venue? venue) ValidateForUpdate(List<UserVenue>? userVenues, VenueUpdateDto venueDto)
     {
-        var report = new ValidationReport();
-        var venue = await _repository.Get(venueDto.Id);
+        var validation = new ValidationReport();
 
-        if (venue is null)
+        if (userVenues != null && !userVenues.Any())
         {
-            report.Success = false;
-            report.Message = "Venue not found";
-            return report;
+            validation.Success = false;
+            validation.Message = "You don't have any claimed venues to edit.";
+            validation.ErrorCode = ErrorCode.NotFound;
+            return (validation, null);
+        }
+
+        var userVenue = userVenues?.FirstOrDefault(uv => uv.Venue.Id == venueDto.Id);
+
+        if (userVenue is null)
+        {
+            validation.Success = false;
+            validation.Message = "You don't have permissions to edit this venue or the venue does not exist!";
+            validation.ErrorCode = ErrorCode.BadRequest;
+            return (validation, null);
         }
         
-        report.Success = true;
-        report.Message = "Venue can be updated";
-        return report;
+        validation.Success = true;
+        return (validation, userVenue.Venue);
     }
 
     public async Task<(ValidationReport, List<Production>?)> ValidateAndFetchVenueProductions(int venueId)

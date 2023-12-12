@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
+using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Caching;
 
 namespace Theatrical.Services.Repositories;
@@ -11,7 +12,7 @@ public interface IVenueRepository
     Task<Venue?> Get(int id);
     Task<Venue> Create(Venue venue);
     Task Delete(Venue venue);
-    Task Update(Venue venue);
+    Task<Venue> Update(Venue venue, VenueUpdateDto venueUpdateDto);
     Task<List<Venue>> UpdateRange(List<Venue> venues);
     Task<List<Production>?> GetVenueProductions(int venueId);
     Task<List<Venue>> GetVenuesByTitles(List<string> titles);
@@ -110,22 +111,18 @@ public class VenueRepository : IVenueRepository
         await _logRepository.UpdateLogs("delete", "venue", columns);
     }
 
-    public async Task Update(Venue venue)
+    public async Task<Venue> Update(Venue venue, VenueUpdateDto venueUpdateDto)
     {
-        var venueToUpdate = await _context.Venues.FindAsync(venue.Id);
-
-        venueToUpdate.Address = venue.Address;
-        venueToUpdate.Title = venue.Title;
-        
-        _context.Venues.Update(venueToUpdate);
+        if (venueUpdateDto.Title != null) venue.Title = venueUpdateDto.Title;
+        if (venueUpdateDto.Address != null) venue.Address = venueUpdateDto.Address;
         await _context.SaveChangesAsync();
-        
-        await _logRepository.UpdateLogs("update", "venue", new List<(string ColumnName, string Value)>
+        /*await _logRepository.UpdateLogs("update", "venue", new List<(string ColumnName, string Value)>
         {
             ("ID", venue.Id.ToString()),
             ("Title", venue.Title),
             ("Address", venue.Address)
-        });
+        });*/
+        return venue;
     }
 
     public async Task<List<Venue>> UpdateRange(List<Venue> venues)

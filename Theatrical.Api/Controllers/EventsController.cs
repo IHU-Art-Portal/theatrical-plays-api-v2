@@ -267,6 +267,11 @@ public class EventsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Users can update their claimed events only, through this endpoint
+    /// </summary>
+    /// <param name="updateEventDto1"></param>
+    /// <returns></returns>
     [HttpPut("update")]
     [TypeFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<IActionResult> UpdateEvent([FromBody] UpdateEventDto1 updateEventDto1)

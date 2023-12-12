@@ -6,6 +6,7 @@ namespace Theatrical.Services;
 public interface IUserVenueService
 {
     Task CreateUserVenue(User user, Venue venue);
+    Task<List<UserVenue>?> GetUserVenues(string email);
 }
 
 public class UserVenueService : IUserVenueService
@@ -27,6 +28,12 @@ public class UserVenueService : IUserVenueService
         
         await _repository.Claim(venue);
         await _repository.Create(userVenue);
+    }
+
+    public async Task<List<UserVenue>?> GetUserVenues(string email)
+    {
+        var userWithVenues = await _repository.GetUserWithVenues(email);
+        return userWithVenues?.UserVenues;
     }
 }
 

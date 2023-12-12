@@ -11,7 +11,7 @@ public interface IVenueService
 {
     Task<Venue> Create(VenueCreateDto venueCreateDto);
     Task Delete(Venue venue);
-    Task Update(VenueUpdateDto venue);
+    Task<VenueResponseDto> Update(Venue venue, VenueUpdateDto venueUpdateDto);
     List<VenueDto> ToDto(List<Venue> venue);
     VenueDto ToDto(Venue venue);
     PaginationResult<VenueDto> Paginate(int? page, int? size, List<VenueDto> venuesDto);
@@ -54,15 +54,16 @@ public class VenueService : IVenueService
         await _repository.Delete(venue);
     }
 
-    public async Task Update(VenueUpdateDto venueDto)
+    public async Task<VenueResponseDto> Update(Venue venue, VenueUpdateDto venueUpdateDto)
     {
-        Venue venue = new Venue
+        var updatedVenue = await _repository.Update(venue, venueUpdateDto);
+        var venueResponse = new VenueResponseDto
         {
-            Id = venueDto.Id,
-            Title = venueDto.Title,
-            Address = venueDto.Address
+            Id = updatedVenue.Id,
+            Title = updatedVenue.Title,
+            Address = updatedVenue.Address
         };
-        await _repository.Update(venue);
+        return venueResponse;
     }
 
     public List<VenueDto> ToDto(List<Venue> venues)

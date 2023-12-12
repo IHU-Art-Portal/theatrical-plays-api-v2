@@ -279,26 +279,47 @@ public class VenuesController : ControllerBase
         }
     }*/
 
-    /*/// <summary>
-    /// Endpoint to updating a Venue
+    /// <summary>
+    /// Users can update their claimed venues only, through this endpoint.
     /// </summary>
     /// <param name="venueDto"></param>
     /// <returns></returns>
-    [HttpPut]
+    [HttpPut("update")]
+    [TypeFilter(typeof(AnyRoleAuthorizationFilter))]
     public async Task<ActionResult<ApiResponse>> UpdateVenue([FromBody] VenueUpdateDto venueDto)
     {
-        var validation = await _validation.ValidateForUpdate(venueDto);
-        
-        if (!validation.Success)
+        try
         {
-            var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message);
-            return new ObjectResult(errorResponse){StatusCode = 404};
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var userVenues = await _userVenueService.GetUserVenues(email!);
+            
+            var (validation, venue) = _validation.ValidateForUpdate(userVenues, venueDto);
+            
+            if (!validation.Success)
+            {
+                if (validation.ErrorCode == ErrorCode.NotFound)
+                {
+                    var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
+                    return new NotFoundObjectResult(errorResponse);
+                }
+
+                var errorResponseBadRequest = new ApiResponse(ErrorCode.BadRequest, validation.Message!);
+                return new BadRequestObjectResult(errorResponseBadRequest);
+            }
+
+            var updatedVenue = await _service.Update(venue!, venueDto);
+            
+            var response = new ApiResponse<VenueResponseDto>(updatedVenue, "You have successfully edited your venue!");
+
+            return new ObjectResult(response);
         }
-        
-        await _service.Update(venueDto);
-        ApiResponse response = new ApiResponse(message: $"Venue with ID: {venueDto.Id} has been updated!");
-        
-        return new ObjectResult(response);
-    }*/
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = StatusCodes.Status500InternalServerError};
+        }
+    }
 
 }
