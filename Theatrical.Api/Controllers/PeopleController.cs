@@ -136,7 +136,7 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost("Addrange")]
-    //[TypeFilter(typeof(AdminAuthorizationFilter))]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(CreatePeopleStatusReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreatePeople([FromBody] List<CreatePersonDto> createPersonDto)
     {
