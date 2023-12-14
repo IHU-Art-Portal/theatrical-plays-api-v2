@@ -136,7 +136,7 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost("Addrange")]
-    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    //[TypeFilter(typeof(AdminAuthorizationFilter))]
     [ProducesResponseType(typeof(CreatePeopleStatusReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse>> CreatePeople([FromBody] List<CreatePersonDto> createPersonDto)
     {
@@ -146,7 +146,7 @@ public class PeopleController : ControllerBase
             var nullFullNamePeople = new List<CreatePersonDto>();
             foreach (var person in createPersonDto)
             {
-                if (string.IsNullOrEmpty(person.Fullname))
+                if (string.IsNullOrEmpty(person.Fullname) || string.IsNullOrWhiteSpace(person.Fullname))
                 {
                     nullFullNamePeople.Add(person);
                     continue;
