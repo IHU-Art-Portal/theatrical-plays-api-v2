@@ -146,12 +146,12 @@ public class PeopleController : ControllerBase
             var nullFullNamePeople = new List<CreatePersonDto>();
             foreach (var person in createPersonDto)
             {
-                if (string.IsNullOrEmpty(person.Fullname) || string.IsNullOrWhiteSpace(person.Fullname))
-                {
-                    nullFullNamePeople.Add(person);
+                if (!string.IsNullOrEmpty(person.Fullname) && !string.IsNullOrWhiteSpace(person.Fullname))
+                { 
+                    validPeople.Add(person);
                     continue;
                 }
-                validPeople.Add(person);
+                nullFullNamePeople.Add(person);
             }
 
             var (alreadyExistingPeople, addingPeople) = await _validation.ValidateForCreateList(validPeople);
