@@ -66,13 +66,36 @@ public class PeopleController : ControllerBase
     /// <param name="page">Optional. The page number for pagination</param>
     /// <param name="size">Optional. THe page size for pagination</param>
     /// <param name="searchFilters"></param>
+    /// <param name="showAvailable"></param>
+    /// <param name="alphabeticalOrder"></param>
+    /// <param name="role"></param>
+    /// <param name="age"></param>
+    /// <param name="height"></param>
+    /// <param name="weight"></param>
+    /// <param name="eyeColor"></param>
+    /// <param name="hairColor"></param>
+    /// <param name="languageKnowledge"></param>
     /// <returns>TheatricalResponse&lt;PerformersPaginationDto&gt; object containing paginated items.</returns>
-    [HttpPost("fetch")]
+    [HttpGet]
     [ProducesResponseType(typeof(PaginationResult<PersonDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, SearchFilters searchFilters)
+    public async Task<ActionResult<ApiResponse>> GetPeople(int? page, int? size, bool? showAvailable,
+        bool? alphabeticalOrder, string? role, int? age, string? height, string? weight, string? eyeColor,
+        string? hairColor, string? languageKnowledge)
     {
         try
         {
+            var searchFilters = new SearchFilters
+            {
+                ShowAvailableAccounts = showAvailable,
+                AlphabeticalOrder = alphabeticalOrder,
+                Role = role,
+                Age = age,
+                Height = height,
+                Weight = weight,
+                EyeColor = eyeColor,
+                HairColor = hairColor,
+                LanguageKnowledge = languageKnowledge,
+            };
             var peopleDto = await _service.GetAndPaginate(page, size, searchFilters);
             
             ApiResponse response = new ApiResponse<PaginationResult<PersonDto>>(peopleDto);
@@ -364,7 +387,7 @@ public class PeopleController : ControllerBase
         {
             if (e.HResult.Equals(-2146233088))
             {
-                return new ObjectResult(new ApiResponse(ErrorCode.ServerError, "Object has already been deleted, but due to temporary caching you get this error. You may disregard this error message.")) { StatusCode = 500 };
+                return new ObjectResult(new ApiResponse(ErrorCode.ServerError, "Object issue due to caching, or foreign key on person's images.")) { StatusCode = 500 };
             }
 
             return new ObjectResult(new ApiResponse(ErrorCode.ServerError, e.Message));
