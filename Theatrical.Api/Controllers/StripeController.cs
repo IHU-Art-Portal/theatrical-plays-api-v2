@@ -16,11 +16,13 @@ public class StripeController : ControllerBase
 {
     private readonly IUserValidationService _userValidation;
     private readonly ITransactionService _transactionService;
+    private readonly IConfiguration _configuration;
 
-    public StripeController(IUserValidationService userValidationService, ITransactionService transactionService)
+    public StripeController(IUserValidationService userValidationService, ITransactionService transactionService, IConfiguration configuration)
     {
         _userValidation = userValidationService;
         _transactionService = transactionService;
+        _configuration = configuration;
     }
 
     [HttpGet("create-checkout-session")]
@@ -60,7 +62,7 @@ public class StripeController : ControllerBase
     public async Task<ActionResult<ApiResponse>> StripeWebhook()
     {
         var stripeSignature = HttpContext.Request.Headers["Stripe-Signature"];
-        var endpointSecret = "whsec_KKIzvtVOngMI59473So1rQHecPyQmq2F";
+        var endpointSecret = _configuration.GetValue<string>("StripeSettings:EndpointSecret");
 
         var reader = new StreamReader(HttpContext.Request.Body);
         var body = await reader.ReadToEndAsync();
