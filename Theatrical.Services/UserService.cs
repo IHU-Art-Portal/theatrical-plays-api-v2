@@ -250,7 +250,8 @@ public class UserService : IUserService
             VenueId = e.VenueId,
             ProductionId = e.ProductionId,
             PriceRange = e.PriceRange,
-            DateEvent = e.DateEvent
+            DateEvent = e.DateEvent,
+            IsClaimed = e.IsClaimed
         })
         .ToList();
         
