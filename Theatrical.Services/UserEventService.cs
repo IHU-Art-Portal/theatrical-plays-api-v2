@@ -26,8 +26,8 @@ public class UserEventService : IUserEventService
             EventId = @event.Id
         };
 
-        await _repository.Claim(@event);
         await _repository.Create(userEvent);
+        await _repository.Claim(@event);
     }
 
     public async Task<List<UserEvent>?> GetUserEvents(string email)

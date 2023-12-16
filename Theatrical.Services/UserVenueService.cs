@@ -26,8 +26,8 @@ public class UserVenueService : IUserVenueService
             VenueId = venue.Id
         };
         
-        await _repository.Claim(venue);
         await _repository.Create(userVenue);
+        await _repository.Claim(venue);
     }
 
     public async Task<List<UserVenue>?> GetUserVenues(string email)
