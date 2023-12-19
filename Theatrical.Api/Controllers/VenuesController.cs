@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.enums;
 using Theatrical.Data.Models;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ProductionDtos;

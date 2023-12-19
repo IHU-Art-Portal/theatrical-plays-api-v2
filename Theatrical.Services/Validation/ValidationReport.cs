@@ -1,4 +1,4 @@
-﻿using Theatrical.Dto.ResponseWrapperFolder;
+﻿using Theatrical.Data.enums;
 
 namespace Theatrical.Services.Validation;
 

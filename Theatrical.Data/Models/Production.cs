@@ -14,6 +14,8 @@ public class Production
     public string? Duration { get; set; } = null!;
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
+    
+    //Navigational Properties
     public virtual Organizer? Organizer { get; set; }
     public virtual System System { get; set; } = null!;
     public virtual List<Contribution> Contributions { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
+using Theatrical.Data.enums;
 using Theatrical.Data.Models;
 using Theatrical.Dto.AccountRequestDtos;
 

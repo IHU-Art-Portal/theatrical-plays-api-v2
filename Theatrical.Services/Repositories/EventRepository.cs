@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;

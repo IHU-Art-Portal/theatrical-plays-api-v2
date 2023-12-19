@@ -1,5 +1,4 @@
-﻿using Theatrical.Data.Context;
-using Theatrical.Data.Models;
+﻿using Theatrical.Data.Models;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;

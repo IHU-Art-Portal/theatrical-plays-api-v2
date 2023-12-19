@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Theatrical.Dto.ResponseWrapperFolder;
+using Theatrical.Data.enums;
 using Theatrical.Services.Validation;
 using Twilio;
 using Twilio.Rest.Verify.V2.Service;

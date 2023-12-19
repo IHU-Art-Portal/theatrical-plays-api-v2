@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using Stripe.Checkout;
+using Theatrical.Data.enums;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;
 using Theatrical.Services.Validation;

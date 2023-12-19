@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.enums;
 using Theatrical.Dto.Pagination;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.ShowsLocal;

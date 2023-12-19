@@ -1,6 +1,4 @@
-﻿using Theatrical.Data.Models;
-
-namespace Theatrical.Dto.AccountRequestDtos;
+﻿namespace Theatrical.Dto.AccountRequestDtos;
 
 public class ResponseAccountRequestDto
 {

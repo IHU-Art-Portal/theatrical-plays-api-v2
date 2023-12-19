@@ -1,6 +1,4 @@
-﻿using Theatrical.Data.Models;
-
-namespace Theatrical.Services.Curators.Responses;
+﻿namespace Theatrical.Services.Curators.Responses;
 
 public class CurateResponseProductions<T> : CuratorResponse
 {

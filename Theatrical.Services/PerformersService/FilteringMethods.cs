@@ -1,4 +1,5 @@
-﻿using Theatrical.Data.Models;
+﻿using Theatrical.Data.enums;
+using Theatrical.Data.Models;
 
 namespace Theatrical.Services.PerformersService;
 

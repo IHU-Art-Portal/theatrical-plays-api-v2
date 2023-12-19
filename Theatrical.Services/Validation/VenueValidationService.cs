@@ -1,5 +1,5 @@
-﻿using Theatrical.Data.Models;
-using Theatrical.Dto.ResponseWrapperFolder;
+﻿using Theatrical.Data.enums;
+using Theatrical.Data.Models;
 using Theatrical.Dto.VenueDtos;
 using Theatrical.Services.Repositories;
 

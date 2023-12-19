@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Theatrical.Data.Models;
+using Theatrical.Data.enums;
 
 namespace Theatrical.Api.Swagger;
 

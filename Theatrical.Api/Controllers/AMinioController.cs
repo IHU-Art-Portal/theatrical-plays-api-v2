@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Minio;
 using Minio.DataModel.Args;
+using Theatrical.Data.enums;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Exception = System.Exception;
 

@@ -2,7 +2,6 @@
 using OtpNet;
 using Theatrical.Data.enums;
 using Theatrical.Data.Models;
-using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.UsersDtos;
 using Theatrical.Services.Repositories;
 

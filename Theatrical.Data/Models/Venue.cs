@@ -8,6 +8,8 @@ public class Venue
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
     public bool isClaimed { get; set; }
+    
+    //Navigational Properties
     public virtual System System { get; set; } = null!;
     public virtual List<Event> Events { get; set; }
     public virtual List<UserVenue> UserVenues { get; set; }

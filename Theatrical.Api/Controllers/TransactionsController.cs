@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Theatrical.Data.enums;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Dto.TransactionDtos;
 using Theatrical.Services;

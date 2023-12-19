@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Theatrical.Data.Models;
+using Theatrical.Data.enums;
 using Theatrical.Dto.AccountRequestDtos;
 using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services;

@@ -11,6 +11,7 @@
         public DateTime Timestamp { get; set; }
         public bool IsClaimed { get; set; }
 
+        //Navigational Properties
         public virtual Production Production { get; set; } = null!;
         public virtual System System { get; set; } = null!;
         public virtual Venue Venue { get; set; } = null!;

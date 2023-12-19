@@ -15,6 +15,7 @@ public class Organizer
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
 
+    //Navigational Properties
     public virtual System System { get; set; } = null!;
     public virtual List<Production> Productions { get; set; }
 

@@ -5,6 +5,7 @@ public class System
     public int Id { get; set; }
     public string Name { get; set; } = null!;
 
+    //Navigational Properties
     public virtual List<Contribution> Contributions { get; set; }
     public virtual List<Event> Events { get; set; }
     public virtual List<Organizer> Organizers { get; set; }

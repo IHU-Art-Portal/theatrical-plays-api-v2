@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
+using Theatrical.Data.enums;
 using Theatrical.Data.Models;
 using Theatrical.Dto.EventDtos;
-using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Repositories;
 
 namespace Theatrical.Services.Validation;

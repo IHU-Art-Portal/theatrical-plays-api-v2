@@ -1,6 +1,6 @@
-﻿using Theatrical.Data.Models;
+﻿using Theatrical.Data.enums;
+using Theatrical.Data.Models;
 using Theatrical.Dto.PersonDtos;
-using Theatrical.Dto.ResponseWrapperFolder;
 using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Repositories;
 

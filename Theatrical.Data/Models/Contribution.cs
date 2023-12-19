@@ -10,6 +10,7 @@ public class Contribution
     public int SystemId { get; set; }
     public DateTime Timestamp { get; set; }
 
+    //Navigational Properties
     public virtual Person People { get; set; } = null!;
     public virtual Production Production { get; set; } = null!;
     public virtual Role Role { get; set; } = null!;

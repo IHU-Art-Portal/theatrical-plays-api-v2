@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Theatrical.Data.Context;
 using Theatrical.Data.Models;
 

@@ -1,4 +1,6 @@
-﻿namespace Theatrical.Data.Models;
+﻿using Theatrical.Data.enums;
+
+namespace Theatrical.Data.Models;
 
 public class AccountRequest
 {
@@ -8,14 +10,9 @@ public class AccountRequest
     public string IdentificationDocument { get; set; }
     public ConfirmationStatus ConfirmationStatus { get; set; }
     public DateTime CreatedAt { get; set; }
+    
+    //Navigational Properties
     public virtual User User { get; set; }
     public virtual Person Person { get; set; }
     public string? AuthorizedBy { get; set; }
-}
-
-public enum ConfirmationStatus
-{
-    Active = 0,
-    Approved = 1,
-    Rejected = 2
 }
