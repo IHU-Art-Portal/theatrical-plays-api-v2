@@ -411,7 +411,7 @@ public class UserValidationService : IUserValidationService
         {
             report.Success = false;
             report.Message = $"You don't have a role with the name: {role}";
-            report.ErrorCode = ErrorCode.RoleNotFound;
+            report.ErrorCode = ErrorCode.NotFound;
             return report;
         }
 

@@ -963,7 +963,7 @@ public class UserController : ControllerBase
                     return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, roleValidation.Message!));
                 }
 
-                return new ObjectResult(new ApiResponse(ErrorCode.RoleNotFound, roleValidation.Message!)){StatusCode = (int)HttpStatusCode.Conflict};
+                return new ObjectResult(new ApiResponse(ErrorCode.NotFound, roleValidation.Message!)){StatusCode = (int)HttpStatusCode.Conflict};
             }
 
             await _service.RemoveRole(user!, role);
