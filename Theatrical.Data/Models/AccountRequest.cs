@@ -10,9 +10,9 @@ public class AccountRequest
     public string IdentificationDocument { get; set; }
     public ConfirmationStatus ConfirmationStatus { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? AuthorizedBy { get; set; }
     
     //Navigational Properties
     public virtual User User { get; set; }
     public virtual Person Person { get; set; }
-    public string? AuthorizedBy { get; set; }
 }

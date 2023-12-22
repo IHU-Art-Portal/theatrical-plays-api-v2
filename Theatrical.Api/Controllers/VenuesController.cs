@@ -128,6 +128,10 @@ public class VenuesController : ControllerBase
                 var errorResponse = new ApiResponse(ErrorCode.NotFound, validation.Message!);
                 return new NotFoundObjectResult(errorResponse);
             }
+            
+            productions = productions!
+                .DistinctBy(p => p.Id)
+                .ToList();              //removes double entries from results.
 
             var productionsDto = _service.ProductionsToDto(productions);
 
