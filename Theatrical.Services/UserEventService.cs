@@ -20,6 +20,8 @@ public class UserEventService : IUserEventService
 
     public async Task CreateUserEvent(User user, Event @event)
     {
+        await _repository.Claim(@event);
+        
         var userEvent = new UserEvent
         {
             UserId = user.Id,
@@ -27,7 +29,6 @@ public class UserEventService : IUserEventService
         };
 
         await _repository.Create(userEvent);
-        await _repository.Claim(@event);
     }
 
     public async Task<List<UserEvent>?> GetUserEvents(string email)
