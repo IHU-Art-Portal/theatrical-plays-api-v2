@@ -6,7 +6,7 @@ using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Pagination;
 using Theatrical.Services.Repositories;
 
-namespace Theatrical.Services.PerformersService;
+namespace Theatrical.Services.PersonService;
 
 public interface IPersonService
 {

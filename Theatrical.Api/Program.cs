@@ -18,14 +18,14 @@ using Theatrical.Services.Curators;
 using Theatrical.Services.Curators.DataCreationCurators;
 using Theatrical.Services.Email;
 using Theatrical.Services.Pagination;
-using Theatrical.Services.PerformersService;
+using Theatrical.Services.PersonService;
 using Theatrical.Services.PhoneVerification.Twilio;
 using Theatrical.Services.Repositories;
 using Theatrical.Services.Security.AuthorizationFilters;
 using Theatrical.Services.Security.Jwt;
 using Theatrical.Services.Validation;
 using EventService = Theatrical.Services.EventService;
-using PersonService = Theatrical.Services.PerformersService.PersonService;
+using PersonService = Theatrical.Services.PersonService.PersonService;
 using TokenService = Theatrical.Services.Security.Jwt.TokenService;
 
 var builder = WebApplication.CreateBuilder(args);

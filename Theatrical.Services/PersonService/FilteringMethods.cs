@@ -1,7 +1,7 @@
 ﻿using Theatrical.Data.enums;
 using Theatrical.Data.Models;
 
-namespace Theatrical.Services.PerformersService;
+namespace Theatrical.Services.PersonService;
 
 public interface IFilteringMethods
 {
