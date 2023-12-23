@@ -20,6 +20,8 @@ public class UserVenueService : IUserVenueService
 
     public async Task CreateUserVenue(User user, Venue venue)
     {
+        await _repository.Claim(venue);
+        
         var userVenue = new UserVenue
         {
             UserId = user.Id,
@@ -27,7 +29,7 @@ public class UserVenueService : IUserVenueService
         };
         
         await _repository.Create(userVenue);
-        await _repository.Claim(venue);
+        
     }
 
     public async Task<List<UserVenue>?> GetUserVenues(string email)
