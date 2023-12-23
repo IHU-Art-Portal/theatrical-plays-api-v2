@@ -105,16 +105,19 @@ public class CuratorController : ControllerBase
         var contributionsToDelete = contributions
             .Where(contribution => !persons.Any(person => person.Id == contribution.PersonId))
             .ToList();
+        
+        var removeCount = contributionsToDelete.Count;
+        var response = new CurateResponseContributions<List<Contribution>>(null, removeCount, contributions.Count);
 
-        var contrResp = new DeletedContributionsDto
+        if (contributionsToDelete.Count == 0)
         {
-            DeletedCount = contributionsToDelete.Count,
-            TotalContributions = contributions.Count
-        };
+            var apiResponseZero = new ApiResponse<CurateResponseContributions<List<Contribution>>>(response, "Not found any contributions for deleted artists!");
+            return new OkObjectResult(apiResponseZero);
+        }
 
         await _contributions.RemoveRange(contributionsToDelete);
         
-        var apiresponse = new ApiResponse<DeletedContributionsDto>(contrResp);
+        var apiresponse = new ApiResponse<CurateResponseContributions<List<Contribution>>>(response, $"Successfully removed {removeCount}");
         
         return new OkObjectResult(apiresponse);
     }
@@ -131,17 +134,19 @@ public class CuratorController : ControllerBase
             .Where(contribution => productions.All(production => production.Id != contribution.ProductionId))
             .ToList();
         
-        var contrResp = new DeletedContributionsDto
-        {
-            DeletedCount = contributionsToDelete.Count,
-            TotalContributions = contributions.Count
-        };
+        var removeCount = contributionsToDelete.Count;
+        var response = new CurateResponseContributions<List<Contribution>>(null, removeCount, contributions.Count);
 
+        if (contributionsToDelete.Count == 0)
+        {
+            var apiResponseZero = new ApiResponse<CurateResponseContributions<List<Contribution>>>(response, $"Not found any contributions for deleted productions!");
+            return new OkObjectResult(apiResponseZero);
+        }
+
+        var apiResponse = new ApiResponse<CurateResponseContributions<List<Contribution>>>(response, $"Removed Contributions:{removeCount}");
         await _contributions.RemoveRange(contributionsToDelete);
-        
-        var apiresponse = new ApiResponse<DeletedContributionsDto>(contrResp);
-        
-        return new OkObjectResult(apiresponse);
+
+        return new OkObjectResult(apiResponse);
     }
 
     [HttpGet]
@@ -171,12 +176,7 @@ public class CuratorController : ControllerBase
         updatedRoles = updatedRoles.OrderBy(role => role.Id).ToList();
         updatedRoles = updatedRoles.DistinctBy(role => role.Id).ToList();
         
-        var response = new CuratorRoleResponse
-        {
-            TotalRoles = roles.Count,
-            CorrectedRoles = updatedRoles.Count,
-            roles = updatedRoles,
-        };
+        var response = new CurateResponseRoles<List<Role>>(updatedRoles, updatedRoles.Count, roles.Count);
 
         return new OkObjectResult(response);
     }
