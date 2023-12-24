@@ -31,6 +31,7 @@ public interface IUserValidationService
     Task<(ValidationReport, UserImage?)> ValidateUserImageExistence(int imageId);
     ValidationReport ValidatePhotoOwnership(User user, UserImage userImage);
     ValidationReport ValidateBioExistence(User user);
+    ValidationReport ValidateNumber(User user);
 }
 
 public class UserValidationService : IUserValidationService
@@ -628,6 +629,22 @@ public class UserValidationService : IUserValidationService
 
         report.Success = true;
         report.Message = "Bio exists!";
+        return report;
+    }
+
+    public ValidationReport ValidateNumber(User user)
+    {
+        var report = new ValidationReport();
+        
+        if (user.PhoneNumber is not null)
+        {
+            report.Message = "User already has a registered number";
+            report.Success = false;
+            report.ErrorCode = ErrorCode.BadRequest;
+            return report;
+        }
+
+        report.Success = true;
         return report;
     }
 }

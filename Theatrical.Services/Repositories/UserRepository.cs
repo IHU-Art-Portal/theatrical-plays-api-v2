@@ -40,6 +40,8 @@ public interface IUserRepository
     Task SetBioPdfLocation(User user, string location);
     Task UnsetBio(User user);
     Task UpdateVerifiedPhoneNumber(User user, string number);
+    Task RegisterPhoneNumber(User user, string phoneNumber);
+    Task RemovePhoneNumber(User user);
 }
 
 public class UserRepository : IUserRepository
@@ -295,6 +297,19 @@ public class UserRepository : IUserRepository
     {
         user.PhoneNumber = number;
         user.PhoneNumberVerified = true;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RegisterPhoneNumber(User user, string phoneNumber)
+    {
+        user.PhoneNumber = phoneNumber;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemovePhoneNumber(User user)
+    {
+        user.PhoneNumber = null;
+        user.PhoneNumberVerified = false;
         await _context.SaveChangesAsync();
     }
 }

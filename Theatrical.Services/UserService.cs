@@ -41,6 +41,8 @@ public interface IUserService
     Task SetBio(User user, string location);
     Task UnsetBio(User user);
     Task UpdateVerifiedPhoneNumber(User user, string number);
+    Task RegisterPhoneNumber(User user, string phoneNumber);
+    Task RemovePhoneNumber(User user);
 }
 
 public class UserService : IUserService
@@ -423,6 +425,16 @@ public class UserService : IUserService
     public async Task UpdateVerifiedPhoneNumber(User user, string number)
     {
         await _repository.UpdateVerifiedPhoneNumber(user, number);
+    }
+
+    public async Task RegisterPhoneNumber(User user, string phoneNumber)
+    {
+        await _repository.RegisterPhoneNumber(user, phoneNumber);
+    }
+
+    public async Task RemovePhoneNumber(User user)
+    {
+        await _repository.RemovePhoneNumber(user);
     }
 
     private async Task<PersonDto?> GetClaimedPersonForUser(User user)

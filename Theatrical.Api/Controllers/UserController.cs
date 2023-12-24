@@ -154,10 +154,11 @@ public class UserController : ControllerBase
             return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError};
         }
     }
-    
-    [HttpPost("request-verification-phone-number")]
+
+    [HttpPost]
+    [Route("register/phoneNumber")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
-    public async Task<IActionResult> SendVerificationCode(string phoneNumber)
+    public async Task<IActionResult> RegisterMobilePhone([FromQuery] string phoneNumber)
     {
         try
         {
@@ -169,6 +170,81 @@ public class UserController : ControllerBase
             {
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var phoneValidated = _validation.ValidateNumber(user!);
+
+            if (!phoneValidated.Success)
+            {
+                return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest, phoneValidated.Message!));
+            }
+
+            await _service.RegisterPhoneNumber(user!, phoneNumber);
+            
+            return Ok(new ApiResponse("Successfully Registered your Number!"));
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
+        }
+    }
+
+    [HttpDelete]
+    [Route("remove/phoneNumber")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<IActionResult> RemovePhoneNumber()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            if (user!.PhoneNumber is null)
+            {
+                return new ObjectResult(new ApiResponse("You don't have a registered number!"));
+            }
+
+            await _service.RemovePhoneNumber(user);
+            var response = new ApiResponse("Successfully removed your number!");
+            return new OkObjectResult(response);
+        }
+        catch (Exception e)
+        {
+            var unexpectedResponse = new ApiResponse(ErrorCode.ServerError, e.Message);
+
+            return new ObjectResult(unexpectedResponse){StatusCode = (int)HttpStatusCode.InternalServerError}; 
+        }
+    }
+    
+    [HttpPost("request-verification-phone-number")]
+    [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
+    public async Task<IActionResult> SendVerificationCode()
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            
+            var (validation, user) = await _validation.ValidateUser(email!);
+
+            if (!validation.Success)
+            {
+                var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
+                return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            if (user!.PhoneNumber is null)
+            {
+                var notRegisteredResponse = new ApiResponse(ErrorCode.BadRequest,"You don't have a registered number to verify!");
+                return new BadRequestObjectResult(notRegisteredResponse);
             }
 
             if (user!.PhoneNumberVerified == true)
@@ -187,7 +263,7 @@ public class UserController : ControllerBase
             }
             
             //Use twilio to send verification code to user's phone number
-            var result = await _twilio.SendVerificationCode(phoneNumber);
+            var result = await _twilio.SendVerificationCode(user.PhoneNumber);
 
             if (!result.Success)
             {
@@ -210,7 +286,7 @@ public class UserController : ControllerBase
     
     [HttpPost("confirm-verification-phone-number")]
     [ServiceFilter(typeof(AnyRoleAuthorizationFilter))]
-    public async Task<IActionResult> CheckVerificationCode(string phoneNumber, string verificationCode)
+    public async Task<IActionResult> CheckVerificationCode(string verificationCode)
     {
         try
         {
@@ -223,8 +299,13 @@ public class UserController : ControllerBase
                 var errorResponse = new ApiResponse((ErrorCode)validation.ErrorCode!, validation.Message!);
                 return new ObjectResult(errorResponse) { StatusCode = (int)HttpStatusCode.NotFound };
             }
+
+            if (user!.PhoneNumber is null)
+            {
+                return new BadRequestObjectResult(new ApiResponse(ErrorCode.BadRequest,"You don't have a registered number to confirm!"));
+            }
             
-            var result = await _twilio.CheckVerificationCode(phoneNumber, verificationCode);
+            var result = await _twilio.CheckVerificationCode(user!.PhoneNumber!, verificationCode);
             
             if (!result.Success)
             {
@@ -232,7 +313,7 @@ public class UserController : ControllerBase
                 return new BadRequestObjectResult(errorResponse);
             }
 
-            await _service.UpdateVerifiedPhoneNumber(user!, phoneNumber);
+            await _service.UpdateVerifiedPhoneNumber(user, user.PhoneNumber!);
             
             var response = new ApiResponse($"Your number has been {result.Message!}!");
 
