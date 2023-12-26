@@ -16,7 +16,6 @@ namespace Theatrical.Services;
 public interface IUserService
 {
     Task<RegisterUserResponseDto> Register(RegisterUserDto registerUserDto, string verificationToken);
-    bool VerifyPassword(string hashedPassword, string providedPassword);
     JwtDto GenerateToken(User user);
     Task EnableAccount(User user);
     string GenerateOTP(User user);
@@ -100,17 +99,6 @@ public class UserService : IUserService
         };
 
         return userDtoRole;
-    }
-
-    /// <summary>
-    /// Verifies the hashed passwords.
-    /// </summary>
-    /// <param name="hashedPassword">The correct password.</param>
-    /// <param name="providedPassword">The provided password by the user who attempted to log in.</param>
-    /// <returns></returns>
-    public bool VerifyPassword(string hashedPassword, string providedPassword)
-    {
-        return BCrypt.Net.BCrypt.Verify(providedPassword, hashedPassword);
     }
 
     /// <summary>

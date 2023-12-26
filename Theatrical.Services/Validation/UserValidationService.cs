@@ -113,7 +113,8 @@ public class UserValidationService : IUserValidationService
             return (report, null);
         }
 
-        if (!_userService.VerifyPassword(user.Password!, loginUserDto.Password))
+        //The provided password by the user who attempted to log in, and, the correct hashed password.
+        if (!BCrypt.Net.BCrypt.Verify(loginUserDto.Password, user.Password!)) 
         {
             report.Message = "User with this combination not found";
             report.Success = false;
