@@ -9,7 +9,7 @@ public class EnumSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type == typeof(ConfirmationStatus))
+        if (context.Type.IsEnum)
         {
             schema.Type = "string";
             schema.Enum.Clear();

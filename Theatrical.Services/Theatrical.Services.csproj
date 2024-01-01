@@ -14,7 +14,6 @@
     <ItemGroup>
       <PackageReference Include="BCrypt.Net" Version="0.1.0" />
       <PackageReference Include="MailKit" Version="4.2.0" />
-      <PackageReference Include="MailKit.NET" Version="2.0.0" />
       <PackageReference Include="Minio" Version="6.0.0" />
       <PackageReference Include="Otp.NET" Version="1.3.0" />
       <PackageReference Include="Stripe.net" Version="43.6.0" />
