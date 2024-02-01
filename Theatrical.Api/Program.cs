@@ -149,7 +149,7 @@ builder.Services.AddTransient<ClaimsManagerAuthorizationFilter>();
 
 //Minio service
 builder.Services.AddTransient<IMinioService, MinioService>();
-builder.Services.AddMinio("3PKAzdLuyugb3rlAat8s", "yDDnd26PLVu0jmaTqpuFVGLYcpJH24v4fM7bcJ9B");
+builder.Services.AddMinio(config.GetValue<string>("MinioService:AccessKey"), config.GetValue<string>("MinioService:SecretKey"));
 
 //Assigned Users Services
 builder.Services.AddTransient<IAssignedUserRepository, AssignedUserRepository>();

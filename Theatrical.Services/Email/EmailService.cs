@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using Theatrical.Data.Models;
 
@@ -20,8 +21,14 @@ public interface IEmailService
 
 public class EmailService : IEmailService
 {
-    private readonly string _userEmail = "theatricalportalv2@gmail.com";
-    private readonly string _emailPassword = "lyhommmmlgekezed";
+    private readonly string _userEmail;
+    private readonly string _emailPassword;
+
+    public EmailService(IConfiguration configuration)
+    {
+        _userEmail = configuration.GetValue<string>("EmailService:Account");
+        _emailPassword = configuration.GetValue<string>("EmailService:Password");
+    }
     
     /// <summary>
     /// Sends a verification code to the registering user.
