@@ -178,30 +178,43 @@ public class PeopleController : ControllerBase
                 nullFullNamePeople.Add(person);
             }
 
-            var (alreadyExistingPeople, addingPeople) = await _validation.ValidateForCreateList(validPeople);
-
             var peopleUpdated = new List<Person>();
-            if (alreadyExistingPeople is not null && alreadyExistingPeople.Count > 0)
+            if (validPeople.Count > 0)
             {
-                peopleUpdated = await _service.UpdateList(alreadyExistingPeople, validPeople);
+                var (alreadyExistingPeople, addingPeople) = await _validation.ValidateForCreateList(validPeople);
+                if (alreadyExistingPeople is not null && alreadyExistingPeople.Count > 0)
+                {
+                    peopleUpdated = await _service.UpdateList(alreadyExistingPeople, validPeople);
+                }
+                
+                var peopleCreated = await _service.CreateList(addingPeople!);
+                var peopleCreatedShortenedDto = _service.ToDtoRange(peopleCreated);
+                var peopleUpdatedShortenedDto = _service.ToDtoRange(peopleUpdated);
+                
+                var statusReport = new CreatePeopleStatusReport
+                {
+                    AddedPeople = addingPeople!.Count,
+                    AlreadyExistingButUpdatedPeople = alreadyExistingPeople?.Count ?? 0,
+                    NullNameNotAddedPeople = nullFullNamePeople.Count,
+                    PeopleUpdated = peopleUpdatedShortenedDto,
+                    PeopleCreated = peopleCreatedShortenedDto
+                };
+                
+                var apiResponse = new ApiResponse<CreatePeopleStatusReport>(statusReport);
+                return new OkObjectResult(apiResponse);
             }
             
-            var peopleCreated = await _service.CreateList(addingPeople!);
-            var peopleCreatedShortenedDto = _service.ToDtoRange(peopleCreated);
-            var peopleUpdatedShortenedDto = _service.ToDtoRange(peopleUpdated);
-
-            var statusReport = new CreatePeopleStatusReport
+            var statusReport1 = new CreatePeopleStatusReport
             {
-                AddedPeople = addingPeople!.Count - nullFullNamePeople.Count,
-                AlreadyExistingButUpdatedPeople = alreadyExistingPeople?.Count ?? 0,
+                AddedPeople = 0,
+                AlreadyExistingButUpdatedPeople = 0,
                 NullNameNotAddedPeople = nullFullNamePeople.Count,
-                PeopleUpdated = peopleUpdatedShortenedDto,
-                PeopleCreated = peopleCreatedShortenedDto
+                PeopleUpdated = null,
+                PeopleCreated = null
             };
-
-            var apiResponse = new ApiResponse<CreatePeopleStatusReport>(statusReport);
-
-            return new OkObjectResult(apiResponse);
+                
+            var apiResponse1 = new ApiResponse<CreatePeopleStatusReport>(statusReport1);
+            return new OkObjectResult(apiResponse1);
         }
         catch (Exception e)
         {
