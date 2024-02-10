@@ -61,7 +61,7 @@ public class PersonRepository : IPersonRepository
     
     public async Task<Person?> Get(int id)
     {
-        var person = await _caching.GetOrSetAsync($"person_{id}", async () => await _context.Persons.FindAsync(id));
+        var person = await _caching.GetOrSetAsync($"person_{id}", async () => await _context.Persons.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == id));
             
         return person;
     }
