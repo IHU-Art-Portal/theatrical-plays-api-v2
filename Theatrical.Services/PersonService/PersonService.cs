@@ -25,6 +25,7 @@ public interface IPersonService
     Task<List<Person>> CreateList(List<CreatePersonDto> addingPeople);
     Task<List<Person>> UpdateList(List<Person> alreadyExistingPeople, List<CreatePersonDto> createPersonDto);
     List<PersonDtoShortened> ToDtoRange(List<Person> alreadyExistingPeople);
+    Task<List<PersonDto>> MapContributionRolesToPerson();
 }
 
 public class PersonService : IPersonService
@@ -317,6 +318,18 @@ public class PersonService : IPersonService
         {
             Id = dto.Id,
             Fullname = dto.Fullname
+        }).ToList();
+    }
+
+    public async Task<List<PersonDto>> MapContributionRolesToPerson()
+    {
+        var persons = await _repository.MapContributionRoleToPerson();
+
+        return persons.Select(dto => new PersonDto
+        {
+            Id = dto.Id,
+            Fullname = dto.Fullname,
+            Roles = dto.Roles
         }).ToList();
     }
 }

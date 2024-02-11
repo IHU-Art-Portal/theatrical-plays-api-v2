@@ -436,4 +436,24 @@ public class PeopleController : ControllerBase
         return NoContent();
     }
 
+    /*/// <summary>
+    /// Caution, long running operation.
+    /// This Method takes every contribution and maps the role to the new person column for roles.
+    /// For each person's Contribution.Role => it maps the role to Person.Roles
+    /// </summary>
+    /// <param name="DontRun_LongOperation"></param>
+    /// <param name="DebuggingPurposesOnly"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("MapContributionPersonRolesToPersonRoles")]
+    [TypeFilter(typeof(AdminAuthorizationFilter))]
+    public async Task<IActionResult> MapContrToPersonRoles([FromQuery] string? DontRun_LongOperation, string? DebuggingPurposesOnly)
+    {
+        var personsUpdated = await _service.MapContributionRolesToPerson();
+
+        var apiResponse = new ApiResponse<List<PersonDto>>(personsUpdated);
+        
+        return new OkObjectResult(apiResponse);
+    }*/
+
 }

@@ -28,6 +28,7 @@ public interface IPersonRepository
     Task<List<Person>?> GetByNameRange(List<CreatePersonDto> persons);
     Task<List<Person>> CreateRange(List<Person> finalPeopleToAdd);
     Task SaveListChanges();
+    Task<List<Person>> MapContributionRoleToPerson();
 }
 
 public class PersonRepository : IPersonRepository
@@ -102,6 +103,7 @@ public class PersonRepository : IPersonRepository
         var people = await _caching.GetOrSetAsync($"persons_with_role_{role}", async () =>
         {
             return await _context.Persons
+                .Include(p => p.Images)
                 .Where(p => p.Contributions.Any(c => c.Role.Role1 == role))
                 .ToListAsync();
         });
@@ -109,11 +111,58 @@ public class PersonRepository : IPersonRepository
         return people;
     }
 
+    public async Task<List<Person>> MapContributionRoleToPerson()
+    {
+        var contributionsWithRoles = await _context.Contributions
+            .Include(c => c.Role)
+            .ToListAsync();
+
+        var peopleUpdated = new List<Person>();
+        var fetchedPerson = new Dictionary<int, Person>();
+
+        foreach (var contribution in contributionsWithRoles)
+        {
+            if (!fetchedPerson.TryGetValue(contribution.PersonId, out var person))
+            {
+                person = await _context.Persons.FindAsync(contribution.PersonId);
+                
+                fetchedPerson.Add(person.Id, person);
+            }
+                
+            Console.WriteLine($"Person parsed: {person.Id}");
+
+            if (person.Roles == null)
+            {
+                person.Roles = new List<string> { contribution.Role.Role1 };
+                Console.WriteLine($"Created list role: {person.Id}, with first role: {contribution.Role.Id}");
+                if (!peopleUpdated.Contains(person))
+                {
+                    peopleUpdated.Add(person);
+                }
+                continue;
+            }
+                
+            if (!person.Roles.Contains(contribution.Role.Role1))
+            {
+                person.Roles.Add(contribution.Role.Role1);
+                if (!peopleUpdated.Contains(person))
+                {
+                    peopleUpdated.Add(person);
+                }
+                Console.WriteLine($"Added new role for: {person.Id}");
+            }
+        }
+        
+        Console.WriteLine($"{peopleUpdated.Count} people had roles added.");
+        await _context.SaveChangesAsync();
+        return peopleUpdated;
+    }
+
     public async Task<List<Person>?> GetByLetter(string initials)
     {
         var people = await _caching.GetOrSetAsync($"persons_by_initials_{initials}", async () =>
         {
-            return await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).ToListAsync();
+            return await _context.Persons.Where(p => p.Fullname.StartsWith(initials)).Include(p => p.Images).ToListAsync();
         });
         
         return people;
