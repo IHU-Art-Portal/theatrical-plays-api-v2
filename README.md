@@ -58,8 +58,7 @@ For example `Theatrical.Api` has references to all three other project, as it wi
     <li><b>/api/people/initials/letters</b> functionality changed to return results based on the provided initials,
 instead of one provided letter.</li>
 </ul>
-<I>New changes will be listed here.</I><br>
-<I>This text will be removed when everything is implemented and working.</I>
+<I>New functions added</I><br>
 
 # 🙋‍♂️ User
 
@@ -68,15 +67,38 @@ The `UserController` is responsible for managing requests like registration, log
 
 ## 📚 Methods
 
-| Method   | Endpoint                     |
-|----------|------------------------------|
-| **POST** | `/api/user`                  |
-| **GET**  | `/api/user/verify`           |
-| **POST** | `/api/user/login`            |
-| **GET**  | `/api/user/{id}/balance`     |
-| **POST** | `/api/user/enabled2fa`       |
-| **POST** | `/api/user/disabled2fa`      |
-| **POST** | `/api/user/login/2fa/{code}` |
+| Method                                           | Endpoint                                      |
+|--------------------------------------------------|-----------------------------------------------|
+| <span style="color:green">**POST**</span>        | `/api/register`                               |
+| <span style="color:green">**POST**</span>        | `/api/user/login`                             |
+| <span style="color:green">**POST**</span>        | `/api/user/register/phoneNumber`              |
+| <span style="color:crimson">**DELETE**</span>    | `/api/user/remove/phoneNumber`                |
+| <span style="color:green">**POST**</span>        | `/api/user/request-verification-phone-number` |
+| <span style="color:green">**POST**</span>        | `/api/user/confirm-verification-phone-number` |
+| <span style="color:#24D3E1">**GET**</span>       | `/api/user/verify-email`                      |
+| <span style="color:green">**POST**</span>        | `/api/user/enable2fa`                         |
+| <span style="color:green">**POST**</span>        | `/api/user/disabled2fa`                       |
+| <span style="color:green">**POST**</span>        | `/api/user/login/2fa/{code}`                  |
+| <span style="color:#24D3E1">**GET**</span>       | `/api/user/{id}/balance`                      |
+| <span style="color:green">**POST**</span>        | `/api/user/info`                              |
+| <span style="color:green">**POST**</span>        | `/api/user/refresh-token`                     |
+| <span style="color:crimson">**DELETE**</span>    | `/api/user/@/facebook`                        |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/@/facebook`                        |
+| <span style="color:crimson">**DELETE**</span>    | `/api/user/@/youtube`                         |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/@/youtube`                         |
+| <span style="color:crimson">**DELETE**</span>    | `/api/user/@/instagram`                       |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/@/instagram`                       |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/update/username/{username}`        |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/update/password`                   |
+| <span style="color:green">**POST**</span>        | `/api/user/ForgotPassword`                    |
+| <span style="color:green">**POST**</span>        | `/api/user/UploadPhoto`                       |
+| <span style="color:green">**POST**</span>        | `/api/user/add-artist-role`                   |
+| <span style="color:green">**POST**</span>        | `/api/user/remove-artist-role`                |
+| <span style="color:green">**POST**</span>        | `/api/user/set/profile-photo`                 |
+| <span style="color:yellow">**PUT** </span>       | `/api/user/unset/profile-photo/{imageId}`     |
+| <span style="color:crimson">**DELETE**</span>    | `/api/user/remove/image/{imageId}`            |
+| <span style="color:green">**POST**</span>        | `/api/user/upload/Bio`                        |
+| <span style="color:green">**POST**</span>        | `/api/user/unset/bio`                         |
 
 ### 🌟 Register
 
@@ -226,16 +248,18 @@ The `PeopleController` manages all the requests regarding a person. 👤
 
 ## 📚 Methods
 
-| Method     | Endpoint                         |
-|------------|----------------------------------|
-| **GET**    | `/api/people`                    |
-| **GET**    | `/api/people/{id}`               |
-| **DELETE** | `/api/people/{id}`               |
-| **GET**    | `/api/people/{id}/photos`        |
-| **GET**    | `/api/people/{id}/productions`   |
-| **POST**   | `/api/people`                    |
-| **GET**    | `/api/people/initials/{letters}` |
-| **GET**    | `/api/people/role/{role}`        |
+| Method                                        | Endpoint                         |
+|-----------------------------------------------|----------------------------------|
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/{id}`               |
+| <span style="color:crimson">**DELETE**</span> | `/api/people/{id}`               |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people`                    |
+| <span style="color:green">**POST**</span>     | `/api/people`                    |
+| <span style="color:green">**POST**</span>     | `/api/people/addrange`           |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/role/{role}`        |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/initials/{letters}` |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/{id}/productions`   |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/{id}/photos`        |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/people/photos`             |
 
 ---
 
@@ -429,9 +453,9 @@ The `LogsController` is responsible for managing requests related to logs.
 
 ## 📚 Methods
 
-| Method  | Endpoint                               |
-|---------|----------------------------------------|
-| **GET** | `/api/logs`                            |
+| Method                                      | Endpoint                               |
+|---------------------------------------------|----------------------------------------|
+| <span style="color:#24D3E1">**GET**</span>  | `/api/logs`                            |
 
 ### 🔍 Get Logs
 
@@ -458,10 +482,17 @@ The `EventsController` is responsible for managing requests related to events.
 
 ## 📚 Methods
 
-| Method   | Endpoint           |
-|----------|--------------------|
-| **GET**  | `/api/events`      |
-| **POST** | `/api/events`      |
+| Method                                       | Endpoint                       |
+|----------------------------------------------|--------------------------------|
+| <span style="color:#24D3E1">**GET**</span>   | `/api/events`                  |
+| <span style="color:green">**POST**</span>    | `/api/events`                  |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/events/{id}`             |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/events/person/{id}`      |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/events/production/{id}`  |
+| <span style="color:green">**POST**</span>    | `/api/events/range`            |
+| <span style="color:yellow">**PUT** </span>   | `/api/events/update/price`     |
+| <span style="color:green">**POST**</span>    | `/api/events/claim-event/{id}` |
+| <span style="color:yellow">**PUT** </span>   | `/api/events/update`           |
 
 ---
 
@@ -511,11 +542,15 @@ The `VenuesController` is responsible for managing requests related to venues.
 
 ## Methods
 
-| Method    | Endpoint            |
-|-----------|---------------------|
-| **GET**   | `/api/venues`       |
-| **GET**   | `/api/venues/{id}`  |
-| **POST**  | `/api/venues/`      |
+| Method                                       | Endpoint                            |
+|----------------------------------------------|-------------------------------------|
+| <span style="color:#24D3E1">**GET**</span>   | `/api/venues`                       |
+| <span style="color:green">**POST**</span>    | `/api/venues`                       |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/venues/{id}`                  |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/venues/{venueid}/productions` |
+| <span style="color:green">**POST**</span>    | `/api/venues/range`                 |
+| <span style="color:green">**POST**</span>    | `/api/venues/claim-venue/{id}`      |
+| <span style="color:yellow">**PUT** </span>   | `/api/venues/update`                |
 
 ### 📜 Get Venues
 
@@ -581,11 +616,11 @@ Requires admin authorization. 👑
 
 ## Methods
 
-| Method   | Endpoint                      |
-|----------|-------------------------------|
-| **POST** | `/api/transactions`           |
-| **GET**  | `/api/transactions/{id}`      |
-| **GET**  | `/api/transactions/user/{id}` |
+| Method                                      | Endpoint                                                                                                                        |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| <span style="color:#24D3E1">**GET**</span>  | `/api/transactions`                                                                                                             |
+| <span style="color:#24D3E1">**GET**</span>  | `/api/transactions/user/{id}`                                                                                                   |
+| <span style="color:#24D3E1">**GET**</span>  | `/api/transactions/pay-verified-emails-not-paid` (debugging method used before the verification rewards function was complete.) |
 
 ### 📤 Post Transaction
 
@@ -650,10 +685,11 @@ Requires admin authorization. 👑
 
 ## Methods
 
-| Method   | Endpoint               |
-|----------|------------------------|
-| **POST** | `/api/roles/{role}`    |
-| **GET**  | `/api/roles`           |
+| Method                                      | Endpoint            |
+|---------------------------------------------|---------------------|
+| <span style="color:green">**POST**</span>   | `/api/roles/{role}` |
+| <span style="color:#24D3E1">**GET**</span>  | `/api/roles`        |
+| <span style="color:green">**POST**</span>   | `/api/roles/range`  |
 
 
 ### ➕ Create Role
@@ -706,10 +742,12 @@ The `ProductionsController` is responsible for managing requests related to prod
 
 ## 📚 Methods
 
-| Method   | Endpoint               |
-|----------|------------------------|
-| **POST** | `/api/productions`     |
-| **GET**  | `/api/productions`     |
+| Method                                       | Endpoint                 |
+|----------------------------------------------|--------------------------|
+| <span style="color:green">**POST**</span>    | `/api/productions`       |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/productions`       |
+| <span style="color:green">**POST**</span>    | `/api/productions/range` |
+| <span style="color:#24D3E1">**GET**</span>   | `/api/productions/{id}`  |
 
 ### 🌟 Create Production
 
@@ -762,10 +800,11 @@ The `OrganizersController` is responsible for managing requests related to organ
 
 ## 📌 Methods 🛠️
 
-| Method   | Endpoint              |
-|----------|-----------------------|
-| **POST** | `/api/organizers`     |
-| **GET**  | `/api/organizers`     |
+| Method                                      | Endpoint                |
+|---------------------------------------------|-------------------------|
+| <span style="color:green">**POST**</span>   | `/api/organizers`       |
+| <span style="color:#24D3E1">**GET**</span>  | `/api/organizers`       |
+| <span style="color:green">**POST**</span>   | `/api/organizers/range` |
 
 ### 🔹 Create Organizer ➕
 
@@ -816,10 +855,11 @@ The `ContributionsController` is responsible for managing requests related to co
 
 ## 📌 Methods 🛠️
 
-| Method   | Endpoint                 |
-|----------|--------------------------|
-| **GET**  | `/api/contributions`     |
-| **POST** | `/api/contributions`     |
+| Method                                       | Endpoint                   |
+|----------------------------------------------|----------------------------|
+| <span style="color:#24D3E1">**GET**</span>   | `/api/contributions`       |
+| <span style="color:green">**POST**</span>    | `/api/contributions`       |
+| <span style="color:green">**POST**</span>    | `/api/contributions/range` |
 
 
 ### 📜 Get Contributions
@@ -864,3 +904,15 @@ Requires admin authorization. 👑
 - If validation fails, returns an `ApiResponse` with an appropriate error message. ❌🚫📋
 
 ---
+# 📜 Account Requests 
+
+The `AccountRequestsController` is responsible for managing requests related to user's requests.
+
+## 📌 Methods 🛠️
+
+| Method                                        | Endpoint                                   |
+|-----------------------------------------------|--------------------------------------------|
+| <span style="color:#24D3E1">**GET**</span>    | `/api/AccountRequests/ClaimsManagers`      |
+| <span style="color:green">**POST**</span>     | `/api/AccountRequests/RequestAccount`      |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/AccountRequests/Approve/{requestId}` |
+| <span style="color:#24D3E1">**GET**</span>    | `/api/AccountRequests/Reject/{requestId}`  |
