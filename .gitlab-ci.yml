@@ -7,38 +7,35 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "shceduled"
     - if: $CI_COMMIT_TAG != null
 
+default:
+  image: mcr.microsoft.com/dotnet/sdk:6.0
+
 variables:
   BUILD_DIR: build
   DEPENDENCIES_DIR: dependencies
   IMAGE_BASE_NAME: "theatrical-plays-api-v2"
   IMAGE_PLATFORMS: "linux/amd64,linux/arm64"
 
-dotnet-restore:
-  stage: prerequisites
-  script:
-    - dotnet restore --use-lock-file --package ${DEPENDENCIES_DIR}
-  cache: &dependencies_cache
-    key:
-      files:
-        - Theatrical.Api/packages.lock.json
-        - Theatrical.Data/packages.lock.json
-        - Theatrical.Dto/packages.lock.json
-        - Theatrical.Services/packages.lock.json
-    paths: [$DEPENDENCIES_DI]
-    policy: pull-push
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+# dotnet-restore:
+#   stage: prerequisites
+#   script:
+#     - dotnet restore --use-lock-file --packages ${DEPENDENCIES_DIR}
+#   cache: &dependencies_cache
+#     key: "[Dependencies]: $CI_COMMIT_REF_SLUG"
+#     paths: [$DEPENDENCIES_DIR]
+#     policy: pull-push
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 dotnet-compile:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:6.0
-  cache: 
-    - <<: *dependencies_cache
-      policy: pull
+  # cache: 
+  #   - <<: *dependencies_cache
+  #     policy: pull
   script:
-    - dotnet ${BUILD_COMMAND:-build} --no-restore -o ${BUILD_DIR}
-  needs: [dotnet-restore]
+    - dotnet ${BUILD_COMMAND:-build} -o ${BUILD_DIR} #--no-restore
+  #needs: [dotnet-restore]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG != null
@@ -47,13 +44,12 @@ dotnet-compile:
 
 dotnet-test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:6.0
-  cache: 
-    - <<: *dependencies_cache
-      policy: pull
+  # cache: 
+  #   - <<: *dependencies_cache
+  #     policy: pull
   script:
-    - dotnet test --no-restore -o ${BUILD_DIR}
-  needs: [dotnet-restore]
+    - dotnet test -o ${BUILD_DIR} #--no-restore
+  #needs: [dotnet-restore]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -65,10 +61,10 @@ docker-build:
     - name: docker:25.0.3-dind-alpine3.19
       alias: docker
   script:
-    - docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
     - docker buildx create --platform ${IMAGE_PLATFORMS} --name ci-build --use
     - docker buildx build -f ${DOCKERFILE_DIR:-.}/${DOCKERFILE:-Dockerfile} --push --platform ${IMAGE_PLATFORMS} -t ${TAG} -t latest ${DOCKERFILE_DIR:-.}
-  needs: [dotnet-publish]
+  needs: [dotnet-compile]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables: 
@@ -76,3 +72,4 @@ docker-build:
     - if: $CI_COMMIT_TAG != null
       variables: 
         TAG: "$CI_COMMIT_TAG"
+
